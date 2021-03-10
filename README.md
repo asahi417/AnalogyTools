@@ -1,2 +1,4 @@
 # Analogy Dataset
-SAT-style analogy datasets.
+Analogy dataset.
+
+
