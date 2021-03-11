@@ -104,7 +104,7 @@ def get_pairs_context(dict_pairvocab: Dict,
 
     logging.info("filtering corpus by frequency")
     context_word_dict = {}
-    bar = tqdm(CORPUS_LINE_LEN)
+    bar = tqdm(total=CORPUS_LINE_LEN)
     with open(PATH_CORPUS, 'r', encoding='utf-8') as corpus_file:
         for sentence in corpus_file:
             bar.update()
