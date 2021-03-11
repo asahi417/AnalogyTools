@@ -37,7 +37,7 @@ def get_pair_relative():
     path = './cache/relative_vocab.pkl'
     if not os.path.exists(path):
         url = 'https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/relative_vocab.tar.gz'
-        path = open_compressed_file(url=url, cache_dir='./cache')
+        open_compressed_file(url=url, cache_dir='./cache')
     with open(path, "rb") as fp:
         return pickle.load(fp)
 
