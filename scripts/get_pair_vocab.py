@@ -4,7 +4,7 @@ https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/relative_voca
 import pickle
 
 from gensim.models import KeyedVectors
-from util import wget
+from scripts.util import wget
 
 if __name__ == '__main__':
     _url = 'https://drive.google.com/u/0/uc?id=1HVJnTjcaQ3aCLdwTZwiGLpMDyEylx-zS&export=download'
