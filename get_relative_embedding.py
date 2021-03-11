@@ -68,7 +68,7 @@ def get_pair_analogy():
 def get_word_from_corpus(minimum_frequency: int, word_vocabulary_size: int = None):
     """ Get word distribution over corpus """
     dict_freq = {}
-    bar = tqdm(CORPUS_LINE_LEN)
+    bar = tqdm(total=CORPUS_LINE_LEN)
     with open(PATH_CORPUS, 'r', encoding='utf-8') as corpus_file:
         for _line in corpus_file:
             bar.update()
