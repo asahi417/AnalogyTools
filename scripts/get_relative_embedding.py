@@ -9,7 +9,7 @@ from typing import Dict
 
 from gensim.models import fasttext
 
-from scripts.util import open_compressed_file
+from util import open_compressed_file
 
 
 # Anchor word embedding model
