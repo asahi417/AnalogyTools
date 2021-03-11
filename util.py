@@ -6,7 +6,7 @@ import os
 
 import gdown
 
-__all__ = ('open_compressed_file', 'wget', 'load_pickle')
+__all__ = ('open_compressed_file', 'wget')
 
 
 def open_compressed_file(url, cache_dir, gdrive: bool = False):
