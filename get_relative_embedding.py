@@ -70,8 +70,8 @@ def get_word_from_corpus(minimum_frequency: int, word_vocabulary_size: int = Non
     dict_freq = {}
     bar = tqdm(CORPUS_LINE_LEN)
     with open(PATH_CORPUS, 'r', encoding='utf-8') as corpus_file:
-        bar.update()
         for _line in corpus_file:
+            bar.update()
             l_split = _line.strip().split(" ")
             for token in l_split:
                 if token in STOPWORD_LIST or "__" in token or token.isdigit():
