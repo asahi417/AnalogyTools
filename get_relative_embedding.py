@@ -57,7 +57,7 @@ def get_pair_analogy():
 
     for name, url in data.items():
         open_compressed_file(url=url, cache_dir='./cache')
-        with open('./cache/{}/train.jsonl'.format(name), 'r') as f_:
+        with open('./cache/{}/valid.jsonl'.format(name), 'r') as f_:
             pairs = list(chain(*[extract_pairs(i) for i in f_.read().split('\n') if len(i) > 0]))
         with open('./cache/{}/test.jsonl'.format(name), 'r') as f_:
             pairs += list(chain(*[extract_pairs(i) for i in f_.read().split('\n') if len(i) > 0]))
