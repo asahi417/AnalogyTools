@@ -6,7 +6,7 @@ import pickle
 import argparse
 from itertools import chain, groupby
 from typing import Dict
-
+from tqdm import tqdm
 from gensim.models import fasttext
 
 from util import open_compressed_file
@@ -23,6 +23,7 @@ if not os.path.exists(PATH_WORD_EMBEDDING):
 # Corpus
 URL_CORPUS = 'https://drive.google.com/u/0/uc?id=17EBy4GD4tXl9G4NTjuIuG5ET7wfG4-xa&export=download'
 PATH_CORPUS = './cache/wikipedia_en_preprocessed.txt'
+CORPUS_LINE_LEN = 104000000
 if not os.path.exists(PATH_CORPUS):
     logging.info('downloading wikidump')
     open_compressed_file(url=URL_CORPUS, cache_dir='./cache', filename='wikipedia_en_preprocessed.zip', gdrive=True)
@@ -67,7 +68,9 @@ def get_pair_analogy():
 def get_word_from_corpus(minimum_frequency: int, word_vocabulary_size: int = None):
     """ Get word distribution over corpus """
     dict_freq = {}
+    bar = tqdm(CORPUS_LINE_LEN)
     with open(PATH_CORPUS, 'r', encoding='utf-8') as corpus_file:
+        bar.update()
         for _line in corpus_file:
             l_split = _line.strip().split(" ")
             for token in l_split:
@@ -99,9 +102,12 @@ def get_pairs_context(dict_pairvocab: Dict,
     logging.info("loading word frequency dictionary")
     vocab = get_word_from_corpus(minimum_frequency=minimum_frequency)
 
+    logging.info("filtering corpus by frequency")
     context_word_dict = {}
+    bar = tqdm(CORPUS_LINE_LEN)
     with open(PATH_CORPUS, 'r', encoding='utf-8') as corpus_file:
         for sentence in corpus_file:
+            bar.update()
             tokens = sentence.strip().split(" ")
             for i, token_i in enumerate(tokens):
                 if token_i not in dict_pairvocab.keys():
