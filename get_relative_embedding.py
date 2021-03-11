@@ -25,7 +25,7 @@ URL_CORPUS = 'https://drive.google.com/u/0/uc?id=17EBy4GD4tXl9G4NTjuIuG5ET7wfG4-
 PATH_CORPUS = './cache/wikipedia_en_preprocessed.txt'
 if not os.path.exists(PATH_CORPUS):
     logging.info('downloading wikidump')
-    open_compressed_file(url=URL_CORPUS, cache_dir='./cache', gdrive=True)
+    open_compressed_file(url=URL_CORPUS, cache_dir='./cache', filename='wikipedia_en_preprocessed.zip', gdrive=True)
 
 # Stopwords
 with open('./stopwords_en.txt', 'r') as f:
