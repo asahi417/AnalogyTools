@@ -17,12 +17,14 @@ logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', level=logg
 URL_WORD_EMBEDDING = 'https://dl.fbaipublicfiles.com/fasttext/vectors-english/crawl-300d-2M-subword.zip'
 PATH_WORD_EMBEDDING = './cache/crawl-300d-2M-subword.bin'
 if not os.path.exists(PATH_WORD_EMBEDDING):
+    logging.info('downloading fasttext model')
     open_compressed_file(url=URL_WORD_EMBEDDING, cache_dir='./cache')
 
 # Corpus
 URL_CORPUS = 'https://drive.google.com/u/0/uc?id=17EBy4GD4tXl9G4NTjuIuG5ET7wfG4-xa&export=download'
 PATH_CORPUS = './cache/wikipedia_en_preprocessed.txt'
 if not os.path.exists(PATH_CORPUS):
+    logging.info('downloading wikidump')
     open_compressed_file(url=URL_CORPUS, cache_dir='./cache', gdrive=True)
 
 # Stopwords
@@ -54,10 +56,10 @@ def get_pair_analogy():
         return [[a.lower() for a in _json['stem']]] + [[a.lower(), b.lower()] for a, b in _json['choice']]
 
     for name, url in data.items():
-        path_sat = open_compressed_file(url=url, cache_dir='./cache')
-        with open('{}/train.jsonl'.format(path_sat), 'r') as f_:
+        open_compressed_file(url=url, cache_dir='./cache')
+        with open('./cache/train.jsonl', 'r') as f_:
             pairs = list(chain(*[extract_pairs(i) for i in f_.read().split('\n') if len(i) > 0]))
-        with open('{}/test.jsonl'.format(path_sat), 'r') as f_:
+        with open('./cache/test.jsonl', 'r') as f_:
             pairs += list(chain(*[extract_pairs(i) for i in f_.read().split('\n') if len(i) > 0]))
     return pairs
 
@@ -134,7 +136,6 @@ def get_relative_init(output_path: str,
     logging.info("loading embeddings")
     word_embedding_model = fasttext.load_facebook_model(PATH_WORD_EMBEDDING)
 
-    cont_lines = 0
     with open(output_path, 'w', encoding='utf-8') as txt_file:
         for token_i, tokens_paired in context_word_dict.items():
             for token_j in tokens_paired:
@@ -151,7 +152,6 @@ def get_relative_init(output_path: str,
                     vector_pair = vector_pair/cont_pair
                     txt_file.write(','.join([token_i, token_j] + list(map(str, vector_pair.tolist()))))                    
                     txt_file.write("\n")
-                    cont_lines += 1                    
     logging.info("new embeddings are available at {}".format(output_path))
 
 
