@@ -120,7 +120,7 @@ def frequency_filtering(vocab, dict_pairvocab, window_size, context_type: str = 
         if len(context_i_) == 0:
             return {}
         print('ccc', tokens[i], context_i_)
-        return dict([(k, list(g)) for k, g in groupby(context_i_, key=lambda x: x[0])])
+        return dict([(k, list(g)[0][1]) for k, g in groupby(context_i_, key=lambda x: x[0])])
 
     def get_frequency(_list):
         """ return dictionary with its occurrence """
