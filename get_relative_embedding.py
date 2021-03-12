@@ -100,7 +100,14 @@ def get_pairs_context(dict_pairvocab: Dict,
                       minimum_frequency: int):
     """ Get context word for each pair over the corpus """
     logging.info("loading word frequency dictionary")
-    vocab = get_word_from_corpus(minimum_frequency=minimum_frequency)
+    path = './cache/vocab.pkl'
+    if os.path.exists(path):
+        with open(path, 'rb') as fb:
+            vocab = pickle.load(fb)
+    else:
+        vocab = get_word_from_corpus(minimum_frequency=minimum_frequency)
+        with open(path, 'wb') as fb:
+            pickle.dump(vocab, fb)
 
     logging.info("filtering corpus by frequency")
     context_word_dict = {}
