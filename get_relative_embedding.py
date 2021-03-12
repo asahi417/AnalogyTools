@@ -110,11 +110,11 @@ def frequency_filtering(vocab, dict_pairvocab, window_size):
         context_i_ = [(k_, v_) for k_, v_ in context_i_ if len(v_) > 1]
         if len(context_i_) == 0:
             return {}
-        return dict([(k, list(g)[0][1]) for k, g in groupby(context_i_, key=lambda x: x[0])])
+        return dict([(k_, list(g)[0][1]) for k_, g in groupby(context_i_, key=lambda x: x[0])])
 
     def get_frequency(_list):
         """ return dictionary with its occurrence """
-        return dict([(k, len(list(i))) for k, i in groupby(_list) if k in vocab])
+        return dict([(k_, len(list(i))) for k_, i in groupby(_list) if k in vocab])
 
     context_word_dict = {}
     logging.info('start computing context word')
@@ -142,8 +142,6 @@ def frequency_filtering(vocab, dict_pairvocab, window_size):
                         except KeyError:
                             context_word_dict[token_i_][k] = v
 
-            # print(context_word_dict)
-            # input()
     logging.info('aggregating to get frequency')
     context_word_dict = {k: {k_: get_frequency(v_) for k_, v_ in v.items()} for k, v in context_word_dict.items()}
 
