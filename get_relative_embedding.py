@@ -96,23 +96,16 @@ def get_word_from_corpus(minimum_frequency: int, word_vocabulary_size: int = Non
     return list(dict_freq.keys())
 
 
-def frequency_filtering(vocab, dict_pairvocab, window_size, context_type: str = 'center'):
-    assert context_type in ['center', 'right', 'left'], context_type
+def frequency_filtering(vocab, dict_pairvocab, window_size):
 
     def get_context_pair(tokens_, i, j):
         """ get tokens in between (i, j) in `tokens_` following the method defined by `context_type` """
-
-        if context_type == 'center':
-            return tokens_[i + 1:j]
-        elif context_type == 'left':
-            return tokens_[max(i - window_size, 0):i]
-        else:
-            return tokens_[j + 1:min(j + 1 + window_size, len(tokens_))]
+        return tokens_[i + 1:j]
 
     def get_context(i, tokens):
         """ get context with token `i` in `tokens`, returns list of tuple (token_j, [w_1, ...])"""
-        context_i_ = [(tokens[j], get_context_pair(tokens, i, j)) for j in
-                      range(i + 1, min(i + 2 + window_size, len(tokens))) if tokens[j] in dict_pairvocab[tokens[i]]]
+        context_i_ = [(tokens[j], tokens[i + 1:j]) for j in
+                      range(i + 3, min(i + 1 + window_size, len(tokens))) if tokens[j] in dict_pairvocab[tokens[i]]]
         if len(context_i_) == 0:
             return {}
         print('ccc', tokens[i], context_i_)
