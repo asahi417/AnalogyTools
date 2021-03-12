@@ -111,8 +111,8 @@ def frequency_filtering(vocab, dict_pairvocab, window_size):
         return dict([(k, len(list(i))) for k, i in groupby(_list) if k in vocab])
 
     def safe_query(_dict, _key):
-        if _key in _dict:
-            return _dict[_key]
+        if _key in _dict.keys():
+            return list(filter(lambda x: len(x) > 1, _dict[_key]))
         else:
             return []
 
