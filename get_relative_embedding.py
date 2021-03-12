@@ -113,6 +113,8 @@ def frequency_filtering(vocab, dict_pairvocab, window_size, context_type: str = 
     def get_context(i, tokens):
         """ get context with token `i` in `tokens`, returns list of tuple (token_j, [w_1, ...])"""
         token_i = tokens[i]
+        print(token_i, i)
+        input()
         tokens_context = tokens[i + 1: min(i + 1 + window_size, len(tokens))]
         context_i_ = [(token_j, get_context_pair(tokens_context, i, j)) for j, token_j in enumerate(tokens_context)
                       if token_j in dict_pairvocab[token_i]]
