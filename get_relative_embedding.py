@@ -103,21 +103,16 @@ def frequency_filtering(vocab, dict_pairvocab, window_size, context_type: str = 
         """ get tokens in between (i, j) in `tokens_` following the method defined by `context_type` """
 
         if context_type == 'center':
-            tokens_c = tokens_[i + 1:j]
-            print(tokens_[i], tokens_[j], tokens_c)
+            return tokens_[i + 1:j]
         elif context_type == 'left':
-            tokens_c = tokens_[max(i - window_size, 0):i]
+            return tokens_[max(i - window_size, 0):i]
         else:
-            assert j is not None
-            tokens_c = tokens_[j + 1:min(j + 1 + window_size, len(tokens_))]
-        return None if len(tokens_c) == 0 else tokens_c
-        # return list(filter(lambda x: x in vocab, tokens_c))
+            return tokens_[j + 1:min(j + 1 + window_size, len(tokens_))]
 
     def get_context(i, tokens):
         """ get context with token `i` in `tokens`, returns list of tuple (token_j, [w_1, ...])"""
         context_i_ = [(tokens[j], get_context_pair(tokens, i, j)) for j in
-                      range(i + 1, min(i + 1 + window_size, len(tokens))) if tokens[j] in dict_pairvocab[tokens[i]]]
-        context_i_ = list(filter(lambda x: x[1] is not None, context_i_))
+                      range(i + 1, min(i + 2 + window_size, len(tokens))) if tokens[j] in dict_pairvocab[tokens[i]]]
         if len(context_i_) == 0:
             return {}
         print('ccc', tokens[i], context_i_)
