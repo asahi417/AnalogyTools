@@ -36,11 +36,11 @@ with open('./stopwords_en.txt', 'r') as f:
 
 def get_pair_relative():
     """ Get the list of word pairs in RELATIVE pretrained model """
-    path = './cache/relative_vocab.pkl'
-    if not os.path.exists(path):
+    _path = './cache/relative_vocab.pkl'
+    if not os.path.exists(_path):
         url = 'https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/relative_vocab.tar.gz'
         open_compressed_file(url=url, cache_dir='./cache')
-    with open(path, "rb") as fp:
+    with open(_path, "rb") as fp:
         return pickle.load(fp)
 
 
@@ -108,12 +108,13 @@ def frequency_filtering(vocab, dict_pairvocab, window_size, context_type: str = 
         else:
             assert j is not None
             tokens_c = tokens_[j + 1:min(j + 1 + window_size, len(tokens_))]
-        return list(filter(lambda x: x in vocab, tokens_c))
+        return tokens_c
+        # return list(filter(lambda x: x in vocab, tokens_c))
 
     def get_context(i, tokens):
         """ get context with token `i` in `tokens`, returns list of tuple (token_j, [w_1, ...])"""
         token_i = tokens[i]
-        
+
         tokens_context = tokens[i + 1: min(i + 1 + window_size, len(tokens))]
         context_i_ = [(token_j, get_context_pair(tokens_context, i, j)) for j, token_j in enumerate(tokens_context)
                       if token_j in dict_pairvocab[token_i]]
@@ -123,7 +124,7 @@ def frequency_filtering(vocab, dict_pairvocab, window_size, context_type: str = 
 
     def get_frequency(_list):
         """ return dictionary with its occurrence """
-        return dict([(k, len(list(i))) for k, i in groupby(_list)])
+        return dict([(k, len(list(i))) for k, i in groupby(_list) if k in vocab])
 
     def safe_query(_dict, _key):
         if _key in _dict:
@@ -137,8 +138,10 @@ def frequency_filtering(vocab, dict_pairvocab, window_size, context_type: str = 
     with open(PATH_CORPUS, 'r', encoding='utf-8') as corpus_file:
         for sentence in corpus_file:
             bar.update()
-            token_list = list(filter(lambda x: x in dict_pairvocab.keys(), sentence.strip().split(" ")))
-            contexts = [(i_, token_i_, get_context(i_, token_list)) for i_, token_i_ in enumerate(token_list)]
+            token_list = sentence.strip().split(" ")
+            # token_list = list(filter(lambda x: x in dict_pairvocab.keys(), sentence.strip().split(" ")))
+            contexts = [(i_, token_i_, get_context(i_, token_list)) for i_, token_i_ in enumerate(token_list)
+                        if token_i_ in dict_pairvocab.keys()]
             for i_, token_i_, context_i in contexts:
                 if len(context_i) == 0:
                     continue
@@ -150,6 +153,9 @@ def frequency_filtering(vocab, dict_pairvocab, window_size, context_type: str = 
 
     logging.info('aggregating to get frequency')
     context_word_dict = {k: {k_: get_frequency(v_) for k_, v_ in v.items()} for k, v in context_word_dict.items()}
+    # logging.info('limit to given vocab')
+    # context_word_dict = {k: {k_: get_frequency(v_) for k_, v_ in v.items()} for k, v in context_word_dict.items()}
+    # vocab
     return context_word_dict
 
 
