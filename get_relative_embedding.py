@@ -7,8 +7,9 @@ import argparse
 from itertools import chain, groupby
 from typing import Dict
 from tqdm import tqdm
-from gensim.models import fasttext
 
+
+from gensim.models import fasttext
 from util import open_compressed_file
 
 logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', level=logging.INFO, datefmt='%Y-%m-%d %H:%M:%S')
@@ -95,50 +96,59 @@ def get_word_from_corpus(minimum_frequency: int, word_vocabulary_size: int = Non
     return list(dict_freq.keys())
 
 
-def get_pairs_context(dict_pairvocab: Dict,
-                      window_size: int,
-                      minimum_frequency: int):
-    """ Get context word for each pair over the corpus """
-    logging.info("loading word frequency dictionary")
-    path = './cache/vocab.pkl'
-    if os.path.exists(path):
-        with open(path, 'rb') as fb:
-            vocab = pickle.load(fb)
-    else:
-        vocab = get_word_from_corpus(minimum_frequency=minimum_frequency)
-        with open(path, 'wb') as fb:
-            pickle.dump(vocab, fb)
+def frequency_filtering(vocab, dict_pairvocab, window_size, context_type: str = 'center'):
+    assert context_type in ['center', 'right', 'left'], context_type
 
-    logging.info("filtering corpus by frequency")
+    def get_context_pair(tokens_, i, j):
+        """ get tokens in between (i, j) in `tokens_` following the method defined by `context_type` """
+        if context_type == 'center':
+            tokens_c = tokens_[i + 1:j]
+        elif context_type == 'left':
+            tokens_c = tokens_[max(i - window_size, 0):i]
+        else:
+            assert j is not None
+            tokens_c = tokens_[j + 1:min(j + 1 + window_size, len(tokens_))]
+        return list(filter(lambda x: x in vocab, tokens_c))
+
+    def get_context(i, tokens):
+        """ get context with token `i` in `tokens`, returns list of tuple (token_j, [w_1, ...])"""
+        token_i = tokens[i]
+        tokens_context = tokens[i + 1: min(i + 1 + window_size, len(tokens))]
+        context_i_ = [(token_j, get_context_pair(tokens_context, i, j)) for j, token_j in enumerate(tokens_context)
+                      if token_j in dict_pairvocab[token_i].keys()]
+        if len(context_i_) == 0:
+            return {}
+        return dict([(k, list(g)) for k, g in groupby(context_i_, key=lambda x: x[0])])
+
+    def get_frequency(_list):
+        """ return dictionary with its occurrence """
+        return dict([(k, len(list(i))) for k, i in groupby(_list)])
+
+    def safe_query(_dict, _key):
+        if _key in _dict:
+            return _dict[_key]
+        else:
+            return []
+
     context_word_dict = {}
+    logging.info('start computing context word')
     bar = tqdm(total=CORPUS_LINE_LEN)
     with open(PATH_CORPUS, 'r', encoding='utf-8') as corpus_file:
         for sentence in corpus_file:
             bar.update()
-            tokens = sentence.strip().split(" ")
-            for i, token_i in enumerate(tokens):
-                if token_i not in dict_pairvocab.keys():
+            token_list = list(filter(lambda x: x in dict_pairvocab.keys(), sentence.strip().split(" ")))
+            contexts = [(i_, token_i_, get_context(i_, token_i_)) for i_, token_i_ in enumerate(token_list)]
+            for i_, token_i_, context_i in contexts:
+                if len(context_i) == 0:
                     continue
-                if token_i not in context_word_dict.keys():
-                    context_word_dict[token_i] = {}
+                if token_i_ not in context_word_dict.keys():
+                    context_word_dict[token_i_] = {}
+                keys = set(context_word_dict[token_i_].keys()).union(set(context_i.keys()))
+                context_word_dict[token_i_] = {
+                    k: safe_query(context_word_dict[token_i_], k) + safe_query(context_i, k) for k in keys}
 
-                for j in range(i + 1, min(i + 1 + window_size, len(tokens))):
-                    token_j = tokens[j]
-                    if token_j not in dict_pairvocab[token_i]:
-                        continue
-                    context = [tokens[h] for h in range(j + 1, min(j + 1 + window_size, len(tokens)))
-                               if tokens[h] in vocab]
-                    if len(context) == 0:
-                        continue
-                    if token_j not in context_word_dict[token_i].keys():
-                        context_word_dict[token_i][token_j] = {}
-
-                    for _token in context:
-                        if _token not in context_word_dict[token_i][token_j]:
-                            context_word_dict[token_i][token_j][_token] = 1
-                        else:
-                            context_word_dict[token_i][token_j][_token] += 1
-
+    logging.info('aggregating to get frequency')
+    context_word_dict = {k: {k_: get_frequency(v_) for k_, v_ in v.items()} for k, v in context_word_dict.items()}
     return context_word_dict
 
 
@@ -206,17 +216,23 @@ if __name__ == '__main__':
             json.dump(pair_vocab_dict, f)
 
     logging.info("extracting contexts(this can take a few hours depending on the size of the corpus)")
+    logging.info("\t * loading word frequency dictionary")
+    path = '{}/vocab.pkl'.format(os.path.dirname(opt.output))
+    if os.path.exists(path):
+        with open(path, 'rb') as fb:
+            vocab = pickle.load(fb)
+    else:
+        vocab = get_word_from_corpus(minimum_frequency=opt.minimum_frequency)
+        with open(path, 'wb') as fb:
+            pickle.dump(vocab, fb)
 
+    logging.info("\t * filtering corpus by frequency")
     cache = '{}/pairs_context.json'.format(os.path.dirname(opt.output))
     if os.path.exists(cache):
         with open(cache, 'r') as f:
             pairs_context = json.load(f)
     else:
-        pairs_context = get_pairs_context(
-            dict_pairvocab=pair_vocab_dict,
-            window_size=opt.window_size,
-            minimum_frequency=opt.minimum_frequency,
-        )
+        pairs_context = frequency_filtering(vocab, pair_vocab_dict, opt.window_size)
         with open(cache, 'w') as f:
             json.dump(pairs_context, f)
 

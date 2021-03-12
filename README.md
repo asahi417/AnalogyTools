@@ -14,7 +14,7 @@ Dataset for analogical knowledge probing:
 is a word-pair embedding model trained on selected word pair from Wikipedia dump.
 
 - [`get_relative_embedding.py`](./get_relative_embedding.py): Compute [relative embedding](http://josecamachocollados.com/papers/relative_ijcai2019.pdf)
-over Wikipedia with FastText.
+over Wikipedia with FastText for the word pairs of analogy test dataset and wiki-common-word-pairs.
 ```shell script
 usage: get_relative_embedding.py [-h] [-o OUTPUT] [-w WINDOW_SIZE] [--minimum-frequency-context MINIMUM_FREQUENCY_CONTEXT] [--minimum-frequency MINIMUM_FREQUENCY]
 
