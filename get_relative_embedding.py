@@ -125,21 +125,22 @@ def frequency_filtering(vocab, dict_pairvocab, window_size):
             for i_, token_i_, context_i in contexts:
                 if len(context_i) == 0:
                     continue
-                if token_i_ not in context_word_dict:
+                try:
+                    cur = context_word_dict[token_i_]
+                except KeyError:
                     context_word_dict[token_i_] = {}
+                    cur = None
                 for k, v in context_i.items():
-                    if k not in context_word_dict[token_i_]:
-                        context_word_dict[token_i_][k] = []
-                    context_word_dict[token_i_][k] += v
-                # keys = set(context_word_dict[token_i_].keys()).union(set(context_i.keys()))
-                # context_word_dict[token_i_] = {
-                #     k: safe_query(context_word_dict[token_i_], k) + safe_query(context_i, k) for k in keys}
+                    if cur is None:
+                        context_word_dict[token_i_][k] = v
+                    else:
+                        try:
+                            context_word_dict[token_i_][k] = cur[k] + v
+                        except KeyError:
+                            context_word_dict[token_i_][k] = v
 
-                # keys = set(context_word_dict[token_i_].keys()).union(set(context_i.keys()))
-                # context_word_dict[token_i_] = {
-                #     k: safe_query(context_word_dict[token_i_], k) + safe_query(context_i, k) for k in keys}
-            # print(context_word_dict)
-            # input()
+            print(context_word_dict)
+            input()
     logging.info('aggregating to get frequency')
     context_word_dict = {k: {k_: get_frequency(v_) for k_, v_ in v.items()} for k, v in context_word_dict.items()}
 
