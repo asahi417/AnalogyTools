@@ -116,7 +116,7 @@ def frequency_filtering(vocab, dict_pairvocab, window_size, context_type: str = 
         token_i = tokens[i]
 
         tokens_context = tokens[i + 1: min(i + 1 + window_size, len(tokens))]
-        context_i_ = [(token_j, get_context_pair(tokens_context, i, j)) for j, token_j in enumerate(i + 2, tokens_context)
+        context_i_ = [(token_j, get_context_pair(tokens_context, i, i + 2 + j)) for j, token_j in enumerate(tokens_context)
                       if token_j in dict_pairvocab[token_i]]
         if len(context_i_) == 0:
             return {}
