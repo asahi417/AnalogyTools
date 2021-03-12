@@ -115,7 +115,7 @@ def frequency_filtering(vocab, dict_pairvocab, window_size, context_type: str = 
         token_i = tokens[i]
         tokens_context = tokens[i + 1: min(i + 1 + window_size, len(tokens))]
         context_i_ = [(token_j, get_context_pair(tokens_context, i, j)) for j, token_j in enumerate(tokens_context)
-                      if token_j in dict_pairvocab[token_i].keys()]
+                      if token_j in dict_pairvocab[token_i]]
         if len(context_i_) == 0:
             return {}
         return dict([(k, list(g)) for k, g in groupby(context_i_, key=lambda x: x[0])])
@@ -220,11 +220,11 @@ if __name__ == '__main__':
     path = '{}/vocab.pkl'.format(os.path.dirname(opt.output))
     if os.path.exists(path):
         with open(path, 'rb') as fb:
-            vocab = pickle.load(fb)
+            vocab_ = pickle.load(fb)
     else:
-        vocab = get_word_from_corpus(minimum_frequency=opt.minimum_frequency)
+        vocab_ = get_word_from_corpus(minimum_frequency=opt.minimum_frequency)
         with open(path, 'wb') as fb:
-            pickle.dump(vocab, fb)
+            pickle.dump(vocab_, fb)
 
     logging.info("\t * filtering corpus by frequency")
     cache = '{}/pairs_context.json'.format(os.path.dirname(opt.output))
@@ -232,7 +232,7 @@ if __name__ == '__main__':
         with open(cache, 'r') as f:
             pairs_context = json.load(f)
     else:
-        pairs_context = frequency_filtering(vocab, pair_vocab_dict, opt.window_size)
+        pairs_context = frequency_filtering(vocab_, pair_vocab_dict, opt.window_size)
         with open(cache, 'w') as f:
             json.dump(pairs_context, f)
 
