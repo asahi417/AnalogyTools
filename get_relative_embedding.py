@@ -100,9 +100,14 @@ def frequency_filtering(vocab, dict_pairvocab, window_size):
 
     def get_context(i, tokens):
         """ get context with token `i` in `tokens`, returns list of tuple (token_j, [w_1, ...])"""
+        try:
+            tmp_vocab = dict_pairvocab[tokens[i]]
+        except KeyError:
+            return {}
+
         context_i_ = [(tokens[j], list(filter(lambda x: len(x) > 1, tokens[i + 1:j]))) for j in
-                      range(i + 2, min(i + 1 + window_size, len(tokens))) if tokens[j] in dict_pairvocab[tokens[i]]]
-        context_i_ = [(k, v) for k, v in context_i_ if len(v) > 1]
+                      range(i + 2, min(i + 1 + window_size, len(tokens))) if tokens[j] in tmp_vocab]
+        context_i_ = [(k_, v_) for k_, v_ in context_i_ if len(v_) > 1]
         if len(context_i_) == 0:
             return {}
         return dict([(k, list(g)[0][1]) for k, g in groupby(context_i_, key=lambda x: x[0])])
@@ -118,11 +123,9 @@ def frequency_filtering(vocab, dict_pairvocab, window_size):
         for sentence in corpus_file:
             bar.update()
             token_list = sentence.strip().split(" ")
-            contexts = [(i_, token_i_, get_context(i_, token_list)) for i_, token_i_ in enumerate(token_list)
-                        if token_i_ in dict_pairvocab]
-            # print(contexts)
-            # input()
-            for i_, token_i_, context_i in contexts:
+            contexts = [(i_, get_context(i_, token_list)) for i_ in range(len(token_list))]
+            for i_, context_i in contexts:
+                token_i_ = token_list[i_]
                 if len(context_i) == 0:
                     continue
                 try:
@@ -139,8 +142,8 @@ def frequency_filtering(vocab, dict_pairvocab, window_size):
                         except KeyError:
                             context_word_dict[token_i_][k] = v
 
-            print(context_word_dict)
-            input()
+            # print(context_word_dict)
+            # input()
     logging.info('aggregating to get frequency')
     context_word_dict = {k: {k_: get_frequency(v_) for k_, v_ in v.items()} for k, v in context_word_dict.items()}
 
