@@ -111,13 +111,6 @@ def frequency_filtering(vocab, dict_pairvocab, window_size):
         """ return dictionary with its occurrence """
         return dict([(k, len(list(i))) for k, i in groupby(_list) if k in vocab])
 
-    def safe_query(_dict, _key):
-        if _key in _dict.keys():
-            return _dict[_key]
-            # return list(filter(lambda x: len(x) > 1, _dict[_key]))
-        else:
-            return []
-
     context_word_dict = {}
     logging.info('start computing context word')
     bar = tqdm(total=CORPUS_LINE_LEN)
@@ -126,20 +119,27 @@ def frequency_filtering(vocab, dict_pairvocab, window_size):
             bar.update()
             token_list = sentence.strip().split(" ")
             contexts = [(i_, token_i_, get_context(i_, token_list)) for i_, token_i_ in enumerate(token_list)
-                        if token_i_ in dict_pairvocab.keys()]
+                        if token_i_ in dict_pairvocab]
             # print(contexts)
             # input()
             for i_, token_i_, context_i in contexts:
                 if len(context_i) == 0:
                     continue
-                context_i = {k: v for k, v in context_i.items()}
-                if token_i_ not in context_word_dict.keys():
+                if token_i_ not in context_word_dict:
                     context_word_dict[token_i_] = {}
-                keys = set(context_word_dict[token_i_].keys()).union(set(context_i.keys()))
-                context_word_dict[token_i_] = {
-                    k: safe_query(context_word_dict[token_i_], k) + safe_query(context_i, k) for k in keys}
-            # print(context_word_dict)
-            # input()
+                for k, v in context_i.items():
+                    if k not in context_word_dict[token_i_]:
+                        context_word_dict[token_i_][k] = []
+                    context_word_dict[token_i_][k] += v
+                # keys = set(context_word_dict[token_i_].keys()).union(set(context_i.keys()))
+                # context_word_dict[token_i_] = {
+                #     k: safe_query(context_word_dict[token_i_], k) + safe_query(context_i, k) for k in keys}
+
+                # keys = set(context_word_dict[token_i_].keys()).union(set(context_i.keys()))
+                # context_word_dict[token_i_] = {
+                #     k: safe_query(context_word_dict[token_i_], k) + safe_query(context_i, k) for k in keys}
+            print(context_word_dict)
+            input()
     logging.info('aggregating to get frequency')
     context_word_dict = {k: {k_: get_frequency(v_) for k_, v_ in v.items()} for k, v in context_word_dict.items()}
 
