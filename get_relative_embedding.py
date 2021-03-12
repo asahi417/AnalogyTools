@@ -141,6 +141,8 @@ def frequency_filtering(vocab, dict_pairvocab, window_size, context_type: str = 
             token_list = sentence.strip().split(" ")
             contexts = [(i_, token_i_, get_context(i_, token_list)) for i_, token_i_ in enumerate(token_list)
                         if token_i_ in dict_pairvocab.keys()]
+            print(contexts)
+            input()
             for i_, token_i_, context_i in contexts:
                 if len(context_i) == 0:
                     continue
