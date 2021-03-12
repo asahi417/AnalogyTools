@@ -102,6 +102,7 @@ def frequency_filtering(vocab, dict_pairvocab, window_size):
         """ get context with token `i` in `tokens`, returns list of tuple (token_j, [w_1, ...])"""
         context_i_ = [(tokens[j], list(filter(lambda x: len(x) > 1, tokens[i + 1:j]))) for j in
                       range(i + 2, min(i + 1 + window_size, len(tokens))) if tokens[j] in dict_pairvocab[tokens[i]]]
+        context_i_ = [(k, v) for k, v in context_i_ if len(v) > 1]
         if len(context_i_) == 0:
             return {}
         return dict([(k, list(g)[0][1]) for k, g in groupby(context_i_, key=lambda x: x[0])])
