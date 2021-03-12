@@ -116,11 +116,11 @@ def frequency_filtering(vocab, dict_pairvocab, window_size, context_type: str = 
         token_i = tokens[i]
 
         tokens_context = tokens[i + 1: min(i + 1 + window_size, len(tokens))]
-        context_i_ = [(token_j, get_context_pair(tokens_context, i, j)) for j, token_j in enumerate(tokens_context)
+        context_i_ = [(token_j, get_context_pair(tokens_context, i, j)) for j, token_j in enumerate(tokens_context, i + 2)
                       if token_j in dict_pairvocab[token_i]]
         if len(context_i_) == 0:
             return {}
-        print('ccc', context_i_)
+        print('ccc', token_i, context_i_)
         return dict([(k, list(g)) for k, g in groupby(context_i_, key=lambda x: x[0])])
 
     def get_frequency(_list):
