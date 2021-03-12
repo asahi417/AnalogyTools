@@ -102,6 +102,7 @@ def frequency_filtering(vocab, dict_pairvocab, window_size, context_type: str = 
     def get_context_pair(tokens_, i, j):
         """ get tokens in between (i, j) in `tokens_` following the method defined by `context_type` """
         if context_type == 'center':
+            print(i+1, j)
             tokens_c = tokens_[i + 1:j]
         elif context_type == 'left':
             tokens_c = tokens_[max(i - window_size, 0):i]
