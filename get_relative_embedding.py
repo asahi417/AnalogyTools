@@ -104,7 +104,6 @@ def frequency_filtering(vocab, dict_pairvocab, window_size):
                       range(i + 2, min(i + 1 + window_size, len(tokens))) if tokens[j] in dict_pairvocab[tokens[i]]]
         if len(context_i_) == 0:
             return {}
-        print('ccc', tokens[i], context_i_)
         return dict([(k, list(g)[0][1]) for k, g in groupby(context_i_, key=lambda x: x[0])])
 
     def get_frequency(_list):
@@ -126,8 +125,8 @@ def frequency_filtering(vocab, dict_pairvocab, window_size):
             token_list = sentence.strip().split(" ")
             contexts = [(i_, token_i_, get_context(i_, token_list)) for i_, token_i_ in enumerate(token_list)
                         if token_i_ in dict_pairvocab.keys()]
-            print(contexts)
-            input()
+            # print(contexts)
+            # input()
             for i_, token_i_, context_i in contexts:
                 if len(context_i) == 0:
                     continue
@@ -136,8 +135,8 @@ def frequency_filtering(vocab, dict_pairvocab, window_size):
                 keys = set(context_word_dict[token_i_].keys()).union(set(context_i.keys()))
                 context_word_dict[token_i_] = {
                     k: safe_query(context_word_dict[token_i_], k) + safe_query(context_i, k) for k in keys}
-            print(context_word_dict)
-            input()
+            # print(context_word_dict)
+            # input()
     logging.info('aggregating to get frequency')
     context_word_dict = {k: {k_: get_frequency(v_) for k_, v_ in v.items()} for k, v in context_word_dict.items()}
 
