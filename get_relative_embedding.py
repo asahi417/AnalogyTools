@@ -138,8 +138,8 @@ def frequency_filtering(vocab, dict_pairvocab, window_size):
                 keys = set(context_word_dict[token_i_].keys()).union(set(context_i.keys()))
                 context_word_dict[token_i_] = {
                     k: safe_query(context_word_dict[token_i_], k) + safe_query(context_i, k) for k in keys}
-            print(context_word_dict)
-            input()
+            # print(context_word_dict)
+            # input()
     logging.info('aggregating to get frequency')
     context_word_dict = {k: {k_: get_frequency(v_) for k_, v_ in v.items()} for k, v in context_word_dict.items()}
 
