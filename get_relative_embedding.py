@@ -100,7 +100,7 @@ def frequency_filtering(vocab, dict_pairvocab, window_size):
 
     def get_context(i, tokens):
         """ get context with token `i` in `tokens`, returns list of tuple (token_j, [w_1, ...])"""
-        context_i_ = [(tokens[j], tokens[i + 1:j]) for j in
+        context_i_ = [(tokens[j], list(filter(lambda x: len(x) > 1, tokens[i + 1:j]))) for j in
                       range(i + 2, min(i + 1 + window_size, len(tokens))) if tokens[j] in dict_pairvocab[tokens[i]]]
         if len(context_i_) == 0:
             return {}
@@ -112,7 +112,8 @@ def frequency_filtering(vocab, dict_pairvocab, window_size):
 
     def safe_query(_dict, _key):
         if _key in _dict.keys():
-            return list(filter(lambda x: len(x) > 1, _dict[_key]))
+            return _dict[_key]
+            # return list(filter(lambda x: len(x) > 1, _dict[_key]))
         else:
             return []
 
@@ -130,6 +131,7 @@ def frequency_filtering(vocab, dict_pairvocab, window_size):
             for i_, token_i_, context_i in contexts:
                 if len(context_i) == 0:
                     continue
+                context_i = {k: v for k, v in context_i.items()}
                 if token_i_ not in context_word_dict.keys():
                     context_word_dict[token_i_] = {}
                 keys = set(context_word_dict[token_i_].keys()).union(set(context_i.keys()))
