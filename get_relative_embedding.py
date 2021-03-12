@@ -139,7 +139,6 @@ def frequency_filtering(vocab, dict_pairvocab, window_size, context_type: str = 
         for sentence in corpus_file:
             bar.update()
             token_list = sentence.strip().split(" ")
-            # token_list = list(filter(lambda x: x in dict_pairvocab.keys(), sentence.strip().split(" ")))
             contexts = [(i_, token_i_, get_context(i_, token_list)) for i_, token_i_ in enumerate(token_list)
                         if token_i_ in dict_pairvocab.keys()]
             for i_, token_i_, context_i in contexts:
@@ -150,12 +149,11 @@ def frequency_filtering(vocab, dict_pairvocab, window_size, context_type: str = 
                 keys = set(context_word_dict[token_i_].keys()).union(set(context_i.keys()))
                 context_word_dict[token_i_] = {
                     k: safe_query(context_word_dict[token_i_], k) + safe_query(context_i, k) for k in keys}
-
+        print(context_word_dict)
+        input()
     logging.info('aggregating to get frequency')
     context_word_dict = {k: {k_: get_frequency(v_) for k_, v_ in v.items()} for k, v in context_word_dict.items()}
-    # logging.info('limit to given vocab')
-    # context_word_dict = {k: {k_: get_frequency(v_) for k_, v_ in v.items()} for k, v in context_word_dict.items()}
-    # vocab
+
     return context_word_dict
 
 
