@@ -101,9 +101,10 @@ def frequency_filtering(vocab, dict_pairvocab, window_size, context_type: str = 
 
     def get_context_pair(tokens_, i, j):
         """ get tokens in between (i, j) in `tokens_` following the method defined by `context_type` """
+
         if context_type == 'center':
             tokens_c = tokens_[i + 1:j]
-            print(tokens_c)
+            print(tokens_[i], tokens_[j], tokens_c)
         elif context_type == 'left':
             tokens_c = tokens_[max(i - window_size, 0):i]
         else:
@@ -114,12 +115,8 @@ def frequency_filtering(vocab, dict_pairvocab, window_size, context_type: str = 
 
     def get_context(i, tokens):
         """ get context with token `i` in `tokens`, returns list of tuple (token_j, [w_1, ...])"""
-        # token_i =
-        context_i_ = [(tokens[j], get_context_pair(tokens, i, j)) for j in range(i + 1, min(i + 1 + window_size, len(tokens)))
-                      if tokens[j] in dict_pairvocab[tokens[i]]]
-        # tokens_context = tokens
-        # context_i_ = [(token_j, get_context_pair(tokens_context, i, i + 2 + j)) for j, token_j in enumerate(tokens_context)
-        #               if token_j in dict_pairvocab[token_i]]
+        context_i_ = [(tokens[j], get_context_pair(tokens, i, j)) for j in
+                      range(i + 1, min(i + 1 + window_size, len(tokens))) if tokens[j] in dict_pairvocab[tokens[i]]]
         if len(context_i_) == 0:
             return {}
         print('ccc', tokens[i], context_i_)
@@ -145,7 +142,6 @@ def frequency_filtering(vocab, dict_pairvocab, window_size, context_type: str = 
             contexts = [(i_, token_i_, get_context(i_, token_list)) for i_, token_i_ in enumerate(token_list)
                         if token_i_ in dict_pairvocab.keys()]
             for i_, token_i_, context_i in contexts:
-                print(context_i)
                 if len(context_i) == 0:
                     continue
                 if token_i_ not in context_word_dict.keys():
