@@ -100,13 +100,6 @@ def get_word_from_corpus(minimum_frequency: int, word_vocabulary_size: int = Non
 
 def frequency_filtering(vocab, dict_pairvocab, window_size, cache_jsonline):
 
-    # def vocab_check(x):
-    #     try:
-    #         vocab.index(x)
-    #         return True
-    #     except ValueError:
-    #         return False
-
     def get_context(i, tokens):
         """ get context with token `i` in `tokens`, returns list of tuple (token_j, [w_1, ...])"""
         try:
@@ -133,10 +126,6 @@ def frequency_filtering(vocab, dict_pairvocab, window_size, cache_jsonline):
                     contexts = dict(filter(lambda x: x[1] is not None, contexts))
                     if len(contexts) > 0:
                         f_jsonline.write(json.dumps(contexts) + '\n')
-
-    # def get_frequency(_list):
-    #     """ return dictionary with its occurrence """
-    #     return dict([(k_, len(list(i))) for k_, i in groupby(_list) if vocab_check(k)])
 
     logging.info('aggregate over cache')
     if not os.path.exists(cache_jsonline.replace('.jsonl', '_org.json')):
@@ -165,12 +154,11 @@ def frequency_filtering(vocab, dict_pairvocab, window_size, cache_jsonline):
                                 context_word_dict[token_i_][k][token] += 1
                             except KeyError:
                                 context_word_dict[token_i_][k][token] = 1
-                # print(context_word_dict)
-                # input()
-        with open(cache_jsonline.replace('.jsonl', '_org.json', 'w')) as f_json:
+
+        with open(cache_jsonline.replace('.jsonl', '_org.json'), 'w') as f_json:
             json.dump(context_word_dict, f_json)
     else:
-        with open(cache_jsonline.replace('.jsonl', '_org.json', 'r')) as f_json:
+        with open(cache_jsonline.replace('.jsonl', '_org.json'), 'r') as f_json:
             context_word_dict = json.load(f_json)
 
     logging.info('filtering vocab')
