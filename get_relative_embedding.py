@@ -165,8 +165,8 @@ def frequency_filtering(vocab, dict_pairvocab, window_size, cache_jsonline):
                                 context_word_dict[token_i_][k][token] += 1
                             except KeyError:
                                 context_word_dict[token_i_][k][token] = 1
-                print(context_word_dict)
-                input()
+                # print(context_word_dict)
+                # input()
         with open(cache_jsonline.replace('.jsonl', '_org.json', 'w')) as f_json:
             json.dump(context_word_dict, f_json)
     else:
