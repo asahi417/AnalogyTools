@@ -98,6 +98,13 @@ def get_word_from_corpus(minimum_frequency: int, word_vocabulary_size: int = Non
 
 def frequency_filtering(vocab, dict_pairvocab, window_size, cache_jsonline):
 
+    def vocab_check(x):
+        try:
+            vocab.index(x)
+            return True
+        except ValueError:
+            return False
+
     def get_context(i, tokens):
         """ get context with token `i` in `tokens`, returns list of tuple (token_j, [w_1, ...])"""
         try:
@@ -107,14 +114,10 @@ def frequency_filtering(vocab, dict_pairvocab, window_size, cache_jsonline):
 
         context_i_ = [(tokens[j], list(filter(lambda x: len(x) > 1, tokens[i + 1:j]))) for j in
                       range(i + 2, min(i + 1 + window_size, len(tokens))) if tokens[j] in tmp_vocab]
-        context_i_ = [(k_, v_) for k_, v_ in context_i_ if len(v_) > 1]
+        context_i_ = [(k_, v_) for k_, v_ in context_i_ if len(v_) > 1 and vocab_check(v_)]
         if len(context_i_) == 0:
             return None
         return dict([(k_, list(g)[0][1]) for k_, g in groupby(context_i_, key=lambda x: x[0])])
-
-    def get_frequency(_list):
-        """ return dictionary with its occurrence """
-        return dict([(k_, len(list(i))) for k_, i in groupby(_list) if k in vocab])
 
     logging.info('cache context word')
     if OVERWRITE_CACHE or not os.path.exists(cache_jsonline):
@@ -128,6 +131,11 @@ def frequency_filtering(vocab, dict_pairvocab, window_size, cache_jsonline):
                     contexts = dict(filter(lambda x: x[1] is not None, contexts))
                     if len(contexts) > 0:
                         f_jsonline.write(json.dumps(contexts) + '\n')
+
+    def get_frequency(_list):
+        """ return dictionary with its occurrence """
+        return dict([(k_, len(list(i))) for k_, i in groupby(_list) if k in vocab])
+
     logging.info('aggregate over cache')
     context_word_dict = {}
     bar = tqdm(total=CORPUS_LINE_LEN)
