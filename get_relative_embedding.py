@@ -8,7 +8,6 @@ from itertools import chain, groupby
 from typing import Dict
 from tqdm import tqdm
 
-
 from gensim.models import fasttext
 from util import open_compressed_file
 
@@ -237,8 +236,9 @@ if __name__ == '__main__':
         with open(cache, 'r') as f:
             pairs_context = json.load(f)
     else:
-        pairs_context = frequency_filtering(vocab_, pair_vocab_dict, opt.window_size,
-                                            cache_jsonline='{}/pairs_context_cache.jsonl'.format(os.path.dirname(opt.output)))
+        pairs_context = frequency_filtering(
+            vocab_, pair_vocab_dict, opt.window_size,
+            cache_jsonline='{}/pairs_context_cache.jsonl'.format(os.path.dirname(opt.output)))
         with open(cache, 'w') as f:
             json.dump(pairs_context, f)
 
