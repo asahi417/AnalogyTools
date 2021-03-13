@@ -24,6 +24,8 @@ if not os.path.exists(PATH_WORD_EMBEDDING):
 URL_CORPUS = 'https://drive.google.com/u/0/uc?id=17EBy4GD4tXl9G4NTjuIuG5ET7wfG4-xa&export=download'
 PATH_CORPUS = './cache/wikipedia_en_preprocessed.txt'
 CORPUS_LINE_LEN = 104000000
+# 104000000
+# 53709029
 OVERWRITE_CACHE = False
 if not os.path.exists(PATH_CORPUS):
     logging.info('downloading wikidump')
@@ -114,7 +116,7 @@ def frequency_filtering(vocab, dict_pairvocab, window_size, cache_jsonline):
 
         context_i_ = [(tokens[j], list(filter(lambda x: len(x) > 1, tokens[i + 1:j]))) for j in
                       range(i + 2, min(i + 1 + window_size, len(tokens))) if tokens[j] in tmp_vocab]
-        context_i_ = [(k_, v_) for k_, v_ in context_i_ if len(v_) > 1 and vocab_check(v_)]
+        context_i_ = [(k_, v_) for k_, v_ in context_i_ if len(v_) > 1]
         if len(context_i_) == 0:
             return None
         return dict([(k_, list(g)[0][1]) for k_, g in groupby(context_i_, key=lambda x: x[0])])
