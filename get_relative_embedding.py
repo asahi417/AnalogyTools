@@ -124,9 +124,7 @@ def frequency_filtering(vocab, dict_pairvocab, window_size):
             bar.update()
             token_list = sentence.strip().split(" ")
             contexts = [(token_list[i_], get_context(i_, token_list)) for i_ in range(len(token_list))]
-            contexts = list(filter(lambda x: x[1] is not None, contexts))
-
-
+            contexts = dict(filter(lambda x: x[1] is not None, contexts))
             print(contexts)
             input()
             continue
