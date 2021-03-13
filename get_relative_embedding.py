@@ -173,17 +173,20 @@ def frequency_filtering(vocab, dict_pairvocab, window_size, cache_jsonline):
         with open(cache_jsonline.replace('.jsonl', '_org.json', 'r')) as f_json:
             context_word_dict = json.load(f_json)
 
+    logging.info('filtering vocab')
+    vocab = set(vocab)
 
-                    # if cur is None:
-                    #     context_word_dict[token_i_][k] = v
-                    # else:
-                    #     try:
-                    #         context_word_dict[token_i_][k] = cur[k] + v
-                    #     except KeyError:
-                    #         context_word_dict[token_i_][k] = v
+    def filter_vocab(_dict):
+        new_key = set(_dict.keys()).intersection(vocab)
+        _new_dict = {__k: _dict[__k] for __k in new_key}
+        return _new_dict
 
-    # logging.info('aggregating to get frequency')
-    # context_word_dict = {k: {k_: v_ for k_, v_ in v.items()} for k, v in context_word_dict.items()}
+    logging.info('filtering vocab 1st')
+    context_word_dict = {k: {k_: filter_vocab(v_) for k_, v_ in v.items()} for k, v in context_word_dict.items()}
+    logging.info('filtering vocab 2nd')
+    context_word_dict = {k: {k_: v_ for k_, v_ in v.items() if len(v_) > 0} for k, v in context_word_dict.items()}
+    logging.info('filtering vocab 3rd')
+    context_word_dict = {k: v for k, v in context_word_dict.items() if len(v) > 0}
 
     return context_word_dict
 
