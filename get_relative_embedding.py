@@ -103,13 +103,13 @@ def frequency_filtering(vocab, dict_pairvocab, window_size):
         try:
             tmp_vocab = dict_pairvocab[tokens[i]]
         except KeyError:
-            return {}
+            return None
 
         context_i_ = [(tokens[j], list(filter(lambda x: len(x) > 1, tokens[i + 1:j]))) for j in
                       range(i + 2, min(i + 1 + window_size, len(tokens))) if tokens[j] in tmp_vocab]
         context_i_ = [(k_, v_) for k_, v_ in context_i_ if len(v_) > 1]
         if len(context_i_) == 0:
-            return {}
+            return None
         return dict([(k_, list(g)[0][1]) for k_, g in groupby(context_i_, key=lambda x: x[0])])
 
     def get_frequency(_list):
@@ -124,6 +124,9 @@ def frequency_filtering(vocab, dict_pairvocab, window_size):
             bar.update()
             token_list = sentence.strip().split(" ")
             contexts = [(i_, get_context(i_, token_list)) for i_ in range(len(token_list))]
+            contexts = list(filter(lambda x: x[1] is not None, contexts))
+
+            
             print(contexts)
             input()
 
