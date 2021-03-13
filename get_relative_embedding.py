@@ -123,12 +123,13 @@ def frequency_filtering(vocab, dict_pairvocab, window_size):
         for sentence in corpus_file:
             bar.update()
             token_list = sentence.strip().split(" ")
-            contexts = [(i_, get_context(i_, token_list)) for i_ in range(len(token_list))]
+            contexts = [(token_list[i_], get_context(i_, token_list)) for i_ in range(len(token_list))]
             contexts = list(filter(lambda x: x[1] is not None, contexts))
 
-            
+
             print(contexts)
             input()
+            continue
 
             for i_, context_i in contexts:
                 token_i_ = token_list[i_]
