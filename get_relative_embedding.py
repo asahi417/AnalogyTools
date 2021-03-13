@@ -131,8 +131,10 @@ def frequency_filtering(vocab, dict_pairvocab, window_size, cache_jsonline):
                         f_jsonline.write(json.dumps(contexts) + '\n')
     logging.info('aggregate over cache')
     context_word_dict = {}
+    bar = tqdm(total=CORPUS_LINE_LEN)
     with open(cache_jsonline, 'r') as f_jsonline:
         for contexts in f_jsonline:
+            bar.update()
             contexts = json.loads(contexts)
             for token_i_, context_i in contexts.items():
                 try:
