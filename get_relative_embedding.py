@@ -96,7 +96,7 @@ def get_word_from_corpus(minimum_frequency: int, word_vocabulary_size: int = Non
     return list(dict_freq.keys())
 
 
-def frequency_filtering(vocab, dict_pairvocab, window_size):
+def frequency_filtering(vocab, dict_pairvocab, window_size, cache_jsonline):
 
     def get_context(i, tokens):
         """ get context with token `i` in `tokens`, returns list of tuple (token_j, [w_1, ...])"""
@@ -120,32 +120,31 @@ def frequency_filtering(vocab, dict_pairvocab, window_size):
     logging.info('start computing context word')
     bar = tqdm(total=CORPUS_LINE_LEN)
     with open(PATH_CORPUS, 'r', encoding='utf-8') as corpus_file:
-        for sentence in corpus_file:
-            bar.update()
-            token_list = sentence.strip().split(" ")
-            contexts = [(token_list[i_], get_context(i_, token_list)) for i_ in range(len(token_list))]
-            contexts = dict(filter(lambda x: x[1] is not None, contexts))
-            print(contexts)
-            input()
-            continue
+        with open(cache_jsonline, 'w') as f_jsonline:
+            for sentence in corpus_file:
+                bar.update()
+                token_list = sentence.strip().split(" ")
+                contexts = [(token_list[i_], get_context(i_, token_list)) for i_ in range(len(token_list))]
+                contexts = json.dumps(dict(filter(lambda x: x[1] is not None, contexts)))
+                f_jsonline.write(contexts + '\n')
 
-            for i_, context_i in contexts:
-                token_i_ = token_list[i_]
-                if len(context_i) == 0:
-                    continue
+    for i_, context_i in contexts:
+        token_i_ = token_list[i_]
+        if len(context_i) == 0:
+            continue
+        try:
+            cur = context_word_dict[token_i_]
+        except KeyError:
+            context_word_dict[token_i_] = {}
+            cur = None
+        for k, v in context_i.items():
+            if cur is None:
+                context_word_dict[token_i_][k] = v
+            else:
                 try:
-                    cur = context_word_dict[token_i_]
+                    context_word_dict[token_i_][k] = cur[k] + v
                 except KeyError:
-                    context_word_dict[token_i_] = {}
-                    cur = None
-                for k, v in context_i.items():
-                    if cur is None:
-                        context_word_dict[token_i_][k] = v
-                    else:
-                        try:
-                            context_word_dict[token_i_][k] = cur[k] + v
-                        except KeyError:
-                            context_word_dict[token_i_][k] = v
+                    context_word_dict[token_i_][k] = v
 
     logging.info('aggregating to get frequency')
     context_word_dict = {k: {k_: get_frequency(v_) for k_, v_ in v.items()} for k, v in context_word_dict.items()}
@@ -233,7 +232,7 @@ if __name__ == '__main__':
         with open(cache, 'r') as f:
             pairs_context = json.load(f)
     else:
-        pairs_context = frequency_filtering(vocab_, pair_vocab_dict, opt.window_size)
+        pairs_context = frequency_filtering(vocab_, pair_vocab_dict, opt.window_size, cache='{}/pairs_context_cache.jsonl')
         with open(cache, 'w') as f:
             json.dump(pairs_context, f)
 
