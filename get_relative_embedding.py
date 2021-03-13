@@ -233,7 +233,7 @@ if __name__ == '__main__':
             pairs_context = json.load(f)
     else:
         pairs_context = frequency_filtering(vocab_, pair_vocab_dict, opt.window_size,
-                                            cache_jsonline='{}/pairs_context_cache.jsonl')
+                                            cache_jsonline='{}/pairs_context_cache.jsonl'.format(os.path.dirname(opt.output)))
         with open(cache, 'w') as f:
             json.dump(pairs_context, f)
 
