@@ -25,6 +25,7 @@ if not os.path.exists(PATH_WORD_EMBEDDING):
 URL_CORPUS = 'https://drive.google.com/u/0/uc?id=17EBy4GD4tXl9G4NTjuIuG5ET7wfG4-xa&export=download'
 PATH_CORPUS = './cache/wikipedia_en_preprocessed.txt'
 CORPUS_LINE_LEN = 104000000
+OVERWRITE_CACHE = False
 if not os.path.exists(PATH_CORPUS):
     logging.info('downloading wikidump')
     open_compressed_file(url=URL_CORPUS, cache_dir='./cache', filename='wikipedia_en_preprocessed.zip', gdrive=True)
@@ -116,35 +117,37 @@ def frequency_filtering(vocab, dict_pairvocab, window_size, cache_jsonline):
         """ return dictionary with its occurrence """
         return dict([(k_, len(list(i))) for k_, i in groupby(_list) if k in vocab])
 
-    context_word_dict = {}
-    logging.info('start computing context word')
-    bar = tqdm(total=CORPUS_LINE_LEN)
-    with open(PATH_CORPUS, 'r', encoding='utf-8') as corpus_file:
+    logging.info('cache context word')
+    if OVERWRITE_CACHE or not os.path.exists(cache_jsonline):
+        bar = tqdm(total=CORPUS_LINE_LEN)
         with open(cache_jsonline, 'w') as f_jsonline:
-            for sentence in corpus_file:
-                bar.update()
-                token_list = sentence.strip().split(" ")
-                contexts = [(token_list[i_], get_context(i_, token_list)) for i_ in range(len(token_list))]
-                contexts = json.dumps(dict(filter(lambda x: x[1] is not None, contexts)))
-                f_jsonline.write(contexts + '\n')
-
-    for i_, context_i in contexts:
-        token_i_ = token_list[i_]
-        if len(context_i) == 0:
-            continue
-        try:
-            cur = context_word_dict[token_i_]
-        except KeyError:
-            context_word_dict[token_i_] = {}
-            cur = None
-        for k, v in context_i.items():
-            if cur is None:
-                context_word_dict[token_i_][k] = v
-            else:
+            with open(PATH_CORPUS, 'r', encoding='utf-8') as corpus_file:
+                for sentence in corpus_file:
+                    bar.update()
+                    token_list = sentence.strip().split(" ")
+                    contexts = [(token_list[i_], get_context(i_, token_list)) for i_ in range(len(token_list))]
+                    contexts = dict(filter(lambda x: x[1] is not None, contexts))
+                    if len(contexts) > 0:
+                        f_jsonline.write(json.dumps(contexts) + '\n')
+    logging.info('aggregate over cache')
+    context_word_dict = {}
+    with open(cache_jsonline, 'r') as f_jsonline:
+        for contexts in f_jsonline:
+            contexts = json.loads(contexts)
+            for token_i_, context_i in contexts.items():
                 try:
-                    context_word_dict[token_i_][k] = cur[k] + v
+                    cur = context_word_dict[token_i_]
                 except KeyError:
-                    context_word_dict[token_i_][k] = v
+                    context_word_dict[token_i_] = {}
+                    cur = None
+                for k, v in context_i.items():
+                    if cur is None:
+                        context_word_dict[token_i_][k] = v
+                    else:
+                        try:
+                            context_word_dict[token_i_][k] = cur[k] + v
+                        except KeyError:
+                            context_word_dict[token_i_][k] = v
 
     logging.info('aggregating to get frequency')
     context_word_dict = {k: {k_: get_frequency(v_) for k_, v_ in v.items()} for k, v in context_word_dict.items()}
