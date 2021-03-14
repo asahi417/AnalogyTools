@@ -64,7 +64,7 @@ def get_diff_vec(output_path: str, relation_pairs: Dict):
         for head, tails in tqdm(relation_pairs.items()):
             for tail in tails:
                 relative_embedding = word_embedding_model[head] - word_embedding_model[tail]
-                body = '__'.join([head, tail])
+                body = '__'.join([head, tail.replace(' ', '_')])
                 # txt_file.write()
                 # for v in relative_embedding.tolist():
                 for v in relative_embedding:
