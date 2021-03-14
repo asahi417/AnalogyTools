@@ -20,46 +20,28 @@ if not os.path.exists(PATH_WORD_EMBEDDING):
     open_compressed_file(url=URL_WORD_EMBEDDING, cache_dir='./cache')
 
 # Relative embedding
-URL_RELATIVE_EMBEDDING = 'TBA'
+URL_RELATIVE_EMBEDDING = 'https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/relative_init_vectors.bin.tar.gz'
 PATH_RELATIVE_EMBEDDING = './cache/relative_init_vectors.bin'
 if not os.path.exists(PATH_WORD_EMBEDDING):
     logging.info('downloading relative model')
     open_compressed_file(url=URL_RELATIVE_EMBEDDING, cache_dir='./cache')
 
-
-def get_analogy_data():
-    """ Get analogy data """
-    data_url = dict(
-        sat='https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/sat.zip',
-        u2='https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/u2.zip',
-        u4='https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/u4.zip',
-        google='https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/google.zip',
-        bats='https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/bats.zip')
-
-    def extract_pairs(_json_file):
-        _json = json.loads(_json_file)
-        return [[a.lower() for a in _json['stem']]] + [[a.lower(), b.lower()] for a, b in _json['choice']]
-
-    for name, url in data.items():
-        open_compressed_file(url=url, cache_dir='./cache')
-        with open('./cache/{}/valid.jsonl'.format(name), 'r') as f_:
-            pairs = list(chain(*[extract_pairs(i) for i in f_.read().split('\n') if len(i) > 0]))
-        with open('./cache/{}/test.jsonl'.format(name), 'r') as f_:
-            pairs += list(chain(*[extract_pairs(i) for i in f_.read().split('\n') if len(i) > 0]))
-    return pairs
+# Analogy data
+DATA = ['sat', 'u2', 'u4', 'google', 'bats']
 
 
-def get_dataset_raw(data_name: str, cache_dir: str = default_cache_dir_analogy):
+def get_dataset_raw(data_name: str):
     """ Get SAT-type dataset: a list of (answer: int, prompts: list, stem: list, choice: list)"""
-    assert data_name in ['sat', 'u2', 'u4', 'google', 'bats'], 'unknown data: {}'.format(data_name)
+    cache_dir = './cache'
+    root_url_analogy = 'https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0'
+    assert data_name in DATA, 'unknown data: {}'.format(data_name)
     if not os.path.exists('{}/{}'.format(cache_dir, data_name)):
-        util.open_compressed_file('{}/{}.zip'.format(root_url_analogy, data_name), cache_dir)
+        open_compressed_file('{}/{}.zip'.format(root_url_analogy, data_name), cache_dir)
     with open('{}/{}/test.jsonl'.format(cache_dir, data_name), 'r') as f:
-        test = list(filter(None, map(lambda x: json.loads(x) if len(x) > 0 else None, f.read().split('\n'))))
+        test_set = list(filter(None, map(lambda x: json.loads(x) if len(x) > 0 else None, f.read().split('\n'))))
     with open('{}/{}/valid.jsonl'.format(cache_dir, data_name), 'r') as f:
-        val = list(filter(None, map(lambda x: json.loads(x) if len(x) > 0 else None, f.read().split('\n'))))
-    return val, test
-
+        val_set = list(filter(None, map(lambda x: json.loads(x) if len(x) > 0 else None, f.read().split('\n'))))
+    return val_set, test_set
 
 
 def embedding(term, model):
@@ -71,60 +53,71 @@ def embedding(term, model):
 
 def cos_similarity(a_, b_):
     if a_ is None or b_ is None:
-        return DUMMY
+        return -100
     inner = (a_ * b_).sum()
     norm_a = (a_ * a_).sum() ** 0.5
     norm_b = (b_ * b_).sum() ** 0.5
     if norm_a == 0 or norm_b == 0:
-        return DUMMY
+        return -100
     return inner / (norm_b * norm_a)
 
 
-def get_embedding(word_list, model):
-    embeddings = [(_i, embedding(_i, model)) for _i in word_list]
-    embeddings = list(filter(lambda x: x[1] is not None, embeddings))
-    return dict(embeddings)
+def get_prediction(stem, choice, embedding_model, relative: bool = False):
+    if relative:
+        # relative vector
+        stem = '__'.join(stem)
+        choice = ['__'.join(c) for c in choice]
+        e_dict = dict([(_i, embedding(_i, embedding_model)) for _i in choice + [stem]])
+    else:
+        # diff vector
+        def diff(x, y):
+            if x is None or y is None:
+                return None
+            return x - y
 
+        e_dict = {
+            '__'.join(stem): diff(embedding(stem[0], word_embedding_model), embedding(stem[1], word_embedding_model))
+        }
+        for h, t in choice:
+            e_dict['__'.join([h, t])] = diff(embedding(h, word_embedding_model), embedding(t, word_embedding_model)),
+        stem = '__'.join(stem)
+        choice = ['__'.join(c) for c in choice]
 
-def get_prediction(stem, choice, embedding_dict):
-    def diff(x, y):
-        if x is None or y is None:
-            return None
-        return x - y
-
-    stem_e = diff(embedding(stem[0], embedding_dict), embedding(stem[1], embedding_dict))
-    if stem_e is None:
-        return None
-    choice_e = [diff(embedding(a, embedding_dict), embedding(b, embedding_dict)) for a, b in choice]
-    score = [cos_similarity(e, stem_e) for e in choice_e]
+    score = [cos_similarity(e_dict[stem], e_dict[c]) for c in choice]
     pred = score.index(max(score))
-    if score[pred] == DUMMY:
+    if score[pred] == -100:
         return None
     return pred
 
 
+def test_analogy(is_relative, reference_prediction=None):
+    if is_relative:
+        word_embedding_model = KeyedVectors.load(PATH_RELATIVE_EMBEDDING)
+        model_name = 'relative'
+    else:
+        word_embedding_model = fasttext.load_facebook_model(PATH_WORD_EMBEDDING)
+        model_name = 'fasttext'
+
+    prediction = {}
+    results = []
+    for i in DATA:
+        tmp_result = {'model': model_name, 'data': i}
+        val, test = get_dataset_raw(i)
+        for prefix, data in zip(['test', 'valid'], [test, val]):
+            pred = [get_prediction(o['stem'], o['choice'], word_embedding_model, relative=is_relative) for o in data]
+            prediction[i][prefix] = pred
+            tmp_result['oov_{}'.format(prefix)] = len([p for p in pred if p is None])
+            pred = [p if p is not None else reference_prediction[i][prefix][n] for n, p in enumerate(pred)]
+            accuracy = sum([o['answer'] == pred[n] for n, o in enumerate(data)]) / len(pred)
+            tmp_result['accuracy_{}'.format(prefix)] = accuracy
+        results.append(tmp_result)
+    return results, prediction
+
+
 if __name__ == '__main__':
-    for prefix in ['test', 'valid']:
-        line_oov = []
-        line_accuracy = []
-        for i in DATA:
-            val, test = get_dataset_raw(i)
-            data = test if prefix == 'test' else val
-            oov = {'data': i}
-            all_accuracy = {'data': i}
-            answer = {n: o['answer'] for n, o in enumerate(data)}
-            random_prediction = {n: randint(0, len(o['choice']) - 1) for n, o in enumerate(data)}
-            all_accuracy['random'] = sum([answer[n] == random_prediction[n] for n in range(len(answer))]) / len(answer)
-
-            vocab = list(set(list(chain(*[list(chain(*[o['stem']] + o['choice'])) for o in data]))))
-
-            dict_ = get_embedding(vocab, model_ft)
-            ft_prediction = {n: get_prediction(o['stem'], o['choice'], dict_) for n, o in enumerate(data)}
-
-            all_accuracy['fasttext'] = sum([answer[n] == ft_prediction[n] for n in range(len(answer))]) / len(answer)
-            line_accuracy.append(all_accuracy)
-
-        pd.DataFrame(line_accuracy).to_csv(
-            'experiments_results/summary/experiment.word_embedding.{}.csv'.format(prefix))
-        pd.DataFrame(line_oov).to_csv(
-            'experiments_results/summary/experiment.word_embedding.{}.oov.csv'.format(prefix))
+    results_fasttext, p_fasttext = test_analogy(False)
+    results_relative, _ = test_analogy(True, p_fasttext)
+    with open('./result.jsonl', 'w') as f:
+        for line in results_fasttext + results_relative:
+            f.write(json.dumps(line) + '\n')
+    logging.info('finish evaluation: result was exported to {}'.format('./result.jsonl'))

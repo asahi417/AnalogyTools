@@ -6,8 +6,8 @@ Dataset for analogical knowledge probing:
     - [U4](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/u4.zip)
     - [Google](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/google.zip)
     - [BATS](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/bats.zip)
-- Word pair list:
-    - [wiki-common-word-pairs](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/relative_vocab.tar.gz)
+- Word pair list: [wiki-common-word-pairs](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/relative_vocab.tar.gz)
+- RELATIVE embedding model: [gensim-format-binary](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/relative_init_vectors.bin.tar.gz)
 
 ### Data description
 ***Analogy test set:*** A jsonline file in which each line consists of following dictionary,

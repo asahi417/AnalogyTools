@@ -202,10 +202,6 @@ def get_relative_init(output_path: str,
                     txt_file.write('__'.join([token_i, token_j]))
                     for v in vector_pair:
                         txt_file.write(' ' + str(v))
-                    # txt_file.write(
-                    #     '__'.join([token_i, token_j]) + ' ' +
-                    #     ' '.join(list(map(str, vector_pair.tolist()))))
-                    # txt_file.write(','.join([token_i, token_j] + list(map(str, vector_pair.tolist()))))
                     txt_file.write("\n")
                     line_count += 1
 
