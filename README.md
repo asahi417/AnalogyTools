@@ -7,7 +7,9 @@ Dataset/model checkpoint for relational knowledge probing:
     - Google: [file](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/google.zip)
     - BATS: [file](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/bats.zip)
 - Word pair list: [file](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/relative_vocab.tar.gz)
-- RELATIVE embedding model: [file](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/relative_init_vectors.bin.tar.gz)
+- RELATIVE embedding model
+    - RELATIVE trained on Wikipedia dump on fasttext: [file](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/relative_init_vectors.bin.tar.gz)
+    - Relation embedding converted from FastText: [file](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/fasttext_diff_vectors.bin.tar.gz)
 
 ## Data description
 ### Analogy test set

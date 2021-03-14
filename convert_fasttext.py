@@ -66,7 +66,10 @@ def get_diff_vec(output_path: str, relation_pairs: Dict):
                 relative_embedding = word_embedding_model[head] - word_embedding_model[tail]
                 txt_file.write('__'.join([head, tail]))
                 for v in relative_embedding:
-                    txt_file.write(' ' + str(v))
+                    if abs(v) < 1e-4:
+                        txt_file.write(' 0')
+                    else:
+                        txt_file.write(' ' + str(v))
                 txt_file.write("\n")
                 line_count += 1
     logging.info("reformat file to add header")
