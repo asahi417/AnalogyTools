@@ -54,6 +54,7 @@ Quick experiment to compare our RELATIVE model with the underlying FastText mode
 | relative | google | 479      | 0.938000      | 47        | 0.940000       |
 | relative | bats   | 1446     | 0.724291      | 156       | 0.738693       |
 
+- ***script to reproduce the result***: [`test_analogy.py`](./test_analogy.py)
 
 ## Acknowledgement
 About RELATIVE embedding work, please refer [the official implementation](https://github.com/pedrada88/relative) and
