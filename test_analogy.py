@@ -76,10 +76,10 @@ def get_prediction(stem, choice, embedding_model, relative: bool = False):
             return x - y
 
         e_dict = {
-            '__'.join(stem): diff(embedding(stem[0], word_embedding_model), embedding(stem[1], word_embedding_model))
+            '__'.join(stem): diff(embedding(stem[0], embedding_model), embedding(stem[1], embedding_model))
         }
         for h, t in choice:
-            e_dict['__'.join([h, t])] = diff(embedding(h, word_embedding_model), embedding(t, word_embedding_model)),
+            e_dict['__'.join([h, t])] = diff(embedding(h, embedding_model), embedding(t, embedding_model)),
         stem = '__'.join(stem)
         choice = ['__'.join(c) for c in choice]
 
