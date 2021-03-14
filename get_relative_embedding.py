@@ -201,11 +201,11 @@ def get_relative_init(output_path: str,
                     vector_pair = vector_pair/cont_pair
                     txt_file.write('__'.join([token_i, token_j]))
                     for v in vector_pair:
-                        # txt_file.write(' ' + str(v))
-                        if abs(v) < 1e-4:
-                            txt_file.write(' 0')
-                        else:
-                            txt_file.write(' ' + str(v))
+                        txt_file.write(' ' + str(v))
+                        # if abs(v) < 1e-4:
+                        #     txt_file.write(' 0')
+                        # else:
+                        #     txt_file.write(' ' + str(v))
                     txt_file.write("\n")
                     line_count += 1
 

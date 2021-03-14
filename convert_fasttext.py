@@ -64,14 +64,21 @@ def get_diff_vec(output_path: str, relation_pairs: Dict):
         for head, tails in tqdm(relation_pairs.items()):
             for tail in tails:
                 relative_embedding = word_embedding_model[head] - word_embedding_model[tail]
-                txt_file.write('__'.join([head, tail]))
+                body = '__'.join([head, tail])
+                # txt_file.write()
+                # for v in relative_embedding.tolist():
                 for v in relative_embedding:
-                    if abs(v) < 1e-4:
-                        txt_file.write(' 0')
-                    else:
-                        txt_file.write(' ' + str(v))
-                txt_file.write("\n")
+                    # if abs(v) < 1e-4:
+                    #     txt_file.write(' 0')
+                    # else:
+                    #     txt_file.write(' ' + str(v))
+                    body += ' ' + str(v)
+                    # txt_file.write(' ' + str(v))
+                body += "\n"
+                print(len(body.rsplit().split(' ')))
+                txt_file.write(body)
                 line_count += 1
+                input()
     logging.info("reformat file to add header")
     logging.info("\t * {} lines, {} dim".format(line_count, word_embedding_model.vector_size))
     with open(output_path, 'w') as f_out:
