@@ -1,5 +1,5 @@
 # Analogy Dataset
-Dataset/model checlpoints for relational knowledge probing:
+Dataset/model checkpoint for relational knowledge probing:
 - Analogy test set:
     - SAT: [file](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/sat.zip)
     - U2: [file](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/u2.zip)
