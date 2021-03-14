@@ -40,18 +40,20 @@ relative_model = KeyedVectors.load_word2vec_format('./relative_init_vectors.bin'
 
 ## Test Analogy 
 Quick experiment to compare our RELATIVE model with the underlying FastText model.
-```
-{"model": "fasttext", "data": "sat", "oov_test": 0, "accuracy_test": 0.4629080118694362, "oov_valid": 0, "accuracy_valid": 0.5405405405405406}
-{"model": "relative", "data": "sat", "oov_test": 252, "accuracy_test": 0.43026706231454004, "oov_valid": 22, "accuracy_valid": 0.32432432432432434}
-{"model": "fasttext", "data": "u2", "oov_test": 0, "accuracy_test": 0.3815789473684211, "oov_valid": 0, "accuracy_valid": 0.2916666666666667}
-{"model": "relative", "data": "u2", "oov_test": 172, "accuracy_test": 0.40789473684210525, "oov_valid": 17, "accuracy_valid": 0.25}
-{"model": "fasttext", "data": "u4", "oov_test": 0, "accuracy_test": 0.38425925925925924, "oov_valid": 0, "accuracy_valid": 0.3958333333333333}
-{"model": "relative", "data": "u4", "oov_test": 304, "accuracy_test": 0.3888888888888889, "oov_valid": 38, "accuracy_valid": 0.3541666666666667}
-{"model": "fasttext", "data": "google", "oov_test": 0, "accuracy_test": 0.948, "oov_valid": 0, "accuracy_valid": 0.94}
-{"model": "relative", "data": "google", "oov_test": 479, "accuracy_test": 0.938, "oov_valid": 47, "accuracy_valid": 0.94}
-{"model": "fasttext", "data": "bats", "oov_test": 0, "accuracy_test": 0.7065036131183992, "oov_valid": 0, "accuracy_valid": 0.7336683417085427}
-{"model": "relative", "data": "bats", "oov_test": 1446, "accuracy_test": 0.7242912729294052, "oov_valid": 156, "accuracy_valid": 0.7386934673366834}
-```
+
+| model    | data   | oov_test | accuracy_test | oov_valid | accuracy_valid |
+|----------|--------|----------|---------------|-----------|----------------|
+| fasttext | sat    | 0        | 0.462908      | 0         | 0.540541       |
+| fasttext | u2     | 0        | 0.381579      | 0         | 0.291667       |
+| fasttext | u4     | 0        | 0.384259      | 0         | 0.395833       |
+| fasttext | google | 0        | 0.948000      | 0         | 0.940000       |
+| fasttext | bats   | 0        | 0.706504      | 0         | 0.733668       |
+| relative | sat    | 252      | 0.430267      | 22        | 0.324324       |
+| relative | u2     | 172      | 0.407895      | 17        | 0.250000       |
+| relative | u4     | 304      | 0.388889      | 38        | 0.354167       |
+| relative | google | 479      | 0.938000      | 47        | 0.940000       |
+| relative | bats   | 1446     | 0.724291      | 156       | 0.738693       |
+
 
 ## Acknowledgement
 About RELATIVE embedding work, please refer [the official implementation](https://github.com/pedrada88/relative) and
