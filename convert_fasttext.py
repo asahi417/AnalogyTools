@@ -75,7 +75,9 @@ def get_diff_vec(output_path: str, relation_pairs: Dict):
                     body += ' ' + str(v)
                     # txt_file.write(' ' + str(v))
                 body += "\n"
-                print(len(body.rsplit().split(' ')))
+                print(body)
+                print(len(body.rsplit()), body.rsplit())
+                print(len(body.split(' ')), body.split(' '))
                 txt_file.write(body)
                 line_count += 1
                 input()
