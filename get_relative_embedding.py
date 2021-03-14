@@ -234,7 +234,7 @@ def get_options():
 if __name__ == '__main__':
 
     opt = get_options()
-    assert opt.output.endwith('.bin')
+    assert opt.output.endswith('.bin')
     if os.path.exists(opt.output):
         exit('found file at {}'.format(opt.output))
 
