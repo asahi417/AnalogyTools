@@ -25,11 +25,10 @@ if not os.path.exists(PATH_WORD_EMBEDDING):
 URL_CORPUS = 'https://drive.google.com/u/0/uc?id=17EBy4GD4tXl9G4NTjuIuG5ET7wfG4-xa&export=download'
 PATH_CORPUS = './cache/wikipedia_en_preprocessed.txt'
 CORPUS_LINE_LEN = 104000000  # 53709029
-
-OVERWRITE_CACHE = False
 if not os.path.exists(PATH_CORPUS):
     logging.info('downloading wikidump')
     open_compressed_file(url=URL_CORPUS, cache_dir='./cache', filename='wikipedia_en_preprocessed.zip', gdrive=True)
+OVERWRITE_CACHE = False
 
 # Stopwords
 with open('./stopwords_en.txt', 'r') as f:
@@ -200,9 +199,12 @@ def get_relative_init(output_path: str,
                     cont_pair += 1
                 if cont_pair != 0:
                     vector_pair = vector_pair/cont_pair
-                    txt_file.write(
-                        '__'.join([token_i, token_j]) + ' ' +
-                        ' '.join(list(map(str, vector_pair.tolist()))))
+                    txt_file.write('__'.join([token_i, token_j]))
+                    for v in vector_pair:
+                        txt_file.write(' ' + str(v))
+                    # txt_file.write(
+                    #     '__'.join([token_i, token_j]) + ' ' +
+                    #     ' '.join(list(map(str, vector_pair.tolist()))))
                     # txt_file.write(','.join([token_i, token_j] + list(map(str, vector_pair.tolist()))))
                     txt_file.write("\n")
                     line_count += 1

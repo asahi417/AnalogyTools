@@ -7,6 +7,7 @@ from random import randint
 
 import pandas as pd
 from gensim.models import fasttext
+from gensim.models import KeyedVectors
 from util import open_compressed_file
 
 logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', level=logging.INFO, datefmt='%Y-%m-%d %H:%M:%S')
@@ -19,8 +20,8 @@ if not os.path.exists(PATH_WORD_EMBEDDING):
     open_compressed_file(url=URL_WORD_EMBEDDING, cache_dir='./cache')
 
 # Relative embedding
-URL_RELATIVE_EMBEDDING = ''
-PATH_RELATIVE_EMBEDDING = './cache/relative_init_vectors.txt'
+URL_RELATIVE_EMBEDDING = 'TBA'
+PATH_RELATIVE_EMBEDDING = './cache/relative_init_vectors.bin'
 if not os.path.exists(PATH_WORD_EMBEDDING):
     logging.info('downloading relative model')
     open_compressed_file(url=URL_RELATIVE_EMBEDDING, cache_dir='./cache')

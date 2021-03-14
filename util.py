@@ -1,4 +1,4 @@
-""" Download files from web """
+""" Download files from web. If Gdrive downloading stacked, try to remove the gdown cache `rm -rf ~/.cache/gdown` """
 import tarfile
 import zipfile
 import requests
