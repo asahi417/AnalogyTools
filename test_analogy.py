@@ -103,6 +103,7 @@ def test_analogy(is_relative, reference_prediction=None):
     for i in DATA:
         tmp_result = {'model': model_name, 'data': i}
         val, test = get_dataset_raw(i)
+        prediction[i] = {}
         for prefix, data in zip(['test', 'valid'], [test, val]):
             pred = [get_prediction(o['stem'], o['choice'], word_embedding_model, relative=is_relative) for o in data]
             prediction[i][prefix] = pred

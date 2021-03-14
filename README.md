@@ -28,7 +28,7 @@ This is fetched from the pretrained RELATIVE embedding released by the [official
 - ***script to reproduce the data***: [`get_pair_vocab.py`](./get_pair_vocab.py)
 
 ### RELATIVE embedding model
-We train RELATIVE model on Fasttext model trainedd  
+We train RELATIVE model on [the common-crawl-pretrained Fasttext model released from Facebook](https://dl.fbaipublicfiles.com/fasttext/vectors-english/crawl-300d-2M-subword.zip).
 
 - ***script to reproduce the data***: [`get_relative_embedding.py`](./get_relative_embedding.py)
 Compute [relative embedding](http://josecamachocollados.com/papers/relative_ijcai2019.pdf)
