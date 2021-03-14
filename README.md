@@ -28,27 +28,15 @@ This is fetched from the pretrained RELATIVE embedding released by the [official
 - ***script to reproduce the data***: [`get_pair_vocab.py`](./get_pair_vocab.py)
 
 ### RELATIVE embedding model
-We train RELATIVE model on [the common-crawl-pretrained Fasttext model released from Facebook](https://dl.fbaipublicfiles.com/fasttext/vectors-english/crawl-300d-2M-subword.zip).
+We release the [RELATIVE embedding model](http://josecamachocollados.com/papers/relative_ijcai2019.pdf) trained on 
+[the common-crawl-pretrained Fasttext model released from Facebook](https://dl.fbaipublicfiles.com/fasttext/vectors-english/crawl-300d-2M-subword.zip).
+As the model vocabulary, we use all the pair from the above analogy test set as well as the word pair list.
+It's formatted to be used in gensim:
+ 
 
-- ***script to reproduce the data***: [`get_relative_embedding.py`](./get_relative_embedding.py)
-Compute [relative embedding](http://josecamachocollados.com/papers/relative_ijcai2019.pdf)
-over Wikipedia with FastText for the word pairs of analogy test dataset and wiki-common-word-pairs.
-```shell script
-usage: get_relative_embedding.py [-h] [-o OUTPUT] [-w WINDOW_SIZE] [--minimum-frequency-context MINIMUM_FREQUENCY_CONTEXT] [--minimum-frequency MINIMUM_FREQUENCY]
+- ***script to train RELATIVE model***: [`get_relative_embedding.py`](./get_relative_embedding.py)
 
-simplified RELATIVE embedding training
 
-optional arguments:
-  -h, --help            show this help message and exit
-  -o OUTPUT, --output OUTPUT
-                        Output file path to store relation vectors
-  -w WINDOW_SIZE, --window-size WINDOW_SIZE
-                        Co-occurring window size
-  --minimum-frequency-context MINIMUM_FREQUENCY_CONTEXT
-                        Minimum frequency of words between word pair: increasing the number can speed up thecalculations and reduce memory but we would recommend keeping this number low
-  --minimum-frequency MINIMUM_FREQUENCY
-                        Minimum frequency of words
-```
 
 
 ## Acknowledgement

@@ -2,10 +2,7 @@
 import os
 import logging
 import json
-from itertools import chain
-from random import randint
 
-import pandas as pd
 from gensim.models import fasttext
 from gensim.models import KeyedVectors
 from util import open_compressed_file
@@ -92,7 +89,7 @@ def get_prediction(stem, choice, embedding_model, relative: bool = False):
 
 def test_analogy(is_relative, reference_prediction=None):
     if is_relative:
-        word_embedding_model = KeyedVectors.load(PATH_RELATIVE_EMBEDDING)
+        word_embedding_model = KeyedVectors.load_word2vec_format(PATH_RELATIVE_EMBEDDING, binary=True)
         model_name = 'relative'
     else:
         word_embedding_model = fasttext.load_facebook_model(PATH_WORD_EMBEDDING)
