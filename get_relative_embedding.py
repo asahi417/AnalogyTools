@@ -187,7 +187,7 @@ def get_relative_init(output_path: str,
     word_embedding_model = fasttext.load_facebook_model(PATH_WORD_EMBEDDING)
     line_count = 0
     with open(output_path + '.tmp', 'w', encoding='utf-8') as txt_file:
-        for token_i, tokens_paired in context_word_dict.items():
+        for token_i, tokens_paired in tqdm(context_word_dict.items()):
             for token_j in tokens_paired:
                 vector_pair = 0
                 cont_pair = 0
@@ -208,12 +208,12 @@ def get_relative_init(output_path: str,
                     line_count += 1
 
     logging.info("reformat file to add header")
-    logging.info("\t * {} lines, {} dim".format(line_count, dim))
-    with open(output_path, 'w') as f:
-        f.write(str(line_count) + " " + str(word_embedding_model.vector_size) + "\n")
+    logging.info("\t * {} lines, {} dim".format(line_count, word_embedding_model.vector_size))
+    with open(output_path, 'w') as f_out:
+        f_out.write(str(line_count) + " " + str(word_embedding_model.vector_size) + "\n")
         with open(output_path + '.tmp', 'r') as f_cache:
             for line in f_cache:
-                f.write(line)
+                f_out.write(line)
 
 
 def get_options():
