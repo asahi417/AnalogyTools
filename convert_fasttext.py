@@ -62,25 +62,18 @@ def get_diff_vec(output_path: str, relation_pairs: Dict):
     logging.info("convert embeddings")
     with open(output_path + '.tmp', 'w', encoding='utf-8') as txt_file:
         for head, tails in tqdm(relation_pairs.items()):
+
             for tail in tails:
                 relative_embedding = word_embedding_model[head] - word_embedding_model[tail]
-                body = '__'.join([head, tail.replace(' ', '_')])
-                # txt_file.write()
-                # for v in relative_embedding.tolist():
+                _tail = tail.replace(' ', '_')
+                _head = head.replace(' ', '_')
+                body = '__'.join([_head, _tail])
                 for v in relative_embedding:
-                    # if abs(v) < 1e-4:
-                    #     txt_file.write(' 0')
-                    # else:
-                    #     txt_file.write(' ' + str(v))
                     body += ' ' + str(v)
-                    # txt_file.write(' ' + str(v))
                 body += "\n"
-                print(body)
-                print(len(body.rsplit()), body.rsplit())
-                print(len(body.split(' ')), body.split(' '))
                 txt_file.write(body)
                 line_count += 1
-                input()
+
     logging.info("reformat file to add header")
     logging.info("\t * {} lines, {} dim".format(line_count, word_embedding_model.vector_size))
     with open(output_path, 'w') as f_out:
