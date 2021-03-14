@@ -9,6 +9,21 @@ Dataset for analogical knowledge probing:
 - Word pair list:
     - [wiki-common-word-pairs](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/relative_vocab.tar.gz)
 
+### Data description
+***Analogy test set:*** A jsonline file in which each line consists of following dictionary,
+```
+{"stem": ["raphael", "painter"],
+ "answer": 2,
+ "choice": [["andersen", "plato"],
+            ["reading", "berkshire"],
+            ["marx", "philosopher"],
+            ["tolstoi", "edison"]]}
+``` 
+where `stem` is the query word pair, `choice` has word pair candidates, and `answer` indicates the index of correct candidate.
+
+***Word pair list:*** A json file of word (head) and its corresponding word (tail), based on PMI over the wikipedia.
+Please take a look the construction at the [original paper](http://josecamachocollados.com/papers/relative_ijcai2019.pdf). 
+
 ## Scripts
 - [`get_pair_vocab.py`](./get_pair_vocab.py): Retrieve wiki-common-word-pairs from [relative embedding model](https://github.com/pedrada88/relative), which
 is a word-pair embedding model trained on selected word pair from Wikipedia dump.

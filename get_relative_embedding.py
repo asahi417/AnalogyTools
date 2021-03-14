@@ -9,6 +9,7 @@ from typing import Dict
 from tqdm import tqdm
 
 from gensim.models import fasttext
+from gensim.models import KeyedVectors
 from util import open_compressed_file
 
 logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', level=logging.INFO, datefmt='%Y-%m-%d %H:%M:%S')
@@ -23,9 +24,8 @@ if not os.path.exists(PATH_WORD_EMBEDDING):
 # Corpus
 URL_CORPUS = 'https://drive.google.com/u/0/uc?id=17EBy4GD4tXl9G4NTjuIuG5ET7wfG4-xa&export=download'
 PATH_CORPUS = './cache/wikipedia_en_preprocessed.txt'
-CORPUS_LINE_LEN = 104000000
-# 104000000
-# 53709029
+CORPUS_LINE_LEN = 104000000  # 53709029
+
 OVERWRITE_CACHE = False
 if not os.path.exists(PATH_CORPUS):
     logging.info('downloading wikidump')
@@ -185,8 +185,8 @@ def get_relative_init(output_path: str,
     """ Get RELATIVE vectors """
     logging.info("loading embeddings")
     word_embedding_model = fasttext.load_facebook_model(PATH_WORD_EMBEDDING)
-
-    with open(output_path, 'w', encoding='utf-8') as txt_file:
+    line_count = 0
+    with open(output_path + '.tmp', 'w', encoding='utf-8') as txt_file:
         for token_i, tokens_paired in context_word_dict.items():
             for token_j in tokens_paired:
                 vector_pair = 0
@@ -200,15 +200,26 @@ def get_relative_init(output_path: str,
                     cont_pair += 1
                 if cont_pair != 0:
                     vector_pair = vector_pair/cont_pair
-                    txt_file.write(','.join([token_i, token_j] + list(map(str, vector_pair.tolist()))))                    
+                    txt_file.write(
+                        '__'.join([token_i, token_j]) + ' ' +
+                        ' '.join(list(map(str, vector_pair.tolist()))))
+                    # txt_file.write(','.join([token_i, token_j] + list(map(str, vector_pair.tolist()))))
                     txt_file.write("\n")
-    logging.info("new embeddings are available at {}".format(output_path))
+                    line_count += 1
+
+    logging.info("reformat file to add header")
+    logging.info("\t * {} lines, {} dim".format(line_count, dim))
+    with open(output_path, 'w') as f:
+        f.write(str(line_count) + " " + str(word_embedding_model.vector_size) + "\n")
+        with open(output_path + '.tmp', 'r') as f_cache:
+            for line in f_cache:
+                f.write(line)
 
 
 def get_options():
     parser = argparse.ArgumentParser(description='simplified RELATIVE embedding training')
     parser.add_argument('-o', '--output', help='Output file path to store relation vectors',
-                        type=str, default="./cache/relative_init_vectors.txt")
+                        type=str, default="./cache/relative_init_vectors.bin")
     # The following parameters are needed if contexts are not provided
     parser.add_argument('-w', '--window-size', help='Co-occurring window size', type=int, default=10)
     parser.add_argument('--minimum-frequency-context', default=1, type=int,
@@ -223,6 +234,7 @@ def get_options():
 if __name__ == '__main__':
 
     opt = get_options()
+    assert opt.output.endwith('.bin')
     if os.path.exists(opt.output):
         exit('found file at {}'.format(opt.output))
 
@@ -266,10 +278,23 @@ if __name__ == '__main__':
             json.dump(pairs_context, f)
 
     logging.info("computing relative-init vectors")
-    get_relative_init(
-        output_path=opt.output,
-        context_word_dict=pairs_context,
-        minimum_frequency_context=opt.minimum_frequency_context)
+    cache = opt.output.replace('.bin', '.txt')
+    if not os.path.exists(cache):
+        get_relative_init(
+            output_path=cache,
+            context_word_dict=pairs_context,
+            minimum_frequency_context=opt.minimum_frequency_context)
+
+    logging.info("producing binary file")
+    model = KeyedVectors.load_word2vec_format(cache)
+    model.wv.save_word2vec_format(opt.output)
+    logging.info("new embeddings are available at {}".format(opt.output))
+
+
+
+
+
+
 
 
 
