@@ -287,12 +287,3 @@ if __name__ == '__main__':
     model = KeyedVectors.load_word2vec_format(cache)
     model.wv.save_word2vec_format(opt.output, binary=True)
     logging.info("new embeddings are available at {}".format(opt.output))
-
-
-
-
-
-
-
-
-
