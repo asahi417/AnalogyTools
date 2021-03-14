@@ -79,7 +79,7 @@ def get_prediction(stem, choice, embedding_model, relative: bool = False):
             '__'.join(stem): diff(embedding(stem[0], embedding_model), embedding(stem[1], embedding_model))
         }
         for h, t in choice:
-            e_dict['__'.join([h, t])] = diff(embedding(h, embedding_model), embedding(t, embedding_model)),
+            e_dict['__'.join([h, t])] = diff(embedding(h, embedding_model), embedding(t, embedding_model))
         stem = '__'.join(stem)
         choice = ['__'.join(c) for c in choice]
 
