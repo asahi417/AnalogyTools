@@ -1,4 +1,8 @@
-""" Simplified script to get RELATIVE vector for fixed pair word dataset on Wikipedia dump with FastText """
+""" Simplified script to get RELATIVE vector for fixed pair word dataset on Wikipedia dump with FastText
+- wikidump is processed so that: lowercase, tokenizerd (token with multiple tokens is jointed by `_`)
+- relative vocabulary is lowercase and token with multiple tokens is jointed by halfspace
+- analogy data vocabulary is case-sensitive and token with multiple tokens is jointed by halfspace
+"""
 import logging
 import os
 import json
@@ -204,7 +208,7 @@ def get_relative_init(output_path: str,
                     freq = context_word_dict[token_i][token_j][token_co]
                     if freq < minimum_frequency_context:
                         continue
-                    token_co_vector = word_embedding_model[token_co]
+                    token_co_vector = word_embedding_model[token_co.replace('_', ' ')]
                     vector_pair += (freq * token_co_vector)
                     cont_pair += 1
                 if cont_pair != 0:
@@ -268,9 +272,9 @@ if __name__ == '__main__':
     else:
         logging.info("retrieve pair and word vocabulary (dictionary)")
         pair_vocab = get_pair_relative() + get_pair_analogy()
+        pair_vocab = sorted(pair_vocab)
         grouper = groupby(pair_vocab, key=lambda x: x[0])
         pair_vocab_dict = {k: list(set(list(map(lambda x: x[1], g)))) for k, g in grouper}
-
         pairs_context = frequency_filtering(
             vocab_, pair_vocab_dict, opt.window_size,
             cache_jsonline='{}/pairs_context_cache.jsonl'.format(os.path.dirname(opt.output)))

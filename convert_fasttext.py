@@ -77,6 +77,9 @@ if __name__ == '__main__':
         pair_vocab = sorted(pair_vocab)
         grouper = groupby(pair_vocab, key=lambda x: x[0])
         pair_vocab_dict = {k: list(set(list(map(lambda x: x[1], g)))) for k, g in grouper}
+        # insensitive. But sorting them, capitalized will come first and the element after second will be skipped when
+        # pair_vocab_dict would contains duplicated key such as Warsaw/warsaw because get_pair_relative is case
+        # forming model.
         get_diff_vec(cache, pair_vocab_dict)
 
     logging.info("producing binary file")
