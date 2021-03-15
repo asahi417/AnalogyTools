@@ -29,11 +29,13 @@ This is fetched from the pretrained RELATIVE embedding released by the [official
 
 ### RELATIVE embedding model
 We release the [RELATIVE embedding model](http://josecamachocollados.com/papers/relative_ijcai2019.pdf) trained on 
-[the common-crawl-pretrained Fasttext model released from Facebook](https://dl.fbaipublicfiles.com/fasttext/vectors-english/crawl-300d-2M-subword.zip).
-As a comparison, we also provide an embedding model with the same format but converted from fasttext trained on common-crawl.
+[the common-crawl-pretrained Fasttext model released from Facebook](https://dl.fbaipublicfiles.com/fasttext/vectors-english/crawl-300d-2M-subword.zip)
+(*relative_init_vectors*).
+As a comparison, we also provide an embedding model with the same format but converted from fasttext trained on common-crawl,
+where we take the difference in between each word pair and regard it as a relative vector (*fasttext_diff_vectors*).
 
-- [relative model](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/relative_init_vectors.bin.tar.gz)
-- [converted fasttext model](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/fasttext_diff_vectors.bin.tar.gz)
+- [*relative_init_vectors*](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/relative_init_vectors.bin.tar.gz)
+- [*fasttext_diff_vectors*](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/fasttext_diff_vectors.bin.tar.gz)
 
 As the model vocabulary, we use all the pair from the above analogy test set as well as the word pair list.
 It's formatted to be used in gensim:

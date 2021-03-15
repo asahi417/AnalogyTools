@@ -23,6 +23,14 @@ if not os.path.exists(PATH_RELATIVE_EMBEDDING):
     logging.info('downloading relative model')
     open_compressed_file(url=URL_RELATIVE_EMBEDDING, cache_dir='./cache')
 
+# Relative embedding
+URL_RELATIVE_EMBEDDING = 'https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/fasttext_diff_vectors.bin.tar.gz'
+PATH_RELATIVE_EMBEDDING = './cache/relative_init_vectors.bin'
+if not os.path.exists(PATH_RELATIVE_EMBEDDING):
+    logging.info('downloading relative model')
+    open_compressed_file(url=URL_RELATIVE_EMBEDDING, cache_dir='./cache')
+
+
 # Analogy data
 DATA = ['sat', 'u2', 'u4', 'google', 'bats']
 
