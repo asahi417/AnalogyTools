@@ -208,10 +208,7 @@ def get_relative_init(output_path: str,
                     txt_file.write('__'.join([token_i, token_j]))
                     for v in vector_pair:
                         txt_file.write(' ' + str(v))
-                        # if abs(v) < 1e-4:
-                        #     txt_file.write(' 0')
-                        # else:
-                        #     txt_file.write(' ' + str(v))
+
                     txt_file.write("\n")
                     line_count += 1
 
@@ -248,20 +245,6 @@ if __name__ == '__main__':
 
     os.makedirs(os.path.dirname(opt.output), exist_ok=True)
 
-    logging.info("retrieve pair and word vocabulary (dictionary)")
-    cache = '{}/pair_vocab.json'.format(os.path.dirname(opt.output))
-    if os.path.exists(cache):
-        with open(cache, 'r') as f:
-            pair_vocab_dict = json.load(f)
-    else:
-        pair_relative = get_pair_relative()
-        pair_analogy = get_pair_analogy()
-        pair_vocab = pair_analogy + pair_relative
-        grouper = groupby(pair_vocab, key=lambda x: x[0])
-        pair_vocab_dict = {k: list(set(list(map(lambda x: x[1], g)))) for k, g in grouper}
-        with open(cache, 'w') as f:
-            json.dump(pair_vocab_dict, f)
-
     logging.info("extracting contexts(this can take a few hours depending on the size of the corpus)")
     logging.info("\t * loading word frequency dictionary")
     path = '{}/vocab.pkl'.format(os.path.dirname(opt.output))
@@ -279,6 +262,11 @@ if __name__ == '__main__':
         with open(cache, 'r') as f:
             pairs_context = json.load(f)
     else:
+        logging.info("retrieve pair and word vocabulary (dictionary)")
+        pair_vocab = get_pair_relative() + get_pair_analogy()
+        grouper = groupby(pair_vocab, key=lambda x: x[0])
+        pair_vocab_dict = {k: list(set(list(map(lambda x: x[1], g)))) for k, g in grouper}
+
         pairs_context = frequency_filtering(
             vocab_, pair_vocab_dict, opt.window_size,
             cache_jsonline='{}/pairs_context_cache.jsonl'.format(os.path.dirname(opt.output)))
