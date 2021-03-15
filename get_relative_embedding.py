@@ -39,7 +39,7 @@ with open('./stopwords_en.txt', 'r') as f:
     STOPWORD_LIST = list(set(list(filter(len, f.read().split('\n')))))
 
 
-def get_pair_relative(uncased: bool = True):
+def get_pair_relative():
     """ Get the list of word pairs in RELATIVE pretrained model """
     _path = './cache/relative_vocab.pkl'
     if not os.path.exists(_path):
@@ -47,8 +47,6 @@ def get_pair_relative(uncased: bool = True):
         open_compressed_file(url=url, cache_dir='./cache')
     with open(_path, "rb") as fp:
         _vocab = pickle.load(fp)
-    if uncased:
-        return [v.lower() for v in _vocab]
     return _vocab
 
 
