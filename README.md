@@ -31,7 +31,8 @@ We release the [RELATIVE embedding model](http://josecamachocollados.com/papers/
 [the common-crawl-pretrained Fasttext model released from Facebook](https://dl.fbaipublicfiles.com/fasttext/vectors-english/crawl-300d-2M-subword.zip)
 (*relative_init_vectors*).
 As a comparison, we also provide an embedding model with the same format but converted from fasttext trained on common-crawl,
-where we take the difference in between each word pair and regard it as a relative vector (*fasttext_diff_vectors*).
+where we take the difference in between each word pair and regard it as a relative vector (*fasttext_diff_vectors*). We use the released model 
+form [official project page](https://fasttext.cc/docs/en/english-vectors.html).
 
 - [*relative_init_vectors*](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/relative_init_vectors.bin.tar.gz)
 - [*fasttext_diff_vectors*](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/fasttext_diff_vectors.bin.tar.gz)
@@ -44,7 +45,11 @@ relative_model = KeyedVectors.load_word2vec_format('./relative_init_vectors.bin'
 relative_model['paris__france']
 ```
 Note that words are joined by `__` and all the vocabulary is uncased. Multiple token should be combined by `_` such as 
-`new_york__tokyo` for the relation in between New York and Tokyo. 
+`new_york__tokyo` for the relation in between New York and Tokyo. The *fasttext_diff_vectors* model also relies on lowercase,
+but at the model construction, we use case-sensitive vocabulary, i.e.
+```
+new_embedding["new_york__tokyo"] = fasttext_model["New York"] - fasttext_model["Tokyo"]
+```
 
 - ***script to train relative_init_vectors***: [`get_relative_embedding.py`](./get_relative_embedding.py)
 - ***script to produce fasttext_diff_vectors***: [`convert_fasttext.py`](./convert_fasttext.py)

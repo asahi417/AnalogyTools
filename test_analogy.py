@@ -94,6 +94,8 @@ def test_analogy(is_relative, reference_prediction=None):
             pred = [p if p is not None else reference_prediction[i][prefix][n] for n, p in enumerate(pred)]
             accuracy = sum([o['answer'] == pred[n] for n, o in enumerate(data)]) / len(pred)
             tmp_result['accuracy_{}'.format(prefix)] = accuracy
+        tmp_result['accuracy'] = (tmp_result['accuracy_test'] * len(test) +
+                                  tmp_result['accuracy_valid'] * len(val)) / (len(val) + len(test))
         results.append(tmp_result)
     return results, prediction
 
