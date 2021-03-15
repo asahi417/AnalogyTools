@@ -62,8 +62,8 @@ def cos_similarity(a_, b_):
 def get_prediction(stem, choice, embedding_model, relative: bool = False):
     if relative:
         # relative vector
-        stem = '__'.join(stem)
-        choice = ['__'.join(c) for c in choice]
+        stem = '__'.join(stem).lower()
+        choice = ['__'.join(c).lower() for c in choice]
         e_dict = dict([(_i, embedding(_i, embedding_model)) for _i in choice + [stem]])
     else:
         # diff vector
@@ -113,8 +113,12 @@ def test_analogy(is_relative, reference_prediction=None):
 
 
 if __name__ == '__main__':
+    import pandas as pd
     results_fasttext, p_fasttext = test_analogy(False)
     results_relative, _ = test_analogy(True, p_fasttext)
+    out = pd.DataFrame(results_fasttext + results_relative)
+    print(out)
+
     with open('./result.jsonl', 'w') as f:
         for line in results_fasttext + results_relative:
             f.write(json.dumps(line) + '\n')
