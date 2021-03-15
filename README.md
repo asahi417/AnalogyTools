@@ -1,5 +1,5 @@
-# Analogy Dataset
-Dataset/model checkpoint for relational knowledge probing.
+# Analogy Data and Relative Embedding 
+Analogy dataset and relative embedding model trained to cover the relation.
 
 ## Analogy test set
 Following analogy dataset is available:

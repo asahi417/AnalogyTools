@@ -35,7 +35,7 @@ with open('./stopwords_en.txt', 'r') as f:
     STOPWORD_LIST = list(set(list(filter(len, f.read().split('\n')))))
 
 
-def get_pair_relative():
+def get_pair_relative(uncased: bool = True):
     """ Get the list of word pairs in RELATIVE pretrained model """
     _path = './cache/relative_vocab.pkl'
     if not os.path.exists(_path):
@@ -43,10 +43,12 @@ def get_pair_relative():
         open_compressed_file(url=url, cache_dir='./cache')
     with open(_path, "rb") as fp:
         _vocab = pickle.load(fp)
-    return [v.lower() for v in _vocab]
+    if uncased:
+        return [v.lower() for v in _vocab]
+    return _vocab
 
 
-def get_pair_analogy():
+def get_pair_analogy(uncased: bool = True):
     """ Get the list of word pairs in analogy dataset """
     data = dict(
         sat='https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/sat.zip',
@@ -57,7 +59,10 @@ def get_pair_analogy():
 
     def extract_pairs(_json_file):
         _json = json.loads(_json_file)
-        return [[a.lower() for a in _json['stem']]] + [[a.lower(), b.lower()] for a, b in _json['choice']]
+        if uncased:
+            return [[a.lower() for a in _json['stem']]] + [[a.lower(), b.lower()] for a, b in _json['choice']]
+        else:
+            return [_json['stem']] + _json['choice']
 
     for name, url in data.items():
         open_compressed_file(url=url, cache_dir='./cache')
@@ -65,7 +70,6 @@ def get_pair_analogy():
             pairs = list(chain(*[extract_pairs(i) for i in f_.read().split('\n') if len(i) > 0]))
         with open('./cache/{}/test.jsonl'.format(name), 'r') as f_:
             pairs += list(chain(*[extract_pairs(i) for i in f_.read().split('\n') if len(i) > 0]))
-    pairs = [v.lower() for v in pairs]
     return pairs
 
 
