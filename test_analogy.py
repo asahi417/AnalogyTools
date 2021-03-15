@@ -61,7 +61,7 @@ def cos_similarity(a_, b_):
 
 def get_prediction(stem, choice, embedding_model, relative: bool = False):
     if relative:
-        # relative vector
+        # relative vector: relative vector can handle lowercase only
         stem = '__'.join(stem).lower()
         choice = ['__'.join(c).lower() for c in choice]
         e_dict = dict([(_i, embedding(_i, embedding_model)) for _i in choice + [stem]])

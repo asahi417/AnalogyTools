@@ -42,7 +42,8 @@ def get_pair_relative():
         url = 'https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/relative_vocab.tar.gz'
         open_compressed_file(url=url, cache_dir='./cache')
     with open(_path, "rb") as fp:
-        return pickle.load(fp)
+        _vocab = pickle.load(fp)
+    return [v.lower() for v in _vocab]
 
 
 def get_pair_analogy():
@@ -64,6 +65,7 @@ def get_pair_analogy():
             pairs = list(chain(*[extract_pairs(i) for i in f_.read().split('\n') if len(i) > 0]))
         with open('./cache/{}/test.jsonl'.format(name), 'r') as f_:
             pairs += list(chain(*[extract_pairs(i) for i in f_.read().split('\n') if len(i) > 0]))
+    pairs = [v.lower() for v in pairs]
     return pairs
 
 
