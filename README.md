@@ -1,19 +1,16 @@
 # Analogy Dataset
-Dataset/model checkpoint for relational knowledge probing:
-- Analogy test set:
-    - SAT: [file](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/sat.zip)
-    - U2: [file](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/u2.zip)
-    - U2: [file](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/u4.zip)
-    - Google: [file](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/google.zip)
-    - BATS: [file](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/bats.zip)
-- Word pair list: [file](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/relative_vocab.tar.gz)
-- RELATIVE embedding model
-    - RELATIVE trained on Wikipedia dump on fasttext: [file](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/relative_init_vectors.bin.tar.gz)
-    - Relation embedding converted from FastText: [file](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/fasttext_diff_vectors.bin.tar.gz)
-
+Dataset/model checkpoint for relational knowledge probing.
+    
 ## Data description
 ### Analogy test set
-A jsonline file in which each line consists of following dictionary,
+Following analogy dataset is available:
+- SAT: [file](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/sat.zip)
+- U2: [file](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/u2.zip)
+- U2: [file](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/u4.zip)
+- Google: [file](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/google.zip)
+- BATS: [file](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/bats.zip)
+
+Each contains jsonline files for validation and test, in which each line consists of following dictionary,
 ```
 {"stem": ["raphael", "painter"],
  "answer": 2,
@@ -25,20 +22,30 @@ A jsonline file in which each line consists of following dictionary,
 where `stem` is the query word pair, `choice` has word pair candidates, and `answer` indicates the index of correct candidate.
 
 ### Word pair list
-A json file of word (head) and its corresponding word (tail), based on PMI over the wikipedia.
+We provide a json file of word (head) and its corresponding word (tail), based on PMI over the lower cased Wikipedia
+[here](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/relative_vocab.tar.gz).
 This is fetched from the pretrained RELATIVE embedding released by the [official repo](https://github.com/pedrada88/relative).
 - ***script to reproduce the data***: [`get_pair_vocab.py`](./get_pair_vocab.py)
 
 ### RELATIVE embedding model
 We release the [RELATIVE embedding model](http://josecamachocollados.com/papers/relative_ijcai2019.pdf) trained on 
 [the common-crawl-pretrained Fasttext model released from Facebook](https://dl.fbaipublicfiles.com/fasttext/vectors-english/crawl-300d-2M-subword.zip).
+As a comparison, we also provide an embedding model with the same format but converted from fasttext trained on common-crawl.
+
+- [relative model](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/relative_init_vectors.bin.tar.gz)
+- [converted fasttext model](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/fasttext_diff_vectors.bin.tar.gz)
+
 As the model vocabulary, we use all the pair from the above analogy test set as well as the word pair list.
 It's formatted to be used in gensim:
 ```python
 from gensim.models import KeyedVectors
 relative_model = KeyedVectors.load_word2vec_format('./relative_init_vectors.bin', binary=True)
+relative_model['paris__france']
 ```
+Note that words are joined by `__` and all the vocabulary is uncased.
+
 - ***script to train RELATIVE model***: [`get_relative_embedding.py`](./get_relative_embedding.py)
+- ***script to convert fasttext model***: [`convert_fasttext.py`](./convert_fasttext.py)
 
 ## Test Analogy 
 Quick experiment to compare our RELATIVE model with the underlying FastText model.
@@ -61,3 +68,4 @@ Quick experiment to compare our RELATIVE model with the underlying FastText mode
 ## Acknowledgement
 About RELATIVE embedding work, please refer [the official implementation](https://github.com/pedrada88/relative) and
 [the paper](http://josecamachocollados.com/papers/relative_ijcai2019.pdf) for further information.
+For the fasttext model, please refer [the facebook release](https://fasttext.cc/docs/en/english-vectors.html).
