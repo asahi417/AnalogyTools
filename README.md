@@ -1,7 +1,7 @@
 # Analogy Data and Relative Embedding 
-Analogy dataset and relative embedding model trained to cover the relation.
+Release five analogy datasets and relative embedding models trained to cover the relation pairs.
 
-## Analogy test set
+## Analogy Test Dataset
 Following analogy dataset is available (click to download the data):
 [SAT](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/sat.zip), 
 [U2](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/u2.zip),
@@ -20,16 +20,18 @@ Each contains jsonline files for validation and test, in which each line consist
 ``` 
 where `stem` is the query word pair, `choice` has word pair candidates, and `answer` indicates the index of correct candidate.
 
-## Word pair list
-We provide a json file of word (head) and its corresponding word (tail), based on PMI over the lower cased Wikipedia
+## Common Word Pairs
+We provide a json file of a head word and its corresponding tail words, based on PMI over the lower cased Wikipedia
 [here](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/relative_vocab.tar.gz).
-This is fetched from the pretrained RELATIVE embedding released by the [official repo](https://github.com/pedrada88/relative).
+This is fetched from the pretrained RELATIVE embedding released by the [official repo](https://github.com/pedrada88/relative) and 
+is supposed to be used as a corpus to train a relation embedding model.
+
 - ***script to reproduce the data***: [`get_pair_vocab.py`](./get_pair_vocab.py)
 
 ## RELATIVE embedding model
-We release the [RELATIVE embedding model](http://josecamachocollados.com/papers/relative_ijcai2019.pdf) trained on 
+We release the [RELATIVE embedding model](http://josecamachocollados.com/papers/relative_ijcai2019.pdf) trained with 
 [the common-crawl-pretrained Fasttext model released from Facebook](https://dl.fbaipublicfiles.com/fasttext/vectors-english/crawl-300d-2M-subword.zip)
-(*relative_init_vectors*).
+(*relative_init_vectors*) over the [common-word-pair](#common-word-pairs) and all the word pairs from [analogy test dataset](#analogy-test-dataset).
 As a comparison, we also provide an embedding model with the same format but converted from fasttext trained on common-crawl,
 where we take the difference in between each word pair and regard it as a relative vector (*fasttext_diff_vectors*).
 
@@ -54,7 +56,7 @@ new_embedding["new_york__tokyo"] = fasttext_model["New York"] - fasttext_model["
 - ***script to produce fasttext_diff_vectors***: [`convert_fasttext.py`](./convert_fasttext.py)
 
 ## Analogy Result 
-Quick experiment to compare our RELATIVE model with the underlying FastText model.
+Benchmark of the analogy dataset with *relative_init_vectors* and *fasttext_diff_vectors*.
 
 | model    | data   | oov_test | accuracy_test | oov_valid | accuracy_valid |
 |----------|--------|----------|---------------|-----------|----------------|

@@ -75,10 +75,10 @@ def get_prediction(stem, choice, embedding_model):
 def test_analogy(is_relative, reference_prediction=None):
     if is_relative:
         model_path = PATH_RELATIVE_EMBEDDING
-        model_name = 'relative'
+        model_name = 'relative_init'
     else:
         model_path = PATH_FASTTEXT_EMBEDDING
-        model_name = 'fasttext'
+        model_name = 'fasttext_diff'
     word_embedding_model = KeyedVectors.load_word2vec_format(model_path, binary=True)
 
     prediction = {}
