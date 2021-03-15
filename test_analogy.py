@@ -1,6 +1,4 @@
-""" Solve analogy task by word embedding model
-Fasttext
-"""
+""" Solve analogy task by word embedding model """
 import os
 import logging
 import json
@@ -10,11 +8,11 @@ from util import open_compressed_file
 logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', level=logging.INFO, datefmt='%Y-%m-%d %H:%M:%S')
 
 # Relative embedding
-# URL_RELATIVE_EMBEDDING = 'https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/relative_init_vectors.bin.tar.gz'
-# PATH_RELATIVE_EMBEDDING = './cache/relative_init_vectors.bin'
-# if not os.path.exists(PATH_RELATIVE_EMBEDDING):
-#     logging.info('downloading relative model')
-#     open_compressed_file(url=URL_RELATIVE_EMBEDDING, cache_dir='./cache')
+URL_RELATIVE_EMBEDDING = 'https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/relative_init_vectors.bin.tar.gz'
+PATH_RELATIVE_EMBEDDING = './cache/relative_init_vectors.bin'
+if not os.path.exists(PATH_RELATIVE_EMBEDDING):
+    logging.info('downloading relative model')
+    open_compressed_file(url=URL_RELATIVE_EMBEDDING, cache_dir='./cache')
 
 # Relative embedding
 URL_FASTTEXT_EMBEDDING = 'https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/fasttext_diff_vectors.bin.tar.gz'
@@ -102,9 +100,11 @@ def test_analogy(is_relative, reference_prediction=None):
 
 if __name__ == '__main__':
     import pandas as pd
+    # if relative dose not have the pair in its vocabulary, we use diff fasttext's prediction as it doesn't have
+    # OOV as its nature.
+
     results_fasttext, p_fasttext = test_analogy(False)
-    # results_relative, _ = test_analogy(True, p_fasttext)
-    # out = pd.DataFrame(results_fasttext + results_relative)
-    out = pd.DataFrame(results_fasttext)
+    results_relative, _ = test_analogy(True, p_fasttext)
+    out = pd.DataFrame(results_fasttext + results_relative)
     logging.info('finish evaluation:\n{}'.format(out))
     out.to_csv('./result.csv')

@@ -58,18 +58,18 @@ new_embedding["new_york__tokyo"] = fasttext_model["New York"] - fasttext_model["
 ## Analogy Result 
 Benchmark of the analogy dataset with *relative_init_vectors* and *fasttext_diff_vectors*.
 
-| model    | data   | oov_test | accuracy_test | oov_valid | accuracy_valid |
-|----------|--------|----------|---------------|-----------|----------------|
-| fasttext | sat    | 0        | 0.462908      | 0         | 0.540541       |
-| fasttext | u2     | 0        | 0.381579      | 0         | 0.291667       |
-| fasttext | u4     | 0        | 0.384259      | 0         | 0.395833       |
-| fasttext | google | 0        | 0.948000      | 0         | 0.940000       |
-| fasttext | bats   | 0        | 0.706504      | 0         | 0.733668       |
-| relative | sat    | 252      | 0.430267      | 22        | 0.324324       |
-| relative | u2     | 172      | 0.407895      | 17        | 0.250000       |
-| relative | u4     | 304      | 0.388889      | 38        | 0.354167       |
-| relative | google | 479      | 0.938000      | 47        | 0.940000       |
-| relative | bats   | 1446     | 0.724291      | 156       | 0.738693       |
+| model         | data   | oov_test | accuracy_test | oov_valid | accuracy_valid | accuracy |
+|---------------|--------|----------|---------------|-----------|----------------|----------|
+| fasttext_diff | sat    | 0        | 0.462908      | 0         | 0.540541       | 0.470588 |
+| fasttext_diff | u2     | 0        | 0.381579      | 0         | 0.291667       | 0.373016 |
+| fasttext_diff | u4     | 0        | 0.384259      | 0         | 0.395833       | 0.385417 |
+| fasttext_diff | google | 0        | 0.948000      | 0         | 0.940000       | 0.947273 |
+| fasttext_diff | bats   | 0        | 0.714842      | 0         | 0.743719       | 0.717718 |
+| relative_init | sat    | 88       | 0.311573      | 4         | 0.243243       | 0.304813 |
+| relative_init | u2     | 49       | 0.342105      | 5         | 0.250000       | 0.333333 |
+| relative_init | u4     | 83       | 0.293981      | 8         | 0.333333       | 0.297917 |
+| relative_init | google | 65       | 0.654000      | 6         | 0.640000       | 0.652727 |
+| relative_init | bats   | 399      | 0.517510      | 50        | 0.537688       | 0.519520 |
 
 - ***script to reproduce the result***: [`test_analogy.py`](./test_analogy.py)
 
