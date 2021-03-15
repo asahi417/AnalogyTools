@@ -2,12 +2,12 @@
 Analogy dataset and relative embedding model trained to cover the relation.
 
 ## Analogy test set
-Following analogy dataset is available:
-- SAT: [file](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/sat.zip)
-- U2: [file](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/u2.zip)
-- U2: [file](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/u4.zip)
-- Google: [file](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/google.zip)
-- BATS: [file](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/bats.zip)
+Following analogy dataset is available (click to download the data):
+[SAT](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/sat.zip), 
+[U2](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/u2.zip),
+[U4](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/u4.zip),
+[Goolgle](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/google.zip),
+[BATS](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/bats.zip).
 
 Each contains jsonline files for validation and test, in which each line consists of following dictionary,
 ```
