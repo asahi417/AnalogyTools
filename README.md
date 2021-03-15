@@ -56,7 +56,7 @@ new_embedding["new_york__tokyo"] = fasttext_model["New York"] - fasttext_model["
 - ***script to produce fasttext_diff_vectors***: [`convert_fasttext.py`](./convert_fasttext.py)
 
 ## Analogy Result 
-Benchmark of the analogy dataset with *relative_init_vectors* and *fasttext_diff_vectors*.
+Benchmark of the analogy dataset with *relative_init_vectors* and *fasttext_diff_vectors*. We export fasttext prediction as a default benchmark [here](./fasttext_prediction.json). 
 
 | model         | data   | oov_test | accuracy_test | oov_valid | accuracy_valid | accuracy |
 |---------------|--------|----------|---------------|-----------|----------------|----------|

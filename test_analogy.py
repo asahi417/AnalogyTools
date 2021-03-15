@@ -44,7 +44,6 @@ def embedding(term, model):
     try:
         return model[term]
     except Exception:
-        print(term)
         return None
 
 
@@ -104,7 +103,10 @@ if __name__ == '__main__':
     # OOV as its nature.
 
     results_fasttext, p_fasttext = test_analogy(False)
+    with open('./fasttext_prediction.json', 'w') as f_write:
+        json.dump(p_fasttext, f_write)
     results_relative, _ = test_analogy(True, p_fasttext)
     out = pd.DataFrame(results_fasttext + results_relative)
     logging.info('finish evaluation:\n{}'.format(out))
     out.to_csv('./result.csv')
+
