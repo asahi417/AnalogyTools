@@ -36,9 +36,9 @@ def get_diff_vec(output_path: str, relation_pairs: Dict):
 
             for tail in tails:
                 relative_embedding = word_embedding_model[head] - word_embedding_model[tail]
+                # index is created in lower case although the embedding is based on case-sensitive
                 _tail = tail.replace(' ', '_')
                 _head = head.replace(' ', '_')
-                # index is created in lower case although the embedding is based on case-sensitive
                 body = '__'.join([_head.lower(), _tail.lower()])
                 for v in relative_embedding:
                     body += ' ' + str(v)

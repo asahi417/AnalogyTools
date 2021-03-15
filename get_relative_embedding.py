@@ -64,10 +64,11 @@ def get_pair_analogy(uncased: bool = True):
         else:
             return [_json['stem']] + _json['choice']
 
+    pairs = []
     for name, url in data.items():
         open_compressed_file(url=url, cache_dir='./cache')
         with open('./cache/{}/valid.jsonl'.format(name), 'r') as f_:
-            pairs = list(chain(*[extract_pairs(i) for i in f_.read().split('\n') if len(i) > 0]))
+            pairs += list(chain(*[extract_pairs(i) for i in f_.read().split('\n') if len(i) > 0]))
         with open('./cache/{}/test.jsonl'.format(name), 'r') as f_:
             pairs += list(chain(*[extract_pairs(i) for i in f_.read().split('\n') if len(i) > 0]))
     return pairs
@@ -84,6 +85,7 @@ def get_word_from_corpus(minimum_frequency: int, word_vocabulary_size: int = Non
             for token in l_split:
                 if token in STOPWORD_LIST or "__" in token or token.isdigit():
                     continue
+                # token = token.replace('_', ' ')  # wiki dump do this preprocessing
                 if token in dict_freq:
                     dict_freq[token] += 1
                 else:
@@ -108,7 +110,7 @@ def frequency_filtering(vocab, dict_pairvocab, window_size, cache_jsonline):
     def get_context(i, tokens):
         """ get context with token `i` in `tokens`, returns list of tuple (token_j, [w_1, ...])"""
         try:
-            tmp_vocab = dict_pairvocab[tokens[i]]
+            tmp_vocab = dict_pairvocab[tokens[i].replace(' ', '_')]  # following preprocessing
         except KeyError:
             return None
 

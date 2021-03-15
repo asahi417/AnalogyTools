@@ -1,9 +1,9 @@
-""" Solve analogy task by word embedding model """
+""" Solve analogy task by word embedding model
+Fasttext
+"""
 import os
 import logging
 import json
-
-from gensim.models import fasttext
 from gensim.models import KeyedVectors
 from util import open_compressed_file
 
@@ -18,7 +18,7 @@ if not os.path.exists(PATH_RELATIVE_EMBEDDING):
 
 # Relative embedding
 URL_FASTTEXT_EMBEDDING = 'https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/fasttext_diff_vectors.bin.tar.gz'
-PATH_FASTTEXT_EMBEDDING = './cache/relative_init_vectors.bin'
+PATH_FASTTEXT_EMBEDDING = './cache/fasttext_diff_vectors.bin'
 if not os.path.exists(PATH_FASTTEXT_EMBEDDING):
     logging.info('downloading diff_fasttext model')
     open_compressed_file(url=URL_FASTTEXT_EMBEDDING, cache_dir='./cache')
@@ -46,6 +46,7 @@ def embedding(term, model):
     try:
         return model[term]
     except Exception:
+        print(term)
         return None
 
 
@@ -60,27 +61,10 @@ def cos_similarity(a_, b_):
     return inner / (norm_b * norm_a)
 
 
-def get_prediction(stem, choice, embedding_model, relative: bool = False):
-    if relative:
-        # relative vector: relative vector can handle lowercase only
-        stem = '__'.join(stem).lower()
-        choice = ['__'.join(c).lower() for c in choice]
-        e_dict = dict([(_i, embedding(_i, embedding_model)) for _i in choice + [stem]])
-    else:
-        # diff vector
-        def diff(x, y):
-            if x is None or y is None:
-                return None
-            return x - y
-
-        e_dict = {
-            '__'.join(stem): diff(embedding(stem[0], embedding_model), embedding(stem[1], embedding_model))
-        }
-        for h, t in choice:
-            e_dict['__'.join([h, t])] = diff(embedding(h, embedding_model), embedding(t, embedding_model))
-        stem = '__'.join(stem)
-        choice = ['__'.join(c) for c in choice]
-
+def get_prediction(stem, choice, embedding_model):
+    stem = '__'.join(stem).lower().replace(' ', '_')
+    choice = ['__'.join(c).lower().replace(' ', '_') for c in choice]
+    e_dict = dict([(_i, embedding(_i, embedding_model)) for _i in choice + [stem]])
     score = [cos_similarity(e_dict[stem], e_dict[c]) for c in choice]
     pred = score.index(max(score))
     if score[pred] == -100:
@@ -90,11 +74,12 @@ def get_prediction(stem, choice, embedding_model, relative: bool = False):
 
 def test_analogy(is_relative, reference_prediction=None):
     if is_relative:
-        word_embedding_model = KeyedVectors.load_word2vec_format(PATH_RELATIVE_EMBEDDING, binary=True)
+        model_path = PATH_RELATIVE_EMBEDDING
         model_name = 'relative'
     else:
-        word_embedding_model = fasttext.load_facebook_model(PATH_WORD_EMBEDDING)
+        model_path = PATH_FASTTEXT_EMBEDDING
         model_name = 'fasttext'
+    word_embedding_model = KeyedVectors.load_word2vec_format(model_path, binary=True)
 
     prediction = {}
     results = []
@@ -103,7 +88,7 @@ def test_analogy(is_relative, reference_prediction=None):
         val, test = get_dataset_raw(i)
         prediction[i] = {}
         for prefix, data in zip(['test', 'valid'], [test, val]):
-            pred = [get_prediction(o['stem'], o['choice'], word_embedding_model, relative=is_relative) for o in data]
+            pred = [get_prediction(o['stem'], o['choice'], word_embedding_model) for o in data]
             prediction[i][prefix] = pred
             tmp_result['oov_{}'.format(prefix)] = len([p for p in pred if p is None])
             pred = [p if p is not None else reference_prediction[i][prefix][n] for n, p in enumerate(pred)]
@@ -116,11 +101,8 @@ def test_analogy(is_relative, reference_prediction=None):
 if __name__ == '__main__':
     import pandas as pd
     results_fasttext, p_fasttext = test_analogy(False)
-    results_relative, _ = test_analogy(True, p_fasttext)
-    out = pd.DataFrame(results_fasttext + results_relative)
-    print(out)
-
-    with open('./result.jsonl', 'w') as f:
-        for line in results_fasttext + results_relative:
-            f.write(json.dumps(line) + '\n')
-    logging.info('finish evaluation: result was exported to {}'.format('./result.jsonl'))
+    # results_relative, _ = test_analogy(True, p_fasttext)
+    # out = pd.DataFrame(results_fasttext + results_relative)
+    out = pd.DataFrame(results_fasttext)
+    logging.info('finish evaluation:\n{}'.format(out))
+    out.to_csv('./result.csv')

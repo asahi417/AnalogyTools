@@ -43,7 +43,8 @@ from gensim.models import KeyedVectors
 relative_model = KeyedVectors.load_word2vec_format('./relative_init_vectors.bin', binary=True)
 relative_model['paris__france']
 ```
-Note that words are joined by `__` and all the vocabulary is uncased.
+Note that words are joined by `__` and all the vocabulary is uncased. Multiple token should be combined by `_` such as 
+`new_york__tokyo` for the relation in between New York and Tokyo. 
 
 - ***script to train relative_init_vectors***: [`get_relative_embedding.py`](./get_relative_embedding.py)
 - ***script to produce fasttext_diff_vectors***: [`convert_fasttext.py`](./convert_fasttext.py)
