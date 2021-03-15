@@ -125,6 +125,7 @@ def frequency_filtering(vocab, dict_pairvocab, window_size, cache_jsonline):
         context_i_ = [(k_, v_) for k_, v_ in context_i_ if len(v_) > 1]
         if len(context_i_) == 0:
             return None
+        context_i_ = sorted(context_i_)
         return dict([(k_, list(g)[0][1]) for k_, g in groupby(context_i_, key=lambda x: x[0])])
 
     logging.info('cache context word')
