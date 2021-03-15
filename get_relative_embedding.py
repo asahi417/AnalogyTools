@@ -110,12 +110,14 @@ def frequency_filtering(vocab, dict_pairvocab, window_size, cache_jsonline):
     def get_context(i, tokens):
         """ get context with token `i` in `tokens`, returns list of tuple (token_j, [w_1, ...])"""
         try:
-            tmp_vocab = dict_pairvocab[tokens[i].replace(' ', '_')]  # following preprocessing
+            # `dict_pairvocab` construct multi words with halfspace while wiki dump with '_', so here to fix
+            # the mismatch
+            tmp_vocab = dict_pairvocab[tokens[i].replace('_', ' ')]
         except KeyError:
             return None
 
         context_i_ = [(tokens[j], list(filter(lambda x: len(x) > 1, tokens[i + 1:j]))) for j in
-                      range(i + 2, min(i + 1 + window_size, len(tokens))) if tokens[j] in tmp_vocab]
+                      range(i + 2, min(i + 1 + window_size, len(tokens))) if tokens[j].replace('_', ' ') in tmp_vocab]
         context_i_ = [(k_, v_) for k_, v_ in context_i_ if len(v_) > 1]
         if len(context_i_) == 0:
             return None

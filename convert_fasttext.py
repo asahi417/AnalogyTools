@@ -74,6 +74,7 @@ if __name__ == '__main__':
     cache = opt.output.replace('.bin', '.txt')
     if not os.path.exists(cache):
         pair_vocab = get_pair_relative(uncased=False) + get_pair_analogy(uncased=False)
+        pair_vocab = sorted(pair_vocab)
         grouper = groupby(pair_vocab, key=lambda x: x[0])
         pair_vocab_dict = {k: list(set(list(map(lambda x: x[1], g)))) for k, g in grouper}
         get_diff_vec(cache, pair_vocab_dict)
