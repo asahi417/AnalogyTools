@@ -1,8 +1,7 @@
 # Analogy Dataset
 Dataset/model checkpoint for relational knowledge probing.
-    
-## Data description
-### Analogy test set
+
+## Analogy test set
 Following analogy dataset is available:
 - SAT: [file](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/sat.zip)
 - U2: [file](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/u2.zip)
@@ -21,13 +20,13 @@ Each contains jsonline files for validation and test, in which each line consist
 ``` 
 where `stem` is the query word pair, `choice` has word pair candidates, and `answer` indicates the index of correct candidate.
 
-### Word pair list
+## Word pair list
 We provide a json file of word (head) and its corresponding word (tail), based on PMI over the lower cased Wikipedia
 [here](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/relative_vocab.tar.gz).
 This is fetched from the pretrained RELATIVE embedding released by the [official repo](https://github.com/pedrada88/relative).
 - ***script to reproduce the data***: [`get_pair_vocab.py`](./get_pair_vocab.py)
 
-### RELATIVE embedding model
+## RELATIVE embedding model
 We release the [RELATIVE embedding model](http://josecamachocollados.com/papers/relative_ijcai2019.pdf) trained on 
 [the common-crawl-pretrained Fasttext model released from Facebook](https://dl.fbaipublicfiles.com/fasttext/vectors-english/crawl-300d-2M-subword.zip)
 (*relative_init_vectors*).
@@ -46,10 +45,10 @@ relative_model['paris__france']
 ```
 Note that words are joined by `__` and all the vocabulary is uncased.
 
-- ***script to train RELATIVE model***: [`get_relative_embedding.py`](./get_relative_embedding.py)
-- ***script to convert fasttext model***: [`convert_fasttext.py`](./convert_fasttext.py)
+- ***script to train relative_init_vectors***: [`get_relative_embedding.py`](./get_relative_embedding.py)
+- ***script to produce fasttext_diff_vectors***: [`convert_fasttext.py`](./convert_fasttext.py)
 
-## Test Analogy 
+## Analogy Result 
 Quick experiment to compare our RELATIVE model with the underlying FastText model.
 
 | model    | data   | oov_test | accuracy_test | oov_valid | accuracy_valid |
