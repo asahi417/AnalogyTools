@@ -1,7 +1,7 @@
-""" Convert fasttext embedding to relational embedding format:
-The embedding for word A and B is computed as, ft[A] - ft[B] and it's stored by the index of
-'{}__{}'.format(A.lower(), B.lowe()). Eg) Dft["paris_france"] = ft["Paris"] - ft["France"] where
-Dft is the new model and ft is the underlying fasttext model.
+""" generate `fasttext_diff` embedding model:
+Convert fasttext embedding to relational embedding format. The embedding for word A and B is computed as,
+ft[A] - ft[B] and it's stored by the index of '{}__{}'.format(A.lower(), B.lowe()).
+Eg) Dft["paris_france"] = ft["Paris"] - ft["France"] where Dft is the new model and ft is the underlying fasttext model.
 """
 import logging
 import os
@@ -13,7 +13,7 @@ from tqdm import tqdm
 from gensim.models import fasttext
 from gensim.models import KeyedVectors
 from util import open_compressed_file
-from get_relative_embedding import get_pair_analogy, get_pair_relative
+from get_relative_init import get_pair_analogy, get_pair_relative
 
 logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', level=logging.INFO, datefmt='%Y-%m-%d %H:%M:%S')
 

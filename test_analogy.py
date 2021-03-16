@@ -2,25 +2,9 @@
 import os
 import logging
 import json
-from gensim.models import KeyedVectors
-from util import open_compressed_file
+from util import open_compressed_file, get_embedding_model
 
 logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', level=logging.INFO, datefmt='%Y-%m-%d %H:%M:%S')
-
-# Relative embedding
-URL_RELATIVE_EMBEDDING = 'https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/relative_init_vectors.bin.tar.gz'
-PATH_RELATIVE_EMBEDDING = './cache/relative_init_vectors.bin'
-if not os.path.exists(PATH_RELATIVE_EMBEDDING):
-    logging.info('downloading relative model')
-    open_compressed_file(url=URL_RELATIVE_EMBEDDING, cache_dir='./cache')
-
-# Relative embedding
-URL_FASTTEXT_EMBEDDING = 'https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/fasttext_diff_vectors.bin.tar.gz'
-PATH_FASTTEXT_EMBEDDING = './cache/fasttext_diff_vectors.bin'
-if not os.path.exists(PATH_FASTTEXT_EMBEDDING):
-    logging.info('downloading diff_fasttext model')
-    open_compressed_file(url=URL_FASTTEXT_EMBEDDING, cache_dir='./cache')
-
 
 # Analogy data
 DATA = ['sat', 'u2', 'u4', 'google', 'bats']
@@ -69,23 +53,17 @@ def get_prediction(stem, choice, embedding_model):
     return pred
 
 
-def test_analogy(is_relative, reference_prediction=None):
-    if is_relative:
-        model_path = PATH_RELATIVE_EMBEDDING
-        model_name = 'relative_init'
-    else:
-        model_path = PATH_FASTTEXT_EMBEDDING
-        model_name = 'fasttext_diff'
-    word_embedding_model = KeyedVectors.load_word2vec_format(model_path, binary=True)
+def test_analogy(model_type, reference_prediction=None):
+    model = get_embedding_model(model_type)
 
     prediction = {}
     results = []
     for i in DATA:
-        tmp_result = {'model': model_name, 'data': i}
+        tmp_result = {'data': i, 'model': model_type}
         val, test = get_dataset_raw(i)
         prediction[i] = {}
         for prefix, data in zip(['test', 'valid'], [test, val]):
-            pred = [get_prediction(o['stem'], o['choice'], word_embedding_model) for o in data]
+            pred = [get_prediction(o['stem'], o['choice'], model) for o in data]
             prediction[i][prefix] = pred
             tmp_result['oov_{}'.format(prefix)] = len([p for p in pred if p is None])
             pred = [p if p is not None else reference_prediction[i][prefix][n] for n, p in enumerate(pred)]
@@ -101,12 +79,14 @@ if __name__ == '__main__':
     import pandas as pd
     # if relative dose not have the pair in its vocabulary, we use diff fasttext's prediction as it doesn't have
     # OOV as its nature.
-
-    results_fasttext, p_fasttext = test_analogy(False)
-    with open('./fasttext_prediction.json', 'w') as f_write:
-        json.dump(p_fasttext, f_write)
-    results_relative, _ = test_analogy(True, p_fasttext)
-    out = pd.DataFrame(results_fasttext + results_relative)
+    results_fasttext, p_fasttext = test_analogy('fasttext_diff')
+    if not os.path.exists('./fasttext_prediction.json'):
+        with open('./fasttext_prediction.json', 'w') as f_write:
+            json.dump(p_fasttext, f_write)
+    results_relative, _ = test_analogy('relative_init', p_fasttext)
+    results_concat, _ = test_analogy('concat_relative_fasttext', p_fasttext)
+    out = pd.DataFrame(results_fasttext + results_relative + results_concat)
+    out = out.sort_values(by=['data', 'model'])
     logging.info('finish evaluation:\n{}'.format(out))
-    out.to_csv('./result.csv')
+    out.to_csv('./analogy_test_baseline.csv')
 

@@ -232,6 +232,8 @@ def get_options():
     parser = argparse.ArgumentParser(description='simplified RELATIVE embedding training')
     parser.add_argument('-o', '--output', help='Output file path to store relation vectors',
                         type=str, default="./cache/relative_init_vectors.bin")
+    # parser.add_argument('-o', '--output-concat', help='Output file path to store concatenated relation vectors',
+    #                     type=str, default="./cache/relative_init_vectors.bin")
     # The following parameters are needed if contexts are not provided
     parser.add_argument('-w', '--window-size', help='Co-occurring window size', type=int, default=10)
     parser.add_argument('--minimum-frequency-context', default=1, type=int,
@@ -247,8 +249,6 @@ if __name__ == '__main__':
 
     opt = get_options()
     assert opt.output.endswith('.bin')
-    if os.path.exists(opt.output):
-        exit('found file at {}'.format(opt.output))
 
     os.makedirs(os.path.dirname(opt.output), exist_ok=True)
 
@@ -289,6 +289,8 @@ if __name__ == '__main__':
             minimum_frequency_context=opt.minimum_frequency_context)
 
     logging.info("producing binary file")
-    model = KeyedVectors.load_word2vec_format(cache)
-    model.wv.save_word2vec_format(opt.output, binary=True)
-    logging.info("new embeddings are available at {}".format(opt.output))
+    if not os.path.exists(opt.output):
+        model = KeyedVectors.load_word2vec_format(cache)
+        model.wv.save_word2vec_format(opt.output, binary=True)
+        logging.info("new embeddings are available at {}".format(opt.output))
+

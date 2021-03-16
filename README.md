@@ -34,15 +34,18 @@ We release the [RELATIVE embedding model](http://josecamachocollados.com/papers/
 (*relative_init_vectors*) over the [common-word-pair](#common-word-pairs) and all the word pairs from [analogy test dataset](#analogy-test-dataset).
 As a comparison, we also provide an embedding model with the same format but converted from fasttext trained on common-crawl,
 where we take the difference in between each word pair and regard it as a relative vector (*fasttext_diff_vectors*).
+Finally, we simply concat *relative_init_vectors* and *fasttext_diff_vectors* that is referred as
+*concat_relative_fasttext_vectors*.
 
 - [*relative_init_vectors*](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/relative_init_vectors.bin.tar.gz)
 - [*fasttext_diff_vectors*](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/fasttext_diff_vectors.bin.tar.gz)
+- [*concat_relative_fasttext_vectors*](https://drive.google.com/u/0/uc?id=1CkdsxEl21TUiBmLS6uq55tH6SiHvWGDn&export=download)
 
 As the model vocabulary, we use all the pair from the above analogy test set as well as the word pair list.
 It's formatted to be used in gensim:
 ```python
 from gensim.models import KeyedVectors
-relative_model = KeyedVectors.load_word2vec_format('./relative_init_vectors.bin', binary=True)
+relative_model = KeyedVectors.load_word2vec_format('relative_init_vectors.bin', binary=True)
 relative_model['paris__france']
 ```
 Note that words are joined by `__` and all the vocabulary is uncased. Multiple token should be combined by `_` such as 
@@ -52,24 +55,31 @@ but at the model construction, we use case-sensitive vocabulary, i.e.
 new_embedding["new_york__tokyo"] = fasttext_model["New York"] - fasttext_model["Tokyo"]
 ```
 
-- ***script to train relative_init_vectors***: [`get_relative_embedding.py`](./get_relative_embedding.py)
-- ***script to produce fasttext_diff_vectors***: [`convert_fasttext.py`](./convert_fasttext.py)
+- ***script to train relative_init_vectors***: [`get_relative_init.py`](get_relative_init.py)
+- ***script to produce fasttext_diff_vectors***: [`get_fasttext_diff.py`](get_fasttext_diff.py)
 
 ## Analogy Result 
-Benchmark of the analogy dataset with *relative_init_vectors* and *fasttext_diff_vectors*. We export fasttext prediction as a default benchmark [here](./fasttext_prediction.json). 
+Benchmark of the analogy dataset with our relative embeddings. Fasttext can handle any words so when other model
+has out-of-vocabulary (OOV), we simply use the fasttext's prediction instead.
+We export fasttext prediction as a default baseline [here](./fasttext_prediction.json).
 
-| model         | data   | oov_test | accuracy_test | oov_valid | accuracy_valid | accuracy |
-|---------------|--------|----------|---------------|-----------|----------------|----------|
-| fasttext_diff | sat    | 0        | 0.462908      | 0         | 0.540541       | 0.470588 |
-| fasttext_diff | u2     | 0        | 0.381579      | 0         | 0.291667       | 0.373016 |
-| fasttext_diff | u4     | 0        | 0.384259      | 0         | 0.395833       | 0.385417 |
-| fasttext_diff | google | 0        | 0.948000      | 0         | 0.940000       | 0.947273 |
-| fasttext_diff | bats   | 0        | 0.714842      | 0         | 0.743719       | 0.717718 |
-| relative_init | sat    | 88       | 0.311573      | 4         | 0.243243       | 0.304813 |
-| relative_init | u2     | 49       | 0.342105      | 5         | 0.250000       | 0.333333 |
-| relative_init | u4     | 83       | 0.293981      | 8         | 0.333333       | 0.297917 |
-| relative_init | google | 65       | 0.654000      | 6         | 0.640000       | 0.652727 |
-| relative_init | bats   | 399      | 0.517510      | 50        | 0.537688       | 0.519520 |
+| data   | model                    | oov_test | accuracy_test | oov_valid | accuracy_valid | accuracy |
+|--------|--------------------------|----------|---------------|-----------|----------------|----------|
+| bats   | concat_relative_fasttext | 399      | 0.685937      | 50        | 0.738693       | 0.691191 |
+| bats   | fasttext_diff            | 0        | 0.714842      | 0         | 0.743719       | 0.717718 |
+| bats   | relative_init            | 399      | 0.517510      | 50        | 0.537688       | 0.519520 |
+| google | concat_relative_fasttext | 65       | 0.870000      | 6         | 0.840000       | 0.867273 |
+| google | fasttext_diff            | 0        | 0.948000      | 0         | 0.940000       | 0.947273 |
+| google | relative_init            | 65       | 0.654000      | 6         | 0.640000       | 0.652727 |
+| sat    | concat_relative_fasttext | 88       | 0.376855      | 4         | 0.405405       | 0.379679 |
+| sat    | fasttext_diff            | 0        | 0.462908      | 0         | 0.540541       | 0.470588 |
+| sat    | relative_init            | 88       | 0.311573      | 4         | 0.243243       | 0.304813 |
+| u2     | concat_relative_fasttext | 49       | 0.372807      | 5         | 0.458333       | 0.380952 |
+| u2     | fasttext_diff            | 0        | 0.381579      | 0         | 0.291667       | 0.373016 |
+| u2     | relative_init            | 49       | 0.342105      | 5         | 0.250000       | 0.333333 |
+| u4     | concat_relative_fasttext | 83       | 0.335648      | 8         | 0.437500       | 0.345833 |
+| u4     | fasttext_diff            | 0        | 0.384259      | 0         | 0.395833       | 0.385417 |
+| u4     | relative_init            | 83       | 0.293981      | 8         | 0.333333       | 0.297917 |
 
 - ***script to reproduce the result***: [`test_analogy.py`](./test_analogy.py)
 
