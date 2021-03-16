@@ -80,11 +80,20 @@ if __name__ == '__main__':
     # if relative dose not have the pair in its vocabulary, we use diff fasttext's prediction as it doesn't have
     # OOV as its nature.
     results_fasttext, p_fasttext = test_analogy('fasttext_diff')
-    if not os.path.exists('./fasttext_prediction.json'):
-        with open('./fasttext_prediction.json', 'w') as f_write:
+    results_relative, p_relative = test_analogy('relative_init', p_fasttext)
+    results_concat, p_concat = test_analogy('concat_relative_fasttext', p_fasttext)
+
+    os.makedirs('./predictions', exist_ok=True)
+    if not os.path.exists('./predictions/fasttext_diff.json'):
+        with open('./predictions/fasttext_diff.json', 'w') as f_write:
             json.dump(p_fasttext, f_write)
-    results_relative, _ = test_analogy('relative_init', p_fasttext)
-    results_concat, _ = test_analogy('concat_relative_fasttext', p_fasttext)
+    if not os.path.exists('./predictions/relative_init.json'):
+        with open('./predictions/relative_init.json', 'w') as f_write:
+            json.dump(p_relative, f_write)
+    if not os.path.exists('./predictions/concat_relative_fasttext.json'):
+        with open('./predictions/concat_relative_fasttext.json', 'w') as f_write:
+            json.dump(p_concat, f_write)
+
     out = pd.DataFrame(results_fasttext + results_relative + results_concat)
     out = out.sort_values(by=['data', 'model'])
     logging.info('finish evaluation:\n{}'.format(out))

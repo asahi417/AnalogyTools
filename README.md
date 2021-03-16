@@ -61,7 +61,6 @@ new_embedding["new_york__tokyo"] = fasttext_model["New York"] - fasttext_model["
 ## Analogy Result 
 Benchmark of the analogy dataset with our relative embeddings. Fasttext can handle any words so when other model
 has out-of-vocabulary (OOV), we simply use the fasttext's prediction instead.
-We export fasttext prediction as a default baseline [here](./fasttext_prediction.json).
 
 | data   | model                    | oov_test | accuracy_test | oov_valid | accuracy_valid | accuracy |
 |--------|--------------------------|----------|---------------|-----------|----------------|----------|
@@ -81,7 +80,9 @@ We export fasttext prediction as a default baseline [here](./fasttext_prediction
 | u4     | fasttext_diff            | 0        | 0.384259      | 0         | 0.395833       | 0.385417 |
 | u4     | relative_init            | 83       | 0.293981      | 8         | 0.333333       | 0.297917 |
 
-- ***script to reproduce the result***: [`test_analogy.py`](./test_analogy.py)
+The prediction from each model is exported at [here](./predictions). 
+
+- ***script to reproduce the result***: [`test_analogy.py`](analogy_test.py)
 
 ## Acknowledgement
 About RELATIVE embedding work, please refer [the official implementation](https://github.com/pedrada88/relative) and
