@@ -18,7 +18,16 @@ Each contains jsonline files for validation and test, in which each line consist
             ["marx", "philosopher"],
             ["tolstoi", "edison"]]}
 ``` 
-where `stem` is the query word pair, `choice` has word pair candidates, and `answer` indicates the index of correct candidate.
+where `stem` is the query word pair, `choice` has word pair candidates, and `answer` indicates the index of correct candidate. Data statistics are summarized as below.
+
+| Dataset | Size     | Num of choice | Num of relation group |
+|---------|----------|---------------|-----------------------|
+| SAT     | 37/337   | 5             | 2                     |
+| U2      | 24/228   | 5,4,3         | 9                     |
+| U4      | 48/432   | 5,4,3         | 5                     |
+| Google  | 50/500   | 4             | 2                     |
+| BATS    | 199/1799 | 4             | 3                     |
+
 
 ## Common Word Pairs
 We provide a common word pair dataset, which is a json file of a head word and its corresponding tail words with some
