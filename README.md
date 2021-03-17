@@ -3,11 +3,11 @@ Release five analogy datasets and relative embedding models trained to cover the
 
 ## Analogy Test Dataset
 Following analogy dataset is available (click to download the data):
-[SAT](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/sat.zip), 
-[U2](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/u2.zip),
-[U4](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/u4.zip),
-[Goolgle](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/google.zip),
-[BATS](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/bats.zip).
+[SAT](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/sat.zip), 
+[U2](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/u2.zip),
+[U4](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/u4.zip),
+[Goolgle](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/google.zip),
+[BATS](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/bats.zip).
 
 Each contains jsonline files for validation and test, in which each line consists of following dictionary,
 ```
@@ -31,7 +31,7 @@ where `stem` is the query word pair, `choice` has word pair candidates, and `ans
 
 ## Common Word Pairs
 We provide a common word pair dataset, which is a pickled file of a head word and its corresponding tail words with some
-relation ([link](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/common_word_pairs.pkl.tar.gz)).
+relation ([link](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/common_word_pairs.pkl.tar.gz)).
 The dataset is from (i) word pairs from English Wikipedia that has large PMI, and (ii) word pairs from all the 
 [analogy test dataset](#analogy-test-dataset). Note that the word pairs from Wikipedia is lowercased, but the pairs from analogy test is case-sensitive.
 
@@ -57,8 +57,8 @@ where we take the difference in between each word pair and regard it as a relati
 Finally, we simply concat *relative_init_vectors* and *fasttext_diff_vectors* that is referred as
 *concat_relative_fasttext_vectors*.
 
-- [*relative_init_vectors*](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/relative_init_vectors.bin.tar.gz)
-- [*fasttext_diff_vectors*](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/fasttext_diff_vectors.bin.tar.gz)
+- [*relative_init_vectors*](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/relative_init_vectors.bin.tar.gz)
+- [*fasttext_diff_vectors*](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/fasttext_diff_vectors.bin.tar.gz)
 - [*concat_relative_fasttext_vectors*](https://drive.google.com/u/0/uc?id=1CkdsxEl21TUiBmLS6uq55tH6SiHvWGDn&export=download)
 
 As the model vocabulary, we use all the pair from the above analogy test set as well as the word pair list.

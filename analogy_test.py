@@ -13,7 +13,7 @@ DATA = ['sat', 'u2', 'u4', 'google', 'bats']
 def get_dataset_raw(data_name: str):
     """ Get SAT-type dataset: a list of (answer: int, prompts: list, stem: list, choice: list)"""
     cache_dir = './cache'
-    root_url_analogy = 'https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0'
+    root_url_analogy = 'https://github.com/asahi417/AnalogyTools/releases/download/0.0.0'
     assert data_name in DATA, 'unknown data: {}'.format(data_name)
     if not os.path.exists('{}/{}'.format(cache_dir, data_name)):
         open_compressed_file('{}/{}.zip'.format(root_url_analogy, data_name), cache_dir)

@@ -37,7 +37,7 @@ def wget(url, cache_dir, gdrive: bool = False, filename: str = None):
 
 
 def get_embedding_model(model_type: str = 'relative_init', cache_dir: str = './cache'):
-    root_url = 'https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/'
+    root_url = 'https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/'
     urls = {
         'relative_init': root_url + 'relative_init_vectors.bin.tar.gz',
         'fasttext_diff': root_url + 'fasttext_diff_vectors.bin.tar.gz',
@@ -67,11 +67,11 @@ def get_pair_relative(cache_dir: str = './cache'):
 def get_pair_analogy(cache_dir: str = './cache'):
     """ Get the list of word pairs in analogy dataset """
     data = dict(
-        sat='https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/sat.zip',
-        u2='https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/u2.zip',
-        u4='https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/u4.zip',
-        google='https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/google.zip',
-        bats='https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/bats.zip'
+        sat='https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/sat.zip',
+        u2='https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/u2.zip',
+        u4='https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/u4.zip',
+        google='https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/google.zip',
+        bats='https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/bats.zip'
     )
 
     def extract_pairs(_json_file):
@@ -89,7 +89,7 @@ def get_pair_analogy(cache_dir: str = './cache'):
 
 
 def get_common_word_pair(cache_dir: str = './cache'):
-    url = 'https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/common_word_pairs.pkl.tar.gz'
+    url = 'https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/common_word_pairs.pkl.tar.gz'
     open_compressed_file(url=url, cache_dir=cache_dir)
     with open('{}/common_word_pairs.pkl'.format(cache_dir), "rb") as fp:
         return pickle.load(fp)
