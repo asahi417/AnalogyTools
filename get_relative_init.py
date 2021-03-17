@@ -8,13 +8,14 @@ import os
 import json
 import pickle
 import argparse
-from itertools import chain, groupby
+from itertools import groupby
 from typing import Dict
 from tqdm import tqdm
 
 from gensim.models import fasttext
 from gensim.models import KeyedVectors
-from util import open_compressed_file
+
+from util import open_compressed_file, get_common_word_pair
 
 logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', level=logging.INFO, datefmt='%Y-%m-%d %H:%M:%S')
 
@@ -37,43 +38,6 @@ OVERWRITE_CACHE = False
 # Stopwords
 with open('./stopwords_en.txt', 'r') as f:
     STOPWORD_LIST = list(set(list(filter(len, f.read().split('\n')))))
-
-
-def get_pair_relative():
-    """ Get the list of word pairs in RELATIVE pretrained model """
-    _path = './cache/relative_vocab.pkl'
-    if not os.path.exists(_path):
-        url = 'https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/relative_vocab.tar.gz'
-        open_compressed_file(url=url, cache_dir='./cache')
-    with open(_path, "rb") as fp:
-        _vocab = pickle.load(fp)
-    return _vocab
-
-
-def get_pair_analogy(uncased: bool = True):
-    """ Get the list of word pairs in analogy dataset """
-    data = dict(
-        sat='https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/sat.zip',
-        u2='https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/u2.zip',
-        u4='https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/u4.zip',
-        google='https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/google.zip',
-        bats='https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/bats.zip')
-
-    def extract_pairs(_json_file):
-        _json = json.loads(_json_file)
-        if uncased:
-            return [[a.lower() for a in _json['stem']]] + [[a.lower(), b.lower()] for a, b in _json['choice']]
-        else:
-            return [_json['stem']] + _json['choice']
-
-    pairs = []
-    for name, url in data.items():
-        open_compressed_file(url=url, cache_dir='./cache')
-        with open('./cache/{}/valid.jsonl'.format(name), 'r') as f_:
-            pairs += list(chain(*[extract_pairs(i) for i in f_.read().split('\n') if len(i) > 0]))
-        with open('./cache/{}/test.jsonl'.format(name), 'r') as f_:
-            pairs += list(chain(*[extract_pairs(i) for i in f_.read().split('\n') if len(i) > 0]))
-    return pairs
 
 
 def get_word_from_corpus(minimum_frequency: int, word_vocabulary_size: int = None):
@@ -232,8 +196,6 @@ def get_options():
     parser = argparse.ArgumentParser(description='simplified RELATIVE embedding training')
     parser.add_argument('-o', '--output', help='Output file path to store relation vectors',
                         type=str, default="./cache/relative_init_vectors.bin")
-    # parser.add_argument('-o', '--output-concat', help='Output file path to store concatenated relation vectors',
-    #                     type=str, default="./cache/relative_init_vectors.bin")
     # The following parameters are needed if contexts are not provided
     parser.add_argument('-w', '--window-size', help='Co-occurring window size', type=int, default=10)
     parser.add_argument('--minimum-frequency-context', default=1, type=int,
@@ -270,7 +232,8 @@ if __name__ == '__main__':
             pairs_context = json.load(f)
     else:
         logging.info("retrieve pair and word vocabulary (dictionary)")
-        pair_vocab = get_pair_relative() + get_pair_analogy()
+        pair_vocab = get_common_word_pair()
+        pair_vocab = [[a.lower(), b.lower()] for a, b in pair_vocab]
         pair_vocab = sorted(pair_vocab)
         grouper = groupby(pair_vocab, key=lambda x: x[0])
         pair_vocab_dict = {k: list(set(list(map(lambda x: x[1], g)))) for k, g in grouper}

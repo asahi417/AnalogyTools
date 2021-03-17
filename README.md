@@ -21,12 +21,12 @@ Each contains jsonline files for validation and test, in which each line consist
 where `stem` is the query word pair, `choice` has word pair candidates, and `answer` indicates the index of correct candidate.
 
 ## Common Word Pairs
-We provide a json file of a head word and its corresponding tail words, based on PMI over the lower cased Wikipedia
-[here](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/relative_vocab.tar.gz).
-This is fetched from the pretrained RELATIVE embedding released by the [official repo](https://github.com/pedrada88/relative) and 
-is supposed to be used as a corpus to train a relation embedding model.
+We provide a common word pair dataset, which is a json file of a head word and its corresponding tail words with some
+relation ([link](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/common_word_pairs.pkl.tar.gz)).
+The dataset is from (i) word pairs from English Wikipedia that has large PMI, and (ii) word pairs from all the 
+[analogy test dataset](#analogy-test-dataset). 
 
-- ***script to reproduce the data***: [`get_pair_vocab.py`](./get_pair_vocab.py)
+- ***script to reproduce the data***: [`generate_word_pair_dataset.py`](generate_word_pair_dataset.py)
 
 ## RELATIVE embedding model
 We release the [RELATIVE embedding model](http://josecamachocollados.com/papers/relative_ijcai2019.pdf) trained with 

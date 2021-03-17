@@ -12,8 +12,8 @@ from tqdm import tqdm
 
 from gensim.models import fasttext
 from gensim.models import KeyedVectors
-from util import open_compressed_file
-from get_relative_init import get_pair_analogy, get_pair_relative
+
+from util import open_compressed_file, get_common_word_pair
 
 logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', level=logging.INFO, datefmt='%Y-%m-%d %H:%M:%S')
 
@@ -73,7 +73,7 @@ if __name__ == '__main__':
 
     cache = opt.output.replace('.bin', '.txt')
     if not os.path.exists(cache):
-        pair_vocab = get_pair_relative() + get_pair_analogy(uncased=False)
+        pair_vocab = get_common_word_pair()
         pair_vocab = sorted(pair_vocab)
         grouper = groupby(pair_vocab, key=lambda x: x[0])
         pair_vocab_dict = {k: list(set(list(map(lambda x: x[1], g)))) for k, g in grouper}
