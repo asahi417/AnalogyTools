@@ -58,8 +58,8 @@ new_embedding["new_york__tokyo"] = fasttext_model["New York"] - fasttext_model["
 - ***script to train relative_init_vectors***: [`get_relative_init.py`](get_relative_init.py)
 - ***script to produce fasttext_diff_vectors***: [`get_fasttext_diff.py`](get_fasttext_diff.py)
 
-## Analogy Result 
-Benchmark of the analogy dataset with our relative embeddings. Fasttext can handle any words so when other model
+## Analogy Test Baseline 
+Here we show baselines of the analogy dataset with our relative embeddings. Fasttext can handle any words so when other model
 has out-of-vocabulary (OOV), we simply use the fasttext's prediction instead.
 
 | data   | model                    | oov_test | accuracy_test | oov_valid | accuracy_valid | accuracy |
