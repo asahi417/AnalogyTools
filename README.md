@@ -30,10 +30,21 @@ where `stem` is the query word pair, `choice` has word pair candidates, and `ans
 
 
 ## Common Word Pairs
-We provide a common word pair dataset, which is a json file of a head word and its corresponding tail words with some
+We provide a common word pair dataset, which is a pickled file of a head word and its corresponding tail words with some
 relation ([link](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/common_word_pairs.pkl.tar.gz)).
 The dataset is from (i) word pairs from English Wikipedia that has large PMI, and (ii) word pairs from all the 
 [analogy test dataset](#analogy-test-dataset). Note that the word pairs from Wikipedia is lowercased, but the pairs from analogy test is case-sensitive.
+
+```python
+In [1] import pickle
+In [2] 
+def load_pickle(path):
+    with open(path, "rb") as fp:
+        return pickle.load(fp)
+In [3] data = load_pickle('common_word_pairs.pkl')
+In [4] data[:2]
+Out[4] [['prosperity', 'century'], ['haileybury', 'imperial']]
+```
 
 - ***script to reproduce the data***: [`generate_word_pair_dataset.py`](generate_word_pair_dataset.py)
 
@@ -53,9 +64,11 @@ Finally, we simply concat *relative_init_vectors* and *fasttext_diff_vectors* th
 As the model vocabulary, we use all the pair from the above analogy test set as well as the word pair list.
 It's formatted to be used in gensim:
 ```python
-from gensim.models import KeyedVectors
-relative_model = KeyedVectors.load_word2vec_format('relative_init_vectors.bin', binary=True)
-relative_model['paris__france']
+In [1] from gensim.models import KeyedVectors
+In [2] relative_model = KeyedVectors.load_word2vec_format('relative_init_vectors.bin', binary=True)
+In [3] relative_model['paris__france']
+Out[4] 
+array([-1.16878878e-02, ... 7.91083463e-03], dtype=float32)  # 300 dim array
 ```
 Note that words are joined by `__` and all the vocabulary is uncased. Multiple token should be combined by `_` such as 
 `new_york__tokyo` for the relation in between New York and Tokyo. The *fasttext_diff_vectors* model also relies on lowercase,
