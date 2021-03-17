@@ -22,11 +22,11 @@ where `stem` is the query word pair, `choice` has word pair candidates, and `ans
 
 | Dataset | Size (valid/test) | Num of choice | Num of relation group |
 |---------|---------:|--------------:|----------------------:|
-| SAT     | 37/337   | 5             | 2                     |
-| U2      | 24/228   | 5,4,3         | 9                     |
-| U4      | 48/432   | 5,4,3         | 5                     |
-| Google  | 50/500   | 4             | 2                     |
-| BATS    | 199/1799 | 4             | 3                     |
+| sat     | 37/337   | 5             | 2                     |
+| u2      | 24/228   | 5,4,3         | 9                     |
+| u4      | 48/432   | 5,4,3         | 5                     |
+| google  | 50/500   | 4             | 2                     |
+| bats    | 199/1799 | 4             | 3                     |
 
 
 ## Common Word Pairs
