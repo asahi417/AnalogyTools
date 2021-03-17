@@ -24,7 +24,7 @@ where `stem` is the query word pair, `choice` has word pair candidates, and `ans
 We provide a common word pair dataset, which is a json file of a head word and its corresponding tail words with some
 relation ([link](https://github.com/asahi417/AnalogyDataset/releases/download/0.0.0/common_word_pairs.pkl.tar.gz)).
 The dataset is from (i) word pairs from English Wikipedia that has large PMI, and (ii) word pairs from all the 
-[analogy test dataset](#analogy-test-dataset). 
+[analogy test dataset](#analogy-test-dataset). Note that the word pairs from Wikipedia is lowercased, but the pairs from analogy test is case-sensitive.
 
 - ***script to reproduce the data***: [`generate_word_pair_dataset.py`](generate_word_pair_dataset.py)
 
