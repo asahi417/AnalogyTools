@@ -28,7 +28,7 @@ The dataset is from (i) word pairs from English Wikipedia that has large PMI, an
 
 - ***script to reproduce the data***: [`generate_word_pair_dataset.py`](generate_word_pair_dataset.py)
 
-## RELATIVE embedding model
+## Pretrained Relation Embedding Model
 We release the [RELATIVE embedding model](http://josecamachocollados.com/papers/relative_ijcai2019.pdf) trained with 
 [the common-crawl-pretrained Fasttext model released from Facebook](https://dl.fbaipublicfiles.com/fasttext/vectors-english/crawl-300d-2M-subword.zip)
 (*relative_init_vectors*) over the [common-word-pair](#common-word-pairs) and all the word pairs from [analogy test dataset](#analogy-test-dataset).
