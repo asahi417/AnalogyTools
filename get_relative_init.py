@@ -26,12 +26,6 @@ def tc(string, word_level: bool = True):
     else:
         return truecase.get_true_case(string)
 
-# Anchor word embedding model
-URL_WORD_EMBEDDING = 'https://dl.fbaipublicfiles.com/fasttext/vectors-english/crawl-300d-2M-subword.zip'
-PATH_WORD_EMBEDDING = './cache/crawl-300d-2M-subword.bin'
-if not os.path.exists(PATH_WORD_EMBEDDING):
-    logging.info('downloading fasttext model')
-    wget(url=URL_WORD_EMBEDDING, cache_dir='./cache')
 
 # Corpus
 URL_CORPUS = 'https://drive.google.com/u/0/uc?id=17EBy4GD4tXl9G4NTjuIuG5ET7wfG4-xa&export=download'
