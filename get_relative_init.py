@@ -260,11 +260,11 @@ if __name__ == '__main__':
         with open(cache, 'w') as f:
             json.dump(pairs_context, f)
 
-    cache = '{}/relative_init.{}'.format(opt.ouput_dir, opt.model)
+    cache = '{}/relative_init.{}'.format(opt.output_dir, opt.model)
     if opt.truecase:
         cache += '.truecase'
     cache += '.txt'
-    logging.info("computing relative-init vectors: {}".format(cache))
+    logging.info("\t * computing relative-init vectors: {}".format(cache))
     if not os.path.exists(cache):
         get_relative_init(
             output_path=cache,
