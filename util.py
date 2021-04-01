@@ -39,7 +39,7 @@ def get_word_embedding_model(model_name: str = 'fasttext'):
         if not os.path.exists(path):
             print('downloading glove model')
             wget(
-                url='https://drive.google.com/file/d/1DbLuxwDlTRDbhBroOVgn2_fhVUQAVIqN/view?usp=sharing',
+                url='https://drive.google.com/u/0/uc?id=1DbLuxwDlTRDbhBroOVgn2_fhVUQAVIqN&export=download',
                 cache_dir='./cache',
                 gdrive_filename='glove.840B.300d.gensim.bin.tar.gz'
             )
@@ -137,10 +137,6 @@ def get_pair_analogy(cache_dir: str = './cache'):
 
 
 def get_common_word_pair(cache_dir: str = './cache'):
-    # if true_case:
-    #     url = 'https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/common_word_pairs_truecase.pkl.tar.gz'
-    #     path = '{}/common_word_pairs_truecase.pkl'.format(cache_dir)
-    # else:
     url = 'https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/common_word_pairs.pkl.tar.gz'
     path = '{}/common_word_pairs.pkl'.format(cache_dir)
     wget(url=url, cache_dir=cache_dir)

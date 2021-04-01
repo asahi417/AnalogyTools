@@ -223,9 +223,7 @@ def get_options():
 
 
 if __name__ == '__main__':
-
     opt = get_options()
-    # assert opt.output_dir.endswith('.bin')
 
     os.makedirs(opt.output_dir, exist_ok=True)
 
