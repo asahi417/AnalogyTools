@@ -26,7 +26,7 @@ if __name__ == '__main__':
     model_word = get_word_embedding_model(opt.model_word)
 
     os.makedirs(opt.output_dir, exist_ok=True)
-    model = '{}/'.format(opt.output_dir, )
+    model = '{}/'.format(opt.output_dir)
     with open(path_concat_embedding.replace('.bin', '.txt'), 'w') as f:
         f.write(str(len(relative.vocab)) + " " + str(relative.vector_size + fasttext.vector_size) + "\n")
         for v in tqdm(relative.vocab):

@@ -136,9 +136,13 @@ def get_pair_analogy(cache_dir: str = './cache'):
     return pairs
 
 
-def get_common_word_pair(cache_dir: str = './cache'):
-    url = 'https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/common_word_pairs.pkl.tar.gz'
-    path = '{}/common_word_pairs.pkl'.format(cache_dir)
+def get_common_word_pair(cache_dir: str = './cache', if_truecase: bool = False):
+    if if_truecase:
+        url = 'https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/common_word_pairs_truecase.pkl.tar.gz'
+        path = '{}/common_word_pairs_truecase.pkl'.format(cache_dir)
+    else:
+        url = 'https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/common_word_pairs.pkl.tar.gz'
+        path = '{}/common_word_pairs.pkl'.format(cache_dir)
     wget(url=url, cache_dir=cache_dir)
     with open(path, "rb") as fp:
         return pickle.load(fp)

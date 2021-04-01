@@ -8,6 +8,7 @@ import os
 import json
 import pickle
 import argparse
+import re
 from itertools import groupby
 from typing import Dict
 from tqdm import tqdm
@@ -20,12 +21,15 @@ from util import wget, get_common_word_pair, get_word_embedding_model
 logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', level=logging.INFO, datefmt='%Y-%m-%d %H:%M:%S')
 
 
-def tc(string, word_level: bool = True):
-    if word_level:
-        return truecase.get_true_case('A ' + string)[2:]
-    else:
-        return truecase.get_true_case(string)
+def tc(string):
+    return truecase.get_true_case('A ' + string)[2:]
 
+    # string = truecase.get_true_case(string)
+    # string = re.sub(r'\W\s', ' ', string)
+    # string = re.sub(r'\s\W', ' ', string)
+    # string = re.sub(r'\W\Z', '', string)
+    # string = re.sub(r'\A\W', '', string)
+    # return string.strip()
 
 # Corpus
 URL_CORPUS = 'https://drive.google.com/u/0/uc?id=17EBy4GD4tXl9G4NTjuIuG5ET7wfG4-xa&export=download'
@@ -48,6 +52,9 @@ def get_wiki_vocab(minimum_frequency: int, word_vocabulary_size: int = None):
     with open(PATH_CORPUS, 'r', encoding='utf-8') as corpus_file:
         for _line in corpus_file:
             bar.update()
+            # if if_truecase:
+            #     tokens = tc(_line).split(" ")
+            # else:
             tokens = _line.strip().split(" ")
             for token in tokens:
                 if token in STOPWORD_LIST or "__" in token or token.isdigit():
@@ -96,6 +103,9 @@ def frequency_filtering(vocab_corpus, dict_pairvocab, window_size, cache_jsonlin
             with open(PATH_CORPUS, 'r', encoding='utf-8') as corpus_file:
                 for sentence in corpus_file:
                     bar.update()
+                    # if if_truecase:
+                    #     token_list = tc(sentence).split(" ")
+                    # else:
                     token_list = sentence.strip().split(" ")
                     contexts = [(token_list[i_], get_context(i_, token_list)) for i_ in range(len(token_list))]
                     contexts = dict(filter(lambda x: x[1] is not None, contexts))
@@ -157,7 +167,6 @@ def frequency_filtering(vocab_corpus, dict_pairvocab, window_size, cache_jsonlin
 def get_relative_init(output_path: str,
                       context_word_dict: Dict,
                       minimum_frequency_context: int,
-                      if_truecase: bool = False,
                       word_embedding_type: str = 'fasttext'):
     """ Get RELATIVE vectors """
     logging.info("loading embeddings")
@@ -175,8 +184,6 @@ def get_relative_init(output_path: str,
                         continue
                     try:
                         tmp = token_co.replace('_', ' ')
-                        if if_truecase:
-                            tmp = tc(tmp)
                         token_co_vector = word_embedding_model[tmp]
                         vector_pair += (freq * token_co_vector)
                         cont_pair += 1
@@ -184,10 +191,10 @@ def get_relative_init(output_path: str,
                         pass
                 if cont_pair != 0:
                     vector_pair = vector_pair/cont_pair
-                    txt_file.write('__'.join([token_i, token_j]))
-                    for v in vector_pair:
-                        txt_file.write(' ' + str(v))
-
+                    # key for relative embedding is lowercased even if truecasing mode
+                    txt_file.write('__'.join([token_i, token_j]).lower())
+                    for y in vector_pair:
+                        txt_file.write(' ' + str(y))
                     txt_file.write("\n")
                     line_count += 1
 
@@ -220,13 +227,10 @@ if __name__ == '__main__':
     opt = get_options()
 
     os.makedirs(opt.output_dir, exist_ok=True)
-    prefix = ''
-    if opt.truecase:
-        prefix = '.truecase'
 
     logging.info("extracting contexts(this can take a few hours depending on the size of the corpus)")
     logging.info("\t * loading word frequency dictionary")
-    cache = '{}/vocab{}.pkl'.format(opt.output_dir, prefix)
+    cache = '{}/vocab.pkl'.format(opt.output_dir)
     if os.path.exists(cache):
         with open(cache, 'rb') as fb:
             vocab = pickle.load(fb)
@@ -236,14 +240,14 @@ if __name__ == '__main__':
             pickle.dump(vocab, fb)
 
     logging.info("\t * filtering corpus by frequency")
-    cache = '{}/pairs_context{}.json'.format(opt.output_dir, prefix)
+    cache = '{}/pairs_context.json'.format(opt.output_dir)
     if os.path.exists(cache):
         with open(cache, 'r') as f:
             pairs_context = json.load(f)
     else:
         logging.info("retrieve pair and word vocabulary (dictionary)")
 
-        pair_vocab = get_common_word_pair()
+        pair_vocab = get_common_word_pair(opt.truecase)
         pair_vocab = sorted(pair_vocab)
         grouper = groupby(pair_vocab, key=lambda x: x[0])
         pair_vocab_dict = {k: list(set(list(map(lambda x: x[1], g)))) for k, g in grouper}
@@ -255,20 +259,35 @@ if __name__ == '__main__':
         with open(cache, 'w') as f:
             json.dump(pairs_context, f)
 
-    cache = '{}/relative_init.{}{}.txt'.format(opt.output_dir, opt.model, prefix)
+    if opt.truecase:
+        logging.info('converting by truecaser')
+        cache = '{}/pairs_context_truecase.json'.format(opt.output_dir)
+        if os.path.exists(cache):
+            with open(cache, 'r') as f:
+                pairs_context_truecase = json.load(f)
+        else:
+            pairs_context_truecase = {}
+            for k, v in tqdm(pairs_context.items()):
+                pairs_context_truecase[tc(k)] = {tc(_k): {tc(__k): __v for __k, __v in _v.items()} for _k, _v in v.items()}
+            with open(cache, 'w') as f:
+                json.dump(pairs_context_truecase, f)
+        pairs_context = pairs_context_truecase
+        cache = '{}/relative_init.{}.truecase.txt'.format(opt.output_dir, opt.model)
+    else:
+        cache = '{}/relative_init.{}.txt'.format(opt.output_dir, opt.model)
+
     logging.info("\t * computing relative-init vectors: {}".format(cache))
     if not os.path.exists(cache):
         get_relative_init(
             output_path=cache,
             context_word_dict=pairs_context,
             minimum_frequency_context=opt.minimum_frequency_context,
-            word_embedding_type=opt.model,
-            if_truecase=opt.truecase)
+            word_embedding_type=opt.model)
 
     logging.info("producing binary file")
     cache_bin = cache.replace('.txt', '.bin')
     if not os.path.exists(cache_bin):
         model = KeyedVectors.load_word2vec_format(cache)
         model.wv.save_word2vec_format(cache_bin, binary=True)
-        logging.info("new embeddings are available at {}".format(cache))
+        logging.info("new embeddings are available at {}".format(cache_bin))
 
