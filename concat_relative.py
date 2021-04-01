@@ -48,7 +48,7 @@ if __name__ == '__main__':
             a, b = v.split('__')
             if opt.truecase:
                 a, b = tc(a), tc(b)
-            v_diff = model[a] - model[b]
+            v_diff = model_word[a] - model_word[b]
             new_vector = list(model[v]) + list(v_diff)
             f.write(v + ' ' + ' '.join([str(i) for i in new_vector]) + "\n")
 
