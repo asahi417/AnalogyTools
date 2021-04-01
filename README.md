@@ -1,5 +1,5 @@
 # Analogy Data and Relative Embedding 
-Release five analogy datasets and relative embedding models trained to cover the relation pairs.
+Five analogy datasets and relative embedding models trained on Wikipedia dump.
 
 ## Analogy Test Dataset
 Following analogy dataset is available (click to download the data):
@@ -30,10 +30,8 @@ where `stem` is the query word pair, `choice` has word pair candidates, and `ans
 
 
 ## Common Word Pairs
-We provide a common word pair dataset, which is a pickled file of a head word and its corresponding tail words with some
-relation ([link](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/common_word_pairs.pkl.tar.gz)).
-The dataset is from (i) word pairs from English Wikipedia that has large PMI, and (ii) word pairs from all the 
-[analogy test dataset](#analogy-test-dataset). Note that the word pairs from Wikipedia is lowercased, but the pairs from analogy test is case-sensitive.
+Common word pair dataset is a dataset consisting of a pair of head and tail word ([link](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/common_word_pairs.pkl.tar.gz)).
+The dataset is built on top of lowercased wikipedia dump. 
 
 ```python
 In [1] import pickle
@@ -49,20 +47,14 @@ Out[4] [['prosperity', 'century'], ['haileybury', 'imperial']]
 - ***script to reproduce the data***: [`generate_word_pair_dataset.py`](generate_word_pair_dataset.py)
 
 ## Pretrained Relation Embedding Model
-We release the [RELATIVE embedding model](http://josecamachocollados.com/papers/relative_ijcai2019.pdf) trained with 
-[the common-crawl-pretrained Fasttext model released from Facebook](https://dl.fbaipublicfiles.com/fasttext/vectors-english/crawl-300d-2M-subword.zip)
-(*relative_init_vectors*) over the [common-word-pair](#common-word-pairs) and all the word pairs from [analogy test dataset](#analogy-test-dataset).
-As a comparison, we also provide an embedding model with the same format but converted from fasttext trained on common-crawl,
-where we take the difference in between each word pair and regard it as a relative vector (*fasttext_diff_vectors*).
-Finally, we simply concat *relative_init_vectors* and *fasttext_diff_vectors* that is referred as
-*concat_relative_fasttext_vectors*.
+Following [RELATIVE embedding](http://josecamachocollados.com/papers/relative_ijcai2019.pdf) models that trained on 
+[common-word-pair](#common-word-pairs) are available:
 
-- [*relative_init_vectors*](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/relative_init_vectors.bin.tar.gz)
-- [*fasttext_diff_vectors*](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/fasttext_diff_vectors.bin.tar.gz)
-- [*concat_relative_fasttext_vectors*](https://drive.google.com/u/0/uc?id=1CkdsxEl21TUiBmLS6uq55tH6SiHvWGDn&export=download)
+- [*relative_init_vectors (word2vec)*](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/relative_init.w2v.bin.tar.gz)
+- [*relative_init_vectors (fasttext)*](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/relative_init.fasttext.bin.tar.gz)
+- [*relative_init_vectors (glove)*](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/relative_init.glove.bin.tar.gz)
 
-As the model vocabulary, we use all the pair from the above analogy test set as well as the word pair list.
-It's formatted to be used in gensim:
+The binary file is supposed to be used via gensim:
 ```python
 In [1] from gensim.models import KeyedVectors
 In [2] relative_model = KeyedVectors.load_word2vec_format('relative_init_vectors.bin', binary=True)
@@ -71,14 +63,9 @@ Out[4]
 array([-1.16878878e-02, ... 7.91083463e-03], dtype=float32)  # 300 dim array
 ```
 Note that words are joined by `__` and all the vocabulary is uncased. Multiple token should be combined by `_` such as 
-`new_york__tokyo` for the relation in between New York and Tokyo. The *fasttext_diff_vectors* model also relies on lowercase,
-but at the model construction, we use case-sensitive vocabulary, i.e.
-```
-new_embedding["new_york__tokyo"] = fasttext_model["New York"] - fasttext_model["Tokyo"]
-```
+`new_york__tokyo` for the relation across New York and Tokyo.
 
 - ***script to train relative_init_vectors***: [`get_relative_init.py`](get_relative_init.py)
-- ***script to produce fasttext_diff_vectors***: [`get_fasttext_diff.py`](get_fasttext_diff.py)
 
 ## Analogy Test Baseline 
 Here we show baselines of the analogy dataset with our relative embeddings. Fasttext can handle any words so when other model

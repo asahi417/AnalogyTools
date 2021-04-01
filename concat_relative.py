@@ -42,15 +42,24 @@ if __name__ == '__main__':
     if os.path.exists(cache_concat):
         os.remove(cache_concat)
 
-    with open(cache_concat, 'w') as f:
-        f.write(str(len(model.vocab)) + " " + str(model.vector_size + model_word.vector_size) + "\n")
+    vocab_size = 0
+    with open(cache_concat + '.tmp', 'w') as f:
         for v in tqdm(model.vocab):
             a, b = v.split('__')
             if opt.truecase:
                 a, b = tc(a), tc(b)
-            v_diff = model_word[a] - model_word[b]
-            new_vector = list(model[v]) + list(v_diff)
-            f.write(v + ' ' + ' '.join([str(i) for i in new_vector]) + "\n")
+            try:
+                v_diff = model_word[a] - model_word[b]
+                new_vector = list(model[v]) + list(v_diff)
+                f.write(v + ' ' + ' '.join([str(i) for i in new_vector]) + "\n")
+                vocab_size += 1
+            except Exception:
+                pass
+    with open(cache_concat, 'w') as f:
+        f.write(str(vocab_size) + " " + str(model.vector_size + model_word.vector_size) + "\n")
+        with open(cache_concat + '.tmp', 'r') as f_read:
+            for line in f_read:
+                f.write(line)
 
     logging.info("producing binary file")
     model = KeyedVectors.load_word2vec_format(cache_concat)
