@@ -13,21 +13,21 @@ from gensim.models import KeyedVectors
 from gensim.models import fasttext
 
 
-def get_relative_embedding_model(model_type: str = 'relative_init', cache_dir: str = './cache'):
-    root_url = 'https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/'
-    urls = {
-        'relative_init': root_url + 'relative_init_vectors.bin.tar.gz',
-        'fasttext_diff': root_url + 'fasttext_diff_vectors.bin.tar.gz',
-        'concat_relative_fasttext': 'https://drive.google.com/u/0/uc?id=1CkdsxEl21TUiBmLS6uq55tH6SiHvWGDn&export=download'
-    }
-    assert model_type in urls, '{} not in {}'.format(model_type, urls.keys())
-    model_name = model_type + '_vectors.bin'
-
-    model_path = '{}/{}'.format(cache_dir, model_name)
-    if not os.path.exists(model_path):
-        wget(url=urls[model_type], cache_dir=cache_dir, gdrive_filename=model_name+'.tar.gz')
-    word_embedding_model = KeyedVectors.load_word2vec_format(model_path, binary=True)
-    return word_embedding_model
+# def get_relative_embedding_model(model_type: str = 'relative_init', cache_dir: str = './cache'):
+#     root_url = 'https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/'
+#     urls = {
+#         'relative_init': root_url + 'relative_init_vectors.bin.tar.gz',
+#         'fasttext_diff': root_url + 'fasttext_diff_vectors.bin.tar.gz',
+#         'concat_relative_fasttext': 'https://drive.google.com/u/0/uc?id=1CkdsxEl21TUiBmLS6uq55tH6SiHvWGDn&export=download'
+#     }
+#     assert model_type in urls, '{} not in {}'.format(model_type, urls.keys())
+#     model_name = model_type + '_vectors.bin'
+#
+#     model_path = '{}/{}'.format(cache_dir, model_name)
+#     if not os.path.exists(model_path):
+#         wget(url=urls[model_type], cache_dir=cache_dir, gdrive_filename=model_name+'.tar.gz')
+#     word_embedding_model = KeyedVectors.load_word2vec_format(model_path, binary=True)
+#     return word_embedding_model
 
 
 def get_word_embedding_model(model_name: str = 'fasttext'):

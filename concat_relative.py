@@ -5,7 +5,7 @@ import logging
 import truecase
 from tqdm import tqdm
 from gensim.models import KeyedVectors
-from util import get_word_embedding_model, get_relative_embedding_model
+from util import get_word_embedding_model
 
 logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', level=logging.INFO, datefmt='%Y-%m-%d %H:%M:%S')
 
@@ -34,7 +34,7 @@ if __name__ == '__main__':
         cache = '{}/relative_init.{}.truecase.txt'.format(opt.output_dir, opt.model)
         relative_model += '.truecase'
 
-    model = get_relative_embedding_model(relative_model)
+    model = get_word_embedding_model(relative_model)
 
     logging.info("concat with word embedding model")
     cache_concat = cache.replace('.txt', '.concat.txt')
