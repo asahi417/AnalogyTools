@@ -291,25 +291,25 @@ if __name__ == '__main__':
         model.wv.save_word2vec_format(cache_bin, binary=True)
         logging.info("new embeddings are available at {}".format(cache_bin))
 
-    logging.info("concat with word embedding model")
-    cache_concat = cache.replace('.txt', '.concat.txt')
-    cache_concat_bin = cache_concat.replace('.txt', '.bin')
-    if not os.path.exists(cache_concat_bin):
-        model = KeyedVectors.load_word2vec_format(cache_bin, binary=True)
-        model_word = get_word_embedding_model(opt.model)
-        with open(cache_concat, 'w') as f:
-            f.write(str(len(model.vocab)) + " " + str(model.vector_size + model_word.vector_size) + "\n")
-            for v in tqdm(model.vocab):
-                a, b = v.split('__')
-                if opt.truecase:
-                    a, b = tc(a), tc(b)
-                v_diff = model[a] - model[b]
-                new_vector = list(model[v]) + list(v_diff)
-                f.write(v + ' ' + ' '.join([str(i) for i in new_vector]) + "\n")
-
-        logging.info("producing binary file")
-        model = KeyedVectors.load_word2vec_format(cache_concat)
-        model.wv.save_word2vec_format(cache_concat_bin, binary=True)
-        logging.info("new embeddings are available at {}".format(cache_concat_bin))
-
+    # logging.info("concat with word embedding model")
+    # cache_concat = cache.replace('.txt', '.concat.txt')
+    # cache_concat_bin = cache_concat.replace('.txt', '.bin')
+    # if not os.path.exists(cache_concat_bin):
+    #     model = KeyedVectors.load_word2vec_format(cache_bin, binary=True)
+    #     model_word = get_word_embedding_model(opt.model)
+    #     with open(cache_concat, 'w') as f:
+    #         f.write(str(len(model.vocab)) + " " + str(model.vector_size + model_word.vector_size) + "\n")
+    #         for v in tqdm(model.vocab):
+    #             a, b = v.split('__')
+    #             if opt.truecase:
+    #                 a, b = tc(a), tc(b)
+    #             v_diff = model[a] - model[b]
+    #             new_vector = list(model[v]) + list(v_diff)
+    #             f.write(v + ' ' + ' '.join([str(i) for i in new_vector]) + "\n")
+    #
+    #     logging.info("producing binary file")
+    #     model = KeyedVectors.load_word2vec_format(cache_concat)
+    #     model.wv.save_word2vec_format(cache_concat_bin, binary=True)
+    #     logging.info("new embeddings are available at {}".format(cache_concat_bin))
+    #
 
