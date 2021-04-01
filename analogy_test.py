@@ -4,7 +4,8 @@ import logging
 import json
 from random import randint, seed
 
-from util import wget, get_relative_embedding_model, get_word_embedding_model
+import pandas as pd
+from util import wget, get_word_embedding_model
 
 logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', level=logging.INFO, datefmt='%Y-%m-%d %H:%M:%S')
 seed(1)
@@ -79,11 +80,10 @@ def get_prediction_re(stem, choice, embedding_model, lower_case: bool = True):
 
 
 def test_analogy(model_type, relative: bool = False):
+    model = get_word_embedding_model(model_type)
     if relative:
-        model = get_relative_embedding_model(model_type)
         get_prediction = get_prediction_re
     else:
-        model = get_word_embedding_model(model_type)
         get_prediction = get_prediction_we
 
     prediction = {}
@@ -108,7 +108,6 @@ def test_analogy(model_type, relative: bool = False):
 
 
 if __name__ == '__main__':
-    import pandas as pd
 
     full_result = []
     os.makedirs('./predictions', exist_ok=True)
