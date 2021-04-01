@@ -2,10 +2,12 @@
 import os
 import logging
 import json
-from util import open_compressed_file, get_embedding_model
+from random import randint, seed
+
+from util import wget, get_relative_embedding_model, get_word_embedding_model
 
 logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', level=logging.INFO, datefmt='%Y-%m-%d %H:%M:%S')
-
+seed(1)
 # Analogy data
 DATA = ['sat', 'u2', 'u4', 'google', 'bats']
 
@@ -16,7 +18,7 @@ def get_dataset_raw(data_name: str):
     root_url_analogy = 'https://github.com/asahi417/AnalogyTools/releases/download/0.0.0'
     assert data_name in DATA, 'unknown data: {}'.format(data_name)
     if not os.path.exists('{}/{}'.format(cache_dir, data_name)):
-        open_compressed_file('{}/{}.zip'.format(root_url_analogy, data_name), cache_dir)
+        wget('{}/{}.zip'.format(root_url_analogy, data_name), cache_dir)
     with open('{}/{}/test.jsonl'.format(cache_dir, data_name), 'r') as f:
         test_set = list(filter(None, map(lambda x: json.loads(x) if len(x) > 0 else None, f.read().split('\n'))))
     with open('{}/{}/valid.jsonl'.format(cache_dir, data_name), 'r') as f:
@@ -42,19 +44,47 @@ def cos_similarity(a_, b_):
     return inner / (norm_b * norm_a)
 
 
-def get_prediction(stem, choice, embedding_model):
-    stem = '__'.join(stem).lower().replace(' ', '_')
-    choice = ['__'.join(c).lower().replace(' ', '_') for c in choice]
-    e_dict = dict([(_i, embedding(_i, embedding_model)) for _i in choice + [stem]])
-    score = [cos_similarity(e_dict[stem], e_dict[c]) for c in choice]
+def get_prediction_we(stem, choice, embedding_model):
+
+    def diff(x, y):
+        if x is None or y is None:
+            return None
+        return x - y
+
+    stem_e = diff(embedding(stem[0], embedding_model), embedding(stem[1], embedding_model))
+    if stem_e is None:
+        return None
+    choice_e = [diff(embedding(a, embedding_model), embedding(b, embedding_model)) for a, b in choice]
+    score = [cos_similarity(e, stem_e) for e in choice_e]
     pred = score.index(max(score))
     if score[pred] == -100:
         return None
     return pred
 
 
-def test_analogy(model_type, reference_prediction=None):
-    model = get_embedding_model(model_type)
+def get_prediction_re(stem, choice, embedding_model, lower_case: bool = True):
+    if lower_case:
+        stem = '__'.join(stem).lower().replace(' ', '_')
+        choice = ['__'.join(c).lower().replace(' ', '_') for c in choice]
+    else:
+        stem = '__'.join(stem).replace(' ', '_')
+        choice = ['__'.join(c).replace(' ', '_') for c in choice]
+
+    e_dict = dict([(_i, embedding(_i, embedding_model)) for _i in choice + [stem]])
+    score = [cos_similarity(e_dict[stem], e_dict[c]) for c in choice]
+    p = score.index(max(score))
+    if score[p] == -100:
+        return None
+    return p
+
+
+def test_analogy(model_type, relative: bool = False):
+    if relative:
+        model = get_relative_embedding_model(model_type)
+        get_prediction = get_prediction_re
+    else:
+        model = get_word_embedding_model(model_type)
+        get_prediction = get_prediction_we
 
     prediction = {}
     results = []
@@ -66,7 +96,9 @@ def test_analogy(model_type, reference_prediction=None):
             pred = [get_prediction(o['stem'], o['choice'], model) for o in data]
             prediction[i][prefix] = pred
             tmp_result['oov_{}'.format(prefix)] = len([p for p in pred if p is None])
-            pred = [p if p is not None else reference_prediction[i][prefix][n] for n, p in enumerate(pred)]
+            # random prediction when OOV occurs
+            pred = [p if p is not None else randint(0, len(data[n]['choice']) - 1)
+                    for n, p in enumerate(pred)]
             accuracy = sum([o['answer'] == pred[n] for n, o in enumerate(data)]) / len(pred)
             tmp_result['accuracy_{}'.format(prefix)] = accuracy
         tmp_result['accuracy'] = (tmp_result['accuracy_test'] * len(test) +
@@ -77,24 +109,34 @@ def test_analogy(model_type, reference_prediction=None):
 
 if __name__ == '__main__':
     import pandas as pd
-    # if relative dose not have the pair in its vocabulary, we use diff fasttext's prediction as it doesn't have
-    # OOV as its nature.
-    results_fasttext, p_fasttext = test_analogy('fasttext_diff')
-    results_relative, p_relative = test_analogy('relative_init', p_fasttext)
-    results_concat, p_concat = test_analogy('concat_relative_fasttext', p_fasttext)
 
+    full_result = []
     os.makedirs('./predictions', exist_ok=True)
-    if not os.path.exists('./predictions/fasttext_diff.json'):
-        with open('./predictions/fasttext_diff.json', 'w') as f_write:
-            json.dump(p_fasttext, f_write)
-    if not os.path.exists('./predictions/relative_init.json'):
-        with open('./predictions/relative_init.json', 'w') as f_write:
-            json.dump(p_relative, f_write)
-    if not os.path.exists('./predictions/concat_relative_fasttext.json'):
-        with open('./predictions/concat_relative_fasttext.json', 'w') as f_write:
-            json.dump(p_concat, f_write)
 
-    out = pd.DataFrame(results_fasttext + results_relative + results_concat)
+    tmp_results, pred = test_analogy('glove')
+    full_result += tmp_results
+    with open('./predictions/glove.json', 'w') as f_write:
+        json.dump(pred, f_write)
+
+    tmp_results, pred = test_analogy('w2v')
+    full_result += tmp_results
+    with open('./predictions/w2v.json', 'w') as f_write:
+        json.dump(pred, f_write)
+
+    tmp_results, pred = test_analogy('fasttext')
+    full_result += tmp_results
+    with open('./predictions/fasttext.json', 'w') as f_write:
+        json.dump(pred, f_write)
+
+    # tmp_results, pred = test_analogy('relative_init', relative=True)
+    # full_result += tmp_results
+    # with open('./predictions/relative_init.json', 'w') as f_write:
+    #     json.dump(pred, f_write)
+
+    # results_relative, p_relative = test_analogy('relative_init', p_fasttext)
+    # results_concat, p_concat = test_analogy('concat_relative_fasttext', p_fasttext)
+
+    out = pd.DataFrame(full_result)
     out = out.sort_values(by=['data', 'model'])
     logging.info('finish evaluation:\n{}'.format(out))
     out.to_csv('./analogy_test_baseline.csv')

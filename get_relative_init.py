@@ -12,19 +12,26 @@ from itertools import groupby
 from typing import Dict
 from tqdm import tqdm
 
-from gensim.models import fasttext
+import truecase
 from gensim.models import KeyedVectors
 
-from util import open_compressed_file, get_common_word_pair
+from util import wget, get_common_word_pair, get_word_embedding_model
 
 logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', level=logging.INFO, datefmt='%Y-%m-%d %H:%M:%S')
+
+
+def tc(string, word_level: bool = True):
+    if word_level:
+        return truecase.get_true_case('A ' + string)[2:]
+    else:
+        return truecase.get_true_case(string)
 
 # Anchor word embedding model
 URL_WORD_EMBEDDING = 'https://dl.fbaipublicfiles.com/fasttext/vectors-english/crawl-300d-2M-subword.zip'
 PATH_WORD_EMBEDDING = './cache/crawl-300d-2M-subword.bin'
 if not os.path.exists(PATH_WORD_EMBEDDING):
     logging.info('downloading fasttext model')
-    open_compressed_file(url=URL_WORD_EMBEDDING, cache_dir='./cache')
+    wget(url=URL_WORD_EMBEDDING, cache_dir='./cache')
 
 # Corpus
 URL_CORPUS = 'https://drive.google.com/u/0/uc?id=17EBy4GD4tXl9G4NTjuIuG5ET7wfG4-xa&export=download'
@@ -32,7 +39,7 @@ PATH_CORPUS = './cache/wikipedia_en_preprocessed.txt'
 CORPUS_LINE_LEN = 104000000  # 53709029
 if not os.path.exists(PATH_CORPUS):
     logging.info('downloading wikidump')
-    open_compressed_file(url=URL_CORPUS, cache_dir='./cache', filename='wikipedia_en_preprocessed.zip', gdrive=True)
+    wget(url=URL_CORPUS, cache_dir='./cache', gdrive_filename='wikipedia_en_preprocessed.zip')
 OVERWRITE_CACHE = False
 
 # Stopwords
@@ -40,22 +47,20 @@ with open('./stopwords_en.txt', 'r') as f:
     STOPWORD_LIST = list(set(list(filter(len, f.read().split('\n')))))
 
 
-def get_word_from_corpus(minimum_frequency: int, word_vocabulary_size: int = None):
-    """ Get word distribution over corpus """
+def get_wiki_vocab(minimum_frequency: int, word_vocabulary_size: int = None):
+    """ Get word distribution over Wikidump (lowercased and tokenized) """
     dict_freq = {}
     bar = tqdm(total=CORPUS_LINE_LEN)
     with open(PATH_CORPUS, 'r', encoding='utf-8') as corpus_file:
         for _line in corpus_file:
             bar.update()
-            l_split = _line.strip().split(" ")
-            for token in l_split:
+            tokens = _line.strip().split(" ")
+            for token in tokens:
                 if token in STOPWORD_LIST or "__" in token or token.isdigit():
                     continue
                 # token = token.replace('_', ' ')  # wiki dump do this preprocessing
-                if token in dict_freq:
-                    dict_freq[token] += 1
-                else:
-                    dict_freq[token] = 1
+                dict_freq[token] = dict_freq[token] + 1 if token in dict_freq else 1
+
     # frequency filter
     dict_freq = sorted(dict_freq.items(), key=lambda x: x[0])
     n = 0
@@ -71,7 +76,7 @@ def get_word_from_corpus(minimum_frequency: int, word_vocabulary_size: int = Non
     return list(dict_freq.keys())
 
 
-def frequency_filtering(vocab, dict_pairvocab, window_size, cache_jsonline):
+def frequency_filtering(vocab_corpus, dict_pairvocab, window_size, cache_jsonline):
 
     def get_context(i, tokens):
         """ get context with token `i` in `tokens`, returns list of tuple (token_j, [w_1, ...])"""
@@ -138,10 +143,10 @@ def frequency_filtering(vocab, dict_pairvocab, window_size, cache_jsonline):
             context_word_dict = json.load(f_json)
 
     logging.info('filtering vocab')
-    vocab = set(vocab)
+    vocab_corpus = set(vocab_corpus)
 
     def filter_vocab(_dict):
-        new_key = set(_dict.keys()).intersection(vocab)
+        new_key = set(_dict.keys()).intersection(vocab_corpus)
         _new_dict = {__k: _dict[__k] for __k in new_key}
         return _new_dict
 
@@ -157,10 +162,13 @@ def frequency_filtering(vocab, dict_pairvocab, window_size, cache_jsonline):
 
 def get_relative_init(output_path: str,
                       context_word_dict: Dict,
-                      minimum_frequency_context: int):
+                      minimum_frequency_context: int,
+                      if_truecase: bool = False,
+                      word_embedding_type: str = 'fasttext'):
     """ Get RELATIVE vectors """
     logging.info("loading embeddings")
-    word_embedding_model = fasttext.load_facebook_model(PATH_WORD_EMBEDDING)
+    word_embedding_model = get_word_embedding_model(word_embedding_type)
+
     line_count = 0
     with open(output_path + '.tmp', 'w', encoding='utf-8') as txt_file:
         for token_i, tokens_paired in tqdm(context_word_dict.items()):
@@ -171,9 +179,15 @@ def get_relative_init(output_path: str,
                     freq = context_word_dict[token_i][token_j][token_co]
                     if freq < minimum_frequency_context:
                         continue
-                    token_co_vector = word_embedding_model[token_co.replace('_', ' ')]
-                    vector_pair += (freq * token_co_vector)
-                    cont_pair += 1
+                    try:
+                        tmp = token_co.replace('_', ' ')
+                        if if_truecase:
+                            tmp = tc(tmp)
+                        token_co_vector = word_embedding_model[tmp]
+                        vector_pair += (freq * token_co_vector)
+                        cont_pair += 1
+                    except Exception:
+                        pass
                 if cont_pair != 0:
                     vector_pair = vector_pair/cont_pair
                     txt_file.write('__'.join([token_i, token_j]))
@@ -194,14 +208,15 @@ def get_relative_init(output_path: str,
 
 def get_options():
     parser = argparse.ArgumentParser(description='simplified RELATIVE embedding training')
-    parser.add_argument('-o', '--output', help='Output file path to store relation vectors',
-                        type=str, default="./cache/relative_init_vectors.bin")
+    parser.add_argument('-o', '--output-dir', help='Output file path to store relation vectors',
+                        type=str, default="./cache")
+    parser.add_argument('-m', '--model', help='anchor word embedding model', type=str, default="fasttext")
+    parser.add_argument('--truecase', help='Truecasing', action='store_true')
     # The following parameters are needed if contexts are not provided
     parser.add_argument('-w', '--window-size', help='Co-occurring window size', type=int, default=10)
     parser.add_argument('--minimum-frequency-context', default=1, type=int,
                         help='Minimum frequency of words between word pair: increasing the number can speed up the'
                              'calculations and reduce memory but we would recommend keeping this number low')
-
     # The following parameters are needed if pair vocabulary is not provided
     parser.add_argument('--minimum-frequency', help='Minimum frequency of words', type=int, default=5)
     return parser.parse_args()
@@ -210,50 +225,58 @@ def get_options():
 if __name__ == '__main__':
 
     opt = get_options()
-    assert opt.output.endswith('.bin')
+    # assert opt.output_dir.endswith('.bin')
 
-    os.makedirs(os.path.dirname(opt.output), exist_ok=True)
+    os.makedirs(opt.output_dir, exist_ok=True)
 
     logging.info("extracting contexts(this can take a few hours depending on the size of the corpus)")
     logging.info("\t * loading word frequency dictionary")
-    path = '{}/vocab.pkl'.format(os.path.dirname(opt.output))
+    path = '{}/vocab.pkl'.format(opt.output_dir)
     if os.path.exists(path):
         with open(path, 'rb') as fb:
-            vocab_ = pickle.load(fb)
+            vocab = pickle.load(fb)
     else:
-        vocab_ = get_word_from_corpus(minimum_frequency=opt.minimum_frequency)
+        vocab = get_wiki_vocab(minimum_frequency=opt.minimum_frequency)
         with open(path, 'wb') as fb:
-            pickle.dump(vocab_, fb)
+            pickle.dump(vocab, fb)
 
     logging.info("\t * filtering corpus by frequency")
-    cache = '{}/pairs_context.json'.format(os.path.dirname(opt.output))
+    cache = '{}/pairs_context.json'.format(opt.output_dir)
     if os.path.exists(cache):
         with open(cache, 'r') as f:
             pairs_context = json.load(f)
     else:
         logging.info("retrieve pair and word vocabulary (dictionary)")
+
         pair_vocab = get_common_word_pair()
-        pair_vocab = [[a.lower(), b.lower()] for a, b in pair_vocab]
         pair_vocab = sorted(pair_vocab)
         grouper = groupby(pair_vocab, key=lambda x: x[0])
         pair_vocab_dict = {k: list(set(list(map(lambda x: x[1], g)))) for k, g in grouper}
         pairs_context = frequency_filtering(
-            vocab_, pair_vocab_dict, opt.window_size,
-            cache_jsonline='{}/pairs_context_cache.jsonl'.format(os.path.dirname(opt.output)))
+            vocab,
+            pair_vocab_dict,
+            opt.window_size,
+            cache_jsonline='{}/pairs_context_cache.jsonl'.format(opt.output_dir))
         with open(cache, 'w') as f:
             json.dump(pairs_context, f)
 
-    logging.info("computing relative-init vectors")
-    cache = opt.output.replace('.bin', '.txt')
+    cache = '{}/relative_init.{}'.format(opt.ouput_dir, opt.model)
+    if opt.truecase:
+        cache += '.truecase'
+    cache += '.txt'
+    logging.info("computing relative-init vectors: {}".format(cache))
     if not os.path.exists(cache):
         get_relative_init(
             output_path=cache,
             context_word_dict=pairs_context,
-            minimum_frequency_context=opt.minimum_frequency_context)
+            minimum_frequency_context=opt.minimum_frequency_context,
+            word_embedding_type=opt.model,
+            if_truecase=opt.truecase)
 
     logging.info("producing binary file")
-    if not os.path.exists(opt.output):
+    cache = cache.replace('.txt', '.bin')
+    if not os.path.exists(opt.output_dir):
         model = KeyedVectors.load_word2vec_format(cache)
-        model.wv.save_word2vec_format(opt.output, binary=True)
-        logging.info("new embeddings are available at {}".format(opt.output))
+        model.wv.save_word2vec_format(opt.output_dir, binary=True)
+        logging.info("new embeddings are available at {}".format(cache))
 
