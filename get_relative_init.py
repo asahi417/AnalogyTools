@@ -267,8 +267,8 @@ if __name__ == '__main__':
 
     logging.info("producing binary file")
     cache = cache.replace('.txt', '.bin')
-    if not os.path.exists(opt.output_dir):
+    if not os.path.exists(cache):
         model = KeyedVectors.load_word2vec_format(cache)
-        model.wv.save_word2vec_format(opt.output_dir, binary=True)
+        model.wv.save_word2vec_format(cache, binary=True)
         logging.info("new embeddings are available at {}".format(cache))
 
