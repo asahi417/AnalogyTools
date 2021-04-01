@@ -220,20 +220,23 @@ if __name__ == '__main__':
     opt = get_options()
 
     os.makedirs(opt.output_dir, exist_ok=True)
+    prefix = ''
+    if opt.truecase:
+        prefix = '.truecase'
 
     logging.info("extracting contexts(this can take a few hours depending on the size of the corpus)")
     logging.info("\t * loading word frequency dictionary")
-    path = '{}/vocab.pkl'.format(opt.output_dir)
-    if os.path.exists(path):
-        with open(path, 'rb') as fb:
+    cache = '{}/vocab{}.pkl'.format(opt.output_dir, prefix)
+    if os.path.exists(cache):
+        with open(cache, 'rb') as fb:
             vocab = pickle.load(fb)
     else:
         vocab = get_wiki_vocab(minimum_frequency=opt.minimum_frequency)
-        with open(path, 'wb') as fb:
+        with open(cache, 'wb') as fb:
             pickle.dump(vocab, fb)
 
     logging.info("\t * filtering corpus by frequency")
-    cache = '{}/pairs_context.json'.format(opt.output_dir)
+    cache = '{}/pairs_context{}.json'.format(opt.output_dir, prefix)
     if os.path.exists(cache):
         with open(cache, 'r') as f:
             pairs_context = json.load(f)
@@ -252,10 +255,7 @@ if __name__ == '__main__':
         with open(cache, 'w') as f:
             json.dump(pairs_context, f)
 
-    cache = '{}/relative_init.{}'.format(opt.output_dir, opt.model)
-    if opt.truecase:
-        cache += '.truecase'
-    cache += '.txt'
+    cache = '{}/relative_init.{}{}.txt'.format(opt.output_dir, opt.model, prefix)
     logging.info("\t * computing relative-init vectors: {}".format(cache))
     if not os.path.exists(cache):
         get_relative_init(
@@ -266,9 +266,9 @@ if __name__ == '__main__':
             if_truecase=opt.truecase)
 
     logging.info("producing binary file")
-    cache = cache.replace('.txt', '.bin')
-    if not os.path.exists(cache):
+    cache_bin = cache.replace('.txt', '.bin')
+    if not os.path.exists(cache_bin):
         model = KeyedVectors.load_word2vec_format(cache)
-        model.wv.save_word2vec_format(cache, binary=True)
+        model.wv.save_word2vec_format(cache_bin, binary=True)
         logging.info("new embeddings are available at {}".format(cache))
 
