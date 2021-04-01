@@ -13,13 +13,30 @@ from gensim.models import KeyedVectors
 from gensim.models import fasttext
 
 
+def get_relative_embedding_model(model_type: str = 'relative_init', cache_dir: str = './cache'):
+    root_url = 'https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/'
+    urls = {
+        'relative_init': root_url + 'relative_init_vectors.bin.tar.gz',
+        'fasttext_diff': root_url + 'fasttext_diff_vectors.bin.tar.gz',
+        'concat_relative_fasttext': 'https://drive.google.com/u/0/uc?id=1CkdsxEl21TUiBmLS6uq55tH6SiHvWGDn&export=download'
+    }
+    assert model_type in urls, '{} not in {}'.format(model_type, urls.keys())
+    model_name = model_type + '_vectors.bin'
+
+    model_path = '{}/{}'.format(cache_dir, model_name)
+    if not os.path.exists(model_path):
+        wget(url=urls[model_type], cache_dir=cache_dir, gdrive_filename=model_name+'.tar.gz')
+    word_embedding_model = KeyedVectors.load_word2vec_format(model_path, binary=True)
+    return word_embedding_model
+
+
 def get_word_embedding_model(model_name: str = 'fasttext'):
     """ get word embedding model """
     os.makedirs('./cache', exist_ok=True)
     if model_name == 'w2v':
         path = './cache/GoogleNews-vectors-negative300.bin'
         if not os.path.exists(path):
-            print('downloading word2vec model')
+            print('downloading {}'.format(model_name))
             wget(
                 url="https://drive.google.com/u/0/uc?id=0B7XkCwpI5KDYNlNUTTlSS21pQmM&export=download",
                 cache_dir='./cache',
@@ -29,7 +46,7 @@ def get_word_embedding_model(model_name: str = 'fasttext'):
     elif model_name == 'fasttext':
         path = './cache/crawl-300d-2M-subword.bin'
         if not os.path.exists(path):
-            print('downloading fasttext model')
+            print('downloading {}'.format(model_name))
             wget(
                 url='https://dl.fbaipublicfiles.com/fasttext/vectors-english/crawl-300d-2M-subword.zip',
                 cache_dir='./cache')
@@ -37,7 +54,7 @@ def get_word_embedding_model(model_name: str = 'fasttext'):
     elif model_name == 'glove':
         path = './cache/glove.840B.300d.gensim.bin'
         if not os.path.exists(path):
-            print('downloading glove model')
+            print('downloading {}'.format(model_name))
             wget(
                 url='https://drive.google.com/u/0/uc?id=1DbLuxwDlTRDbhBroOVgn2_fhVUQAVIqN&export=download',
                 cache_dir='./cache',
@@ -45,7 +62,12 @@ def get_word_embedding_model(model_name: str = 'fasttext'):
             )
         model = KeyedVectors.load_word2vec_format(path, binary=True)
     else:
-        raise ValueError('unknown model: {}'.format(model_name))
+        path = './cache/{}.bin'.format(model_name)
+        if not os.path.exists(path):
+            print('downloading {}'.format(model_name))
+            wget(url='https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/{}.bin.tar.gz'.format(model_name),
+                 cache_dir='./cache')
+        model = KeyedVectors.load_word2vec_format(path, binary=True)
     return model
 
 
@@ -83,33 +105,6 @@ def _wget(url: str, cache_dir, gdrive_filename: str = None):
         r = requests.get(url)
         f.write(r.content)
     return '{}/{}'.format(cache_dir, filename)
-
-
-def get_relative_embedding_model(model_type: str = 'relative_init', cache_dir: str = './cache'):
-    root_url = 'https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/'
-    urls = {
-        'relative_init': root_url + 'relative_init_vectors.bin.tar.gz',
-        'fasttext_diff': root_url + 'fasttext_diff_vectors.bin.tar.gz',
-        'concat_relative_fasttext': 'https://drive.google.com/u/0/uc?id=1CkdsxEl21TUiBmLS6uq55tH6SiHvWGDn&export=download'
-    }
-    assert model_type in urls, '{} not in {}'.format(model_type, urls.keys())
-    model_name = model_type + '_vectors.bin'
-
-    model_path = '{}/{}'.format(cache_dir, model_name)
-    if not os.path.exists(model_path):
-        wget(url=urls[model_type], cache_dir=cache_dir, gdrive_filename=model_name+'.tar.gz')
-    word_embedding_model = KeyedVectors.load_word2vec_format(model_path, binary=True)
-    return word_embedding_model
-
-
-def get_pair_relative(cache_dir: str = './cache'):
-    """ Get the list of word pairs in RELATIVE pretrained model """
-    path = '{}/relative-init_wikipedia_en_300d.bin'.format(cache_dir)
-    if not os.path.exists(path):
-        url = 'https://drive.google.com/u/0/uc?id=1HVJnTjcaQ3aCLdwTZwiGLpMDyEylx-zS&export=download'
-        wget(url, cache_dir, gdrive_filename='relative-init_wikipedia_en_300d.bin')
-    model = KeyedVectors.load_word2vec_format(path, binary=True)
-    return list(map(lambda x: [i.replace('_', ' ') for i in x.split('__')], model.vocab.keys()))
 
 
 def get_pair_analogy(cache_dir: str = './cache'):
