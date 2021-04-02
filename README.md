@@ -83,8 +83,8 @@ Note that words are joined by `__` and all the vocabulary is uncased. Multiple t
 - ***script to train relative_init_vectors***: [`get_relative_init.py`](get_relative_init.py)
 
 ## Analogy Test Baseline 
-Here we show baselines of the analogy dataset with our relative embeddings. Fasttext can handle any words so when other model
-has out-of-vocabulary (OOV), we simply use the fasttext's prediction instead.
+Here we show baselines of the analogy dataset with our relative embeddings.
+For out-of-vocabulary (OOV), we randomly pick up choice from given candidate.
 
 | data   | model                                  | oov_test | accuracy_test       | oov_valid | accuracy_valid      | accuracy            | 
 |--------|----------------------------------------|----------|---------------------|-----------|---------------------|---------------------| 
