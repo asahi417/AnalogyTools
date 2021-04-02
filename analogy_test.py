@@ -112,6 +112,39 @@ if __name__ == '__main__':
     full_result = []
     os.makedirs('./predictions', exist_ok=True)
 
+    # relative embeddings (concat)
+    tmp_results, pred = test_analogy('relative_init.fasttext.concat', relative=True)
+    full_result += tmp_results
+    with open('./predictions/relative_init.fasttext.json', 'w') as f_write:
+        json.dump(pred, f_write)
+
+    tmp_results, pred = test_analogy('relative_init.glove.concat', relative=True)
+    full_result += tmp_results
+    with open('./predictions/relative_init.glove.json', 'w') as f_write:
+        json.dump(pred, f_write)
+
+    tmp_results, pred = test_analogy('relative_init.w2v.concat', relative=True)
+    full_result += tmp_results
+    with open('./predictions/relative_init.w2v.json', 'w') as f_write:
+        json.dump(pred, f_write)
+
+    # relative embeddings (concat & truecase)
+    tmp_results, pred = test_analogy('relative_init.fasttext.truecase.concat', relative=True)
+    full_result += tmp_results
+    with open('./predictions/relative_init.fasttext.truecase.json', 'w') as f_write:
+        json.dump(pred, f_write)
+
+    tmp_results, pred = test_analogy('relative_init.glove.truecase.concat', relative=True)
+    full_result += tmp_results
+    with open('./predictions/relative_init.glove.truecase.json', 'w') as f_write:
+        json.dump(pred, f_write)
+
+    tmp_results, pred = test_analogy('relative_init.w2v.truecase.concat', relative=True)
+    full_result += tmp_results
+    with open('./predictions/relative_init.w2v.truecase.json', 'w') as f_write:
+        json.dump(pred, f_write)
+
+    # word embeddings
     tmp_results, pred = test_analogy('glove')
     full_result += tmp_results
     with open('./predictions/glove.json', 'w') as f_write:
@@ -126,14 +159,6 @@ if __name__ == '__main__':
     full_result += tmp_results
     with open('./predictions/fasttext.json', 'w') as f_write:
         json.dump(pred, f_write)
-
-    # tmp_results, pred = test_analogy('relative_init', relative=True)
-    # full_result += tmp_results
-    # with open('./predictions/relative_init.json', 'w') as f_write:
-    #     json.dump(pred, f_write)
-
-    # results_relative, p_relative = test_analogy('relative_init', p_fasttext)
-    # results_concat, p_concat = test_analogy('concat_relative_fasttext', p_fasttext)
 
     out = pd.DataFrame(full_result)
     out = out.sort_values(by=['data', 'model'])

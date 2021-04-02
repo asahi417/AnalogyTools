@@ -50,10 +50,22 @@ Out[4] [['prosperity', 'century'], ['haileybury', 'imperial']]
 Following [RELATIVE embedding](http://josecamachocollados.com/papers/relative_ijcai2019.pdf) models that trained on 
 [common-word-pair](#common-word-pairs) are available:
 
-- [*relative_init_vectors (word2vec)*](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/relative_init.w2v.bin.tar.gz)
-- [*relative_init_vectors (fasttext)*](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/relative_init.fasttext.bin.tar.gz)
-- [*relative_init_vectors (glove)*](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/relative_init.glove.bin.tar.gz)
+- [*relative (word2vec)*](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/relative_init.w2v.bin.tar.gz)
+- [*relative (fasttext)*](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/relative_init.fasttext.bin.tar.gz)
+- [*relative (glove)*](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/relative_init.glove.bin.tar.gz)
+- [*relative_truecase (word2vec)*](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/relative_init.w2v.truecase.bin.tar.gz)
+- [*relative_truecase (fasttext)*](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/relative_init.fasttext.truecase.bin.tar.gz)
+- [*relative_truecase (glove)*](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/relative_init.glove.truecase.bin.tar.gz)
+- [*relative_concat (word2vec)*](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/relative_init.w2v.concat.bin.tar.gz)
+- [*relative_concat (fasttext)*](https://drive.google.com/u/0/uc?id=1EH0oywBo8OaNExyc5XTGIFhLvf8mZiBz&export=download)
+- [*relative_concat (glove)*](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/relative_init.glove.concat.bin.tar.gz)
+- [*relative_truecase_concat (word2vec)*](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/relative_init.w2v.truecase.concat.bin.tar.gz)
+- [*relative_truecase_concat (fasttext)*](https://drive.google.com/u/0/uc?id=1iUuCYM_UJ6FHI5yxg5UIGkXN4qqU5S3G&export=download)
+- [*relative_truecase_concat (glove)*](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/relative_init.glove.truecase.concat.bin.tar.gz)
 
+
+Models with `{}_concat` means the relative vector is concatenated on top of the underlying word embedding's difference, and
+`{}_truecase` means the wikidump is converted into truecase by third party truecaser.
 The binary file is supposed to be used via gensim:
 ```python
 In [1] from gensim.models import KeyedVectors
