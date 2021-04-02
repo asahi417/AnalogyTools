@@ -43,9 +43,8 @@ In [3] data = load_pickle('common_word_pairs.pkl')
 In [4] data[:2]
 Out[4] [['prosperity', 'century'], ['haileybury', 'imperial']]
 ```
-
-Additionally, a common word list taken by the intersection of glove and word2vec pretrained model is released
-([link](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/common_word.pkl)).
+It has 1,138,305 pairs with 87,422 unique words. Additionally, a common word list taken by the intersection of glove and word2vec pretrained model is released
+([link](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/common_word.pkl)) that has 654,805 unique word.
 
 - ***script to reproduce the data***: [`generate_word_pair_dataset.py`](generate_word_pair_dataset.py)
 
