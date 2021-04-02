@@ -30,7 +30,7 @@ where `stem` is the query word pair, `choice` has word pair candidates, and `ans
 
 
 ## Common Word Pairs
-Common word pair dataset is a dataset consisting of a pair of head and tail word ([link](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/common_word_pairs.pkl.tar.gz)).
+Common word pair dataset is a dataset consisting of a pair of head and tail word ([link](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/common_word_pairs.pkl)).
 The dataset is built on top of lowercased wikipedia dump. 
 
 ```python
@@ -43,6 +43,9 @@ In [3] data = load_pickle('common_word_pairs.pkl')
 In [4] data[:2]
 Out[4] [['prosperity', 'century'], ['haileybury', 'imperial']]
 ```
+
+Additionally, a common word list taken by the intersection of glove and word2vec pretrained model is released
+([link](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/common_word.pkl)).
 
 - ***script to reproduce the data***: [`generate_word_pair_dataset.py`](generate_word_pair_dataset.py)
 
