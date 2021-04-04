@@ -30,8 +30,12 @@ where `stem` is the query word pair, `choice` has word pair candidates, and `ans
 
 
 ## Common Word Pairs
-Common word pair dataset is a dataset consisting of a pair of head and tail word ([link](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/common_word_pairs.pkl)).
-The dataset is built on top of lowercased wikipedia dump. 
+Common word pair dataset is a dataset consisting of a pair of head and tail word which built on top of lowercased wikipedia dump with PMI criteron in RELATIVE ([the official implementation](https://github.com/pedrada88/relative), [paper](http://josecamachocollados.com/papers/relative_ijcai2019.pdf)). As the original data is lowercased, we share the truecased version via [truecaser](https://pypi.org/project/truecase/).
+
+- [common word pairs](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/common_word_pairs.pkl).
+- [common word pairs (truecased)](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/common_word_pairs_truecase.pkl).
+
+It has 1,138,305 pairs with 87,422 unique words. Additionally, a common word list taken by the intersection of glove and word2vec pretrained model is shared ([link](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/common_word.pkl)) that has 654,805 unique word.
 
 ```python
 In [1] import pickle
@@ -43,8 +47,6 @@ In [3] data = load_pickle('common_word_pairs.pkl')
 In [4] data[:2]
 Out[4] [['prosperity', 'century'], ['haileybury', 'imperial']]
 ```
-It has 1,138,305 pairs with 87,422 unique words. Additionally, a common word list taken by the intersection of glove and word2vec pretrained model is released
-([link](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/common_word.pkl)) that has 654,805 unique word.
 
 - ***script to reproduce the data***: [`generate_word_pair_dataset.py`](generate_word_pair_dataset.py)
 
