@@ -8,6 +8,7 @@ Following analogy dataset is available (click to download the data):
 [U4](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/u4.zip),
 [Goolgle](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/google.zip),
 [BATS](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/bats.zip).
+All data is lowercased except Google dataset. 
 
 Each contains jsonline files for validation and test, in which each line consists of following dictionary,
 ```
