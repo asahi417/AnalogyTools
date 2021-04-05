@@ -8,6 +8,7 @@ Following analogy dataset is available (click to download the data):
 [U4](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/u4.zip),
 [Goolgle](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/google.zip),
 [BATS](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/bats.zip).
+All data is lowercased except Google dataset. 
 
 Each contains jsonline files for validation and test, in which each line consists of following dictionary,
 ```
@@ -30,8 +31,12 @@ where `stem` is the query word pair, `choice` has word pair candidates, and `ans
 
 
 ## Common Word Pairs
-Common word pair dataset is a dataset consisting of a pair of head and tail word ([link](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/common_word_pairs.pkl)).
-The dataset is built on top of lowercased wikipedia dump. 
+Common word pair dataset is a dataset consisting of a pair of head and tail word which built on top of lowercased wikipedia dump with PMI criteron in RELATIVE ([the official implementation](https://github.com/pedrada88/relative), [paper](http://josecamachocollados.com/papers/relative_ijcai2019.pdf)). As the original data is lowercased, we share the truecased version via [truecaser](https://pypi.org/project/truecase/).
+
+- [common word pairs](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/common_word_pairs.pkl).
+- [common word pairs (truecased)](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/common_word_pairs_truecase.pkl).
+
+It has 1,138,305 pairs with 87,422 unique words. Additionally, a common word list taken by the intersection of glove and word2vec pretrained model is shared ([link](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/common_word.pkl)) that has 654,805 unique word.
 
 ```python
 In [1] import pickle
@@ -44,13 +49,10 @@ In [4] data[:2]
 Out[4] [['prosperity', 'century'], ['haileybury', 'imperial']]
 ```
 
-Additionally, a common word list taken by the intersection of glove and word2vec pretrained model is released
-([link](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/common_word.pkl)).
-
 - ***script to reproduce the data***: [`generate_word_pair_dataset.py`](generate_word_pair_dataset.py)
 
 ## Pretrained Relation Embedding Model
-Following [RELATIVE embedding](http://josecamachocollados.com/papers/relative_ijcai2019.pdf) models that trained on 
+[RELATIVE embedding](http://josecamachocollados.com/papers/relative_ijcai2019.pdf) models that trained on 
 [common-word-pair](#common-word-pairs) are available:
 
 - [*relative (word2vec)*](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/relative_init.w2v.bin.tar.gz)
@@ -68,7 +70,7 @@ Following [RELATIVE embedding](http://josecamachocollados.com/papers/relative_ij
 
 
 Models with `{}_concat` means the relative vector is concatenated on top of the underlying word embedding's difference, and
-`{}_truecase` means the wikidump is converted into truecase by third party truecaser.
+`{}_truecase` means the wikidump is converted into truecase by truecaser.
 The binary file is supposed to be used via gensim:
 ```python
 In [1] from gensim.models import KeyedVectors
@@ -141,4 +143,3 @@ The prediction from each model is exported at [here](./predictions).
 ## Acknowledgement
 About RELATIVE embedding work, please refer [the official implementation](https://github.com/pedrada88/relative) and
 [the paper](http://josecamachocollados.com/papers/relative_ijcai2019.pdf) for further information.
-For the fasttext model, please refer [the facebook release](https://fasttext.cc/docs/en/english-vectors.html).
