@@ -27,13 +27,24 @@ def get_word_embedding_model(model_name: str = 'fasttext'):
             )
         model = KeyedVectors.load_word2vec_format(path, binary=True)
     elif model_name == 'fasttext':
-        path = './cache/crawl-300d-2M-subword.bin'
+        path = './cache/crawl-300d-2M-subword.vec'
         if not os.path.exists(path):
             print('downloading {}'.format(model_name))
             wget(
                 url='https://dl.fbaipublicfiles.com/fasttext/vectors-english/crawl-300d-2M-subword.zip',
                 cache_dir='./cache')
-        model = fasttext.load_facebook_model(path)
+        # model = fasttext.load_facebook_model(path)
+        model = KeyedVectors.load_word2vec_format(path)
+    elif model_name == 'fasttext_wiki':
+        path = './cache/wiki-news-300d-1M.vec'
+        if not os.path.exists(path):
+            print('downloading {}'.format(model_name))
+            wget(
+                url='https://dl.fbaipublicfiles.com/fasttext/vectors-english/wiki-news-300d-1M.vec.zip',
+                cache_dir='./cache'
+            )
+        model = KeyedVectors.load_word2vec_format(path)
+
     elif model_name == 'glove':
         path = './cache/glove.840B.300d.gensim.bin'
         if not os.path.exists(path):
@@ -89,7 +100,7 @@ def wget(url, cache_dir: str, gdrive_filename: str = None):
         with gzip.open(path, 'rb') as f:
             with open(path.replace('.gz', ''), 'wb') as f_write:
                 f_write.write(f.read())
-
+        os.remove(path)
     elif path.endswith('.zip'):
         with zipfile.ZipFile(path, 'r') as zip_ref:
             zip_ref.extractall(cache_dir)

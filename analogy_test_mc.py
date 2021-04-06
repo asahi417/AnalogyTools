@@ -160,6 +160,11 @@ if __name__ == '__main__':
     with open('./predictions/fasttext.json', 'w') as f_write:
         json.dump(pred, f_write)
 
+    tmp_results, pred = test_analogy('fasttext_wiki')
+    full_result += tmp_results
+    with open('./predictions/fasttext_wiki.json', 'w') as f_write:
+        json.dump(pred, f_write)
+
     out = pd.DataFrame(full_result)
     out = out.sort_values(by=['data', 'model'])
     logging.info('finish evaluation:\n{}'.format(out))
