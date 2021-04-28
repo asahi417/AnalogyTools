@@ -76,7 +76,8 @@ def evaluate(embedding_model: str = None, feature_set='concat'):
 
         logging.info('\t run validation')
         x = [diff(a, b, model, feature_set) for (a, b) in v['test']['x']]
-        y_pred = [clf.predict(i) if i is not None else freq_label for i in x]
+        y_pred = [clf.predict([i])[0] if i is not None else freq_label for i in x]
+        print(y_pred)
         oov = len(x) - sum([i is None for i in x])
         # accuracy
         accuracy = clf.score(x, v['test']['y'])
@@ -93,22 +94,13 @@ def evaluate(embedding_model: str = None, feature_set='concat'):
     return report
 
 
-def config(parser):
-    parser.add_argument('-b', '--batch', help='batch size', default=512, type=int)
-    parser.add_argument('--export-file', help='export file', default='results/lexical_relation.csv', type=str)
-    return parser
-
-
-def main():
-    argument_parser = argparse.ArgumentParser(description='Evaluate on relation classification.')
-    argument_parser = config(argument_parser)
-    opt = argument_parser.parse_args()
-
+if __name__ == '__main__':
     target_word_embedding = ['w2v', 'glove', 'fasttext']
     done_list = []
     full_result = []
-    if os.path.exists(opt.export_file):
-        df = pd.read_csv(opt.export_file, index_col=0)
+    export = 'results/lexical_relation.csv'
+    if os.path.exists(export):
+        df = pd.read_csv(export, index_col=0)
         done_list = list(set(df['model'].values))
         full_result = [i.to_dict() for _, i in df.iterrows()]
     logging.info("RUN WORD-EMBEDDING BASELINE")
@@ -116,10 +108,8 @@ def main():
     for m in target_word_embedding:
         if m in done_list:
             continue
-        for feature in pattern:
-            full_result += evaluate(m, feature_set=feature)
-        pd.DataFrame(full_result).to_csv(opt.export_file)
+        for _feature in pattern:
+            full_result += evaluate(m, feature_set=_feature)
+        pd.DataFrame(full_result).to_csv(export)
 
 
-if __name__ == '__main__':
-    main()
