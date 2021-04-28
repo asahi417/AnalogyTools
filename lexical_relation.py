@@ -76,8 +76,8 @@ def evaluate(embedding_model: str = None, feature_set='concat'):
 
         logging.info('\t run validation')
         x = [diff(a, b, model, feature_set) for (a, b) in v['test']['x']]
-        x = [(n, _x) for n, _x in enumerate(x) if _x is not None]
         y_pred = np.ones(len(x)) * freq_label
+        x = [(n, _x) for n, _x in enumerate(x) if _x is not None]
         y_pred_ = clf.predict([_x for _, _x in x])
         for n, _ in x:
             y_pred[n] = y_pred_[n]
