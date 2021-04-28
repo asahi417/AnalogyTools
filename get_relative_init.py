@@ -172,8 +172,7 @@ def get_relative_init(output_path: str,
                         pass
                 if cont_pair != 0:
                     vector_pair = vector_pair/cont_pair
-                    # key for relative embedding is lowercased even if truecasing mode
-                    txt_file.write('__'.join([token_i, token_j]).lower())
+                    txt_file.write('__'.join([token_i, token_j]))
                     for y in vector_pair:
                         txt_file.write(' ' + str(y))
                     txt_file.write("\n")
@@ -214,7 +213,7 @@ if __name__ == '__main__':
         with open(path) as f:
             pair_vocab += [x.split('\t') for x in f.read().split('\n') if len(x)]
     # lower case vocab
-    pair_vocab = [[i.lower(), i.lower()] for i in pair_vocab]
+    pair_vocab = [[i[0].lower(), i[1].lower()] for i in pair_vocab]
 
     logging.info("extracting contexts(this can take a few hours depending on the size of the corpus)")
     logging.info("\t * loading word frequency dictionary")
