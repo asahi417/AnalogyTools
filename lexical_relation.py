@@ -70,7 +70,7 @@ def evaluate(embedding_model: str = None, feature_set='concat'):
 
         x = [diff(a, b, model, feature_set) for (a, b) in v['train']['x']]
         y = [y for y, flag in zip(v['train']['y'], x) if flag is not None]
-        x = list(filter(None, x))
+        x = [_x for _x in x if _x is not None]
         logging.info('\t training data info: data size {}, label size {}'.format(len(x), len(label_dict)))
         clf = MLPClassifier().fit(x, y)
 
@@ -95,7 +95,7 @@ def evaluate(embedding_model: str = None, feature_set='concat'):
 
 def config(parser):
     parser.add_argument('-b', '--batch', help='batch size', default=512, type=int)
-    parser.add_argument('--export-file', help='export file', required=True, type=str)
+    parser.add_argument('--export-file', help='export file', default='results/lexical_relation.csv', type=str)
     return parser
 
 
