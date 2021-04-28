@@ -3,8 +3,10 @@ import os
 import logging
 import json
 from random import randint, seed
+from itertools import combinations
 
 import pandas as pd
+import numpy as np
 from util import wget, get_word_embedding_model
 
 logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', level=logging.INFO, datefmt='%Y-%m-%d %H:%M:%S')
@@ -45,22 +47,31 @@ def cos_similarity(a_, b_):
     return inner / (norm_b * norm_a)
 
 
-def get_prediction_we(stem, choice, embedding_model):
+def get_prediction_we(stem, choice, embedding_model, add_feature_set='concat'):
 
-    def diff(x, y):
-        if x is None or y is None:
+    def diff(vec_a, vec_b):
+        if vec_a is None or vec_b is None:
             return None
-        return x - y
+        if 'concat' in add_feature_set:
+            feature = [vec_a, vec_b]
+        else:
+            feature = []
+        if 'diff' in add_feature_set:
+            feature.append(vec_a - vec_b)
+        if 'dot' in add_feature_set:
+            feature.append(vec_a * vec_b)
+        assert len(feature)
+        return np.concatenate(feature)
 
     stem_e = diff(embedding(stem[0], embedding_model), embedding(stem[1], embedding_model))
     if stem_e is None:
         return None
     choice_e = [diff(embedding(a, embedding_model), embedding(b, embedding_model)) for a, b in choice]
     score = [cos_similarity(e, stem_e) for e in choice_e]
-    pred = score.index(max(score))
-    if score[pred] == -100:
+    _pred = score.index(max(score))
+    if score[_pred] == -100:
         return None
-    return pred
+    return _pred
 
 
 def get_prediction_re(stem, choice, embedding_model, lower_case: bool = True):
@@ -79,7 +90,7 @@ def get_prediction_re(stem, choice, embedding_model, lower_case: bool = True):
     return p
 
 
-def test_analogy(model_type, relative: bool = False):
+def test_analogy(model_type, relative: bool = False, add_feature_set='concat'):
     model = get_word_embedding_model(model_type)
     if relative:
         get_prediction = get_prediction_re
@@ -93,13 +104,13 @@ def test_analogy(model_type, relative: bool = False):
         val, test = get_dataset_raw(i)
         prediction[i] = {}
         for prefix, data in zip(['test', 'valid'], [test, val]):
-            pred = [get_prediction(o['stem'], o['choice'], model) for o in data]
-            prediction[i][prefix] = pred
-            tmp_result['oov_{}'.format(prefix)] = len([p for p in pred if p is None])
+            _pred = [get_prediction(o['stem'], o['choice'], model, add_feature_set) for o in data]
+            prediction[i][prefix] = _pred
+            tmp_result['oov_{}'.format(prefix)] = len([p for p in _pred if p is None])
             # random prediction when OOV occurs
-            pred = [p if p is not None else randint(0, len(data[n]['choice']) - 1)
-                    for n, p in enumerate(pred)]
-            accuracy = sum([o['answer'] == pred[n] for n, o in enumerate(data)]) / len(pred)
+            _pred = [p if p is not None else randint(0, len(data[n]['choice']) - 1)
+                     for n, p in enumerate(_pred)]
+            accuracy = sum([o['answer'] == _pred[n] for n, o in enumerate(data)]) / len(_pred)
             tmp_result['accuracy_{}'.format(prefix)] = accuracy
         tmp_result['accuracy'] = (tmp_result['accuracy_test'] * len(test) +
                                   tmp_result['accuracy_valid'] * len(val)) / (len(val) + len(test))
@@ -108,7 +119,7 @@ def test_analogy(model_type, relative: bool = False):
 
 
 if __name__ == '__main__':
-
+    pattern = list(combinations(['diff', 'concat', 'dot'], 2)) + [('diff', 'concat', 'dot')] + ['diff', 'concat', 'dot']
     full_result = []
     os.makedirs('./predictions', exist_ok=True)
 

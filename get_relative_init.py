@@ -8,7 +8,6 @@ import os
 import json
 import pickle
 import argparse
-import re
 from itertools import groupby
 from typing import Dict
 from tqdm import tqdm
@@ -16,7 +15,7 @@ from tqdm import tqdm
 import truecase
 from gensim.models import KeyedVectors
 
-from util import wget, get_common_word_pair, get_word_embedding_model
+from util import wget, get_word_embedding_model
 
 logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', level=logging.INFO, datefmt='%Y-%m-%d %H:%M:%S')
 
@@ -225,8 +224,14 @@ def get_options():
 
 if __name__ == '__main__':
     opt = get_options()
-
     os.makedirs(opt.output_dir, exist_ok=True)
+    pair_vocab = []
+    for url in ['https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/analogy.vocab.tar.gz',
+                'https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/LexicalRelation.vocab.tar.gz']:
+        wget(url, opt.output_dir)
+        path = '{}/{}'.format(opt.output_dir, os.path.basename(url).replace('.tar.gz', ''))
+        with open(path) as f:
+            pair_vocab += [x.split('\t') for x in f.read().split('\n') if len(x)]
 
     logging.info("extracting contexts(this can take a few hours depending on the size of the corpus)")
     logging.info("\t * loading word frequency dictionary")
@@ -246,8 +251,6 @@ if __name__ == '__main__':
             pairs_context = json.load(f)
     else:
         logging.info("retrieve pair and word vocabulary (dictionary)")
-
-        pair_vocab = get_common_word_pair(opt.truecase)
         pair_vocab = sorted(pair_vocab)
         grouper = groupby(pair_vocab, key=lambda x: x[0])
         pair_vocab_dict = {k: list(set(list(map(lambda x: x[1], g)))) for k, g in grouper}
@@ -290,26 +293,3 @@ if __name__ == '__main__':
         model = KeyedVectors.load_word2vec_format(cache)
         model.wv.save_word2vec_format(cache_bin, binary=True)
         logging.info("new embeddings are available at {}".format(cache_bin))
-
-    # logging.info("concat with word embedding model")
-    # cache_concat = cache.replace('.txt', '.concat.txt')
-    # cache_concat_bin = cache_concat.replace('.txt', '.bin')
-    # if not os.path.exists(cache_concat_bin):
-    #     model = KeyedVectors.load_word2vec_format(cache_bin, binary=True)
-    #     model_word = get_word_embedding_model(opt.model)
-    #     with open(cache_concat, 'w') as f:
-    #         f.write(str(len(model.vocab)) + " " + str(model.vector_size + model_word.vector_size) + "\n")
-    #         for v in tqdm(model.vocab):
-    #             a, b = v.split('__')
-    #             if opt.truecase:
-    #                 a, b = tc(a), tc(b)
-    #             v_diff = model[a] - model[b]
-    #             new_vector = list(model[v]) + list(v_diff)
-    #             f.write(v + ' ' + ' '.join([str(i) for i in new_vector]) + "\n")
-    #
-    #     logging.info("producing binary file")
-    #     model = KeyedVectors.load_word2vec_format(cache_concat)
-    #     model.wv.save_word2vec_format(cache_concat_bin, binary=True)
-    #     logging.info("new embeddings are available at {}".format(cache_concat_bin))
-    #
-
