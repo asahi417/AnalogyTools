@@ -1,7 +1,6 @@
-""" Simplified script to get RELATIVE vector for fixed pair word dataset on Wikipedia dump with FastText
+""" Compute RELATIVE vector with Wikipedia dump
 - wikidump is processed so that: lowercase, tokenizerd (token with multiple tokens is jointed by `_`)
 - relative vocabulary is lowercase and token with multiple tokens is jointed by halfspace
-- analogy data vocabulary is case-sensitive and token with multiple tokens is jointed by halfspace
 """
 import logging
 import os
@@ -13,7 +12,6 @@ from typing import Dict
 from tqdm import tqdm
 
 from gensim.models import KeyedVectors
-
 from util import wget, get_word_embedding_model
 
 logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', level=logging.INFO, datefmt='%Y-%m-%d %H:%M:%S')
@@ -191,7 +189,7 @@ def get_options():
     parser = argparse.ArgumentParser(description='simplified RELATIVE embedding training')
     parser.add_argument('-o', '--output-dir', help='Output file path to store relation vectors',
                         type=str, default="./cache")
-    parser.add_argument('-m', '--model', help='anchor word embedding model', type=str, default="fasttext")
+    parser.add_argument('-m', '--model', help='anchor word embedding model', type=str, default="glove")
     # The following parameters are needed if contexts are not provided
     parser.add_argument('-w', '--window-size', help='Co-occurring window size', type=int, default=10)
     parser.add_argument('--minimum-frequency-context', default=1, type=int,
@@ -206,10 +204,10 @@ if __name__ == '__main__':
     opt = get_options()
     os.makedirs(opt.output_dir, exist_ok=True)
     pair_vocab = []
-    for url in ['https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/analogy.vocab.tar.gz',
-                'https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/LexicalRelation.vocab.tar.gz']:
+    for url in ['https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/analogy_test_dataset.tar.gz',
+                'https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/lexical_relation_dataset.tar.gz']:
         wget(url, opt.output_dir)
-        path = '{}/{}'.format(opt.output_dir, os.path.basename(url).replace('.tar.gz', ''))
+        path = '{}/{}/vocab.txt'.format(opt.output_dir, os.path.basename(url).replace('.tar.gz', ''))
         with open(path) as f:
             pair_vocab += [x.split('\t') for x in f.read().split('\n') if len(x)]
     # lower case vocab
@@ -260,3 +258,4 @@ if __name__ == '__main__':
         model = KeyedVectors.load_word2vec_format(cache)
         model.wv.save_word2vec_format(cache_bin, binary=True)
         logging.info("new embeddings are available at {}".format(cache_bin))
+        os.remove(cache)

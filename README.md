@@ -1,25 +1,21 @@
-# Analogy Data and Relative Embedding 
-Five analogy datasets and relative embedding models trained on Wikipedia dump.
+# Analogy Tools 
+Dataset and models for word analogy research.
+- [Analogy Test Dataset](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/analogy_test_dataset.tar.gz)
+- [Lexical Relation Dataset](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/lexical_relation_dataset.tar.gz)
 
 ## Analogy Test Dataset
-Following analogy dataset is available (click to download the data):
-[SAT](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/sat.zip), 
-[U2](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/u2.zip),
-[U4](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/u4.zip),
-[Goolgle](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/google.zip),
-[BATS](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/bats.zip).
-All data is lowercased except Google dataset. 
-
-Each contains jsonline files for validation and test, in which each line consists of following dictionary,
+Five different datasets for word analogy. Each contains jsonline files for validation and test, in which each line consists of following dictionary,
 ```
 {"stem": ["raphael", "painter"],
  "answer": 2,
+ "pmi_pred": 1,
  "choice": [["andersen", "plato"],
             ["reading", "berkshire"],
             ["marx", "philosopher"],
             ["tolstoi", "edison"]]}
 ``` 
-where `stem` is the query word pair, `choice` has word pair candidates, and `answer` indicates the index of correct candidate. Data statistics are summarized as below.
+where `stem` is the query word pair, `choice` has word pair candidates, `pmi_pred` is statistical baseline
+and `answer` indicates the index of correct candidate. Data statistics are summarized as below.
 
 | Dataset | Size (valid/test) | Num of choice | Num of relation group |
 |---------|---------:|--------------:|----------------------:|
@@ -29,27 +25,10 @@ where `stem` is the query word pair, `choice` has word pair candidates, and `ans
 | google  | 50/500   | 4             | 2                     |
 | bats    | 199/1799 | 4             | 3                     |
 
+All data is lowercased except Google dataset.
 
-## Common Word Pairs
-Common word pair dataset is a dataset consisting of a pair of head and tail word which built on top of lowercased wikipedia dump with PMI criteron in RELATIVE ([the official implementation](https://github.com/pedrada88/relative), [paper](http://josecamachocollados.com/papers/relative_ijcai2019.pdf)). As the original data is lowercased, we share the truecased version via [truecaser](https://pypi.org/project/truecase/).
-
-- [common word pairs](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/common_word_pairs.pkl).
-- [common word pairs (truecased)](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/common_word_pairs_truecase.pkl).
-
-It has 1,138,305 pairs with 87,422 unique words. Additionally, a common word list taken by the intersection of glove and word2vec pretrained model is shared ([link](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/common_word.pkl)) that has 654,805 unique word.
-
-```python
-In [1] import pickle
-In [2] 
-def load_pickle(path):
-    with open(path, "rb") as fp:
-        return pickle.load(fp)
-In [3] data = load_pickle('common_word_pairs.pkl')
-In [4] data[:2]
-Out[4] [['prosperity', 'century'], ['haileybury', 'imperial']]
-```
-
-- ***script to reproduce the data***: [`generate_word_pair_dataset.py`](generate_word_pair_dataset.py)
+## Lexical Relation Dataset
+Five different datasets for lexical relation classification.
 
 ## Pretrained Relation Embedding Model
 [RELATIVE embedding](http://josecamachocollados.com/papers/relative_ijcai2019.pdf) models that trained on 
@@ -138,7 +117,7 @@ For out-of-vocabulary (OOV), we randomly pick up choice from given candidate.
 
 The prediction from each model is exported at [here](./predictions). 
 
-- ***script to reproduce the result***: [`test_analogy.py`](analogy_test.py)
+- ***script to reproduce the result***: [`test_analogy.py`](google_word_analogy.py)
 
 ## Acknowledgement
 About RELATIVE embedding work, please refer [the official implementation](https://github.com/pedrada88/relative) and

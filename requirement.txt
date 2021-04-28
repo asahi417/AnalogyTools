@@ -1,3 +1,4 @@
 truecase
 gdown
 gensim==3.8.1
+sklearn

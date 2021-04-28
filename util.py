@@ -4,13 +4,10 @@ import zipfile
 import gzip
 import requests
 import os
-import json
-import pickle
-from itertools import chain
 
 import gdown
 from gensim.models import KeyedVectors
-from gensim.models import fasttext
+# from gensim.models import fasttext
 
 
 def get_word_embedding_model(model_name: str = 'fasttext'):
@@ -120,38 +117,3 @@ def _wget(url: str, cache_dir, gdrive_filename: str = None):
         f.write(r.content)
     return '{}/{}'.format(cache_dir, filename)
 
-
-def get_pair_analogy(cache_dir: str = './cache'):
-    """ Get the list of word pairs in analogy dataset """
-    data = dict(
-        sat='https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/sat.zip',
-        u2='https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/u2.zip',
-        u4='https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/u4.zip',
-        google='https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/google.zip',
-        bats='https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/bats.zip'
-    )
-
-    def extract_pairs(_json_file):
-        _json = json.loads(_json_file)
-        return [_json['stem']] + _json['choice']
-
-    pairs = []
-    for name, url in data.items():
-        wget(url=url, cache_dir=cache_dir)
-        with open('./cache/{}/valid.jsonl'.format(name), 'r') as f_:
-            pairs += list(chain(*[extract_pairs(i) for i in f_.read().split('\n') if len(i) > 0]))
-        with open('./cache/{}/test.jsonl'.format(name), 'r') as f_:
-            pairs += list(chain(*[extract_pairs(i) for i in f_.read().split('\n') if len(i) > 0]))
-    return pairs
-
-
-def get_common_word_pair(cache_dir: str = './cache', if_truecase: bool = False):
-    if if_truecase:
-        url = 'https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/common_word_pairs_truecase.pkl.tar.gz'
-        path = '{}/common_word_pairs_truecase.pkl'.format(cache_dir)
-    else:
-        url = 'https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/common_word_pairs.pkl.tar.gz'
-        path = '{}/common_word_pairs.pkl'.format(cache_dir)
-    wget(url=url, cache_dir=cache_dir)
-    with open(path, "rb") as fp:
-        return pickle.load(fp)
