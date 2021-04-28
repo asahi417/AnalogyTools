@@ -12,23 +12,11 @@ from itertools import groupby
 from typing import Dict
 from tqdm import tqdm
 
-import truecase
 from gensim.models import KeyedVectors
 
 from util import wget, get_word_embedding_model
 
 logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', level=logging.INFO, datefmt='%Y-%m-%d %H:%M:%S')
-
-
-def tc(string):
-    return truecase.get_true_case('A ' + string)[2:]
-
-    # string = truecase.get_true_case(string)
-    # string = re.sub(r'\W\s', ' ', string)
-    # string = re.sub(r'\s\W', ' ', string)
-    # string = re.sub(r'\W\Z', '', string)
-    # string = re.sub(r'\A\W', '', string)
-    # return string.strip()
 
 # Corpus
 URL_CORPUS = 'https://drive.google.com/u/0/uc?id=17EBy4GD4tXl9G4NTjuIuG5ET7wfG4-xa&export=download'
@@ -51,9 +39,6 @@ def get_wiki_vocab(minimum_frequency: int, word_vocabulary_size: int = None):
     with open(PATH_CORPUS, 'r', encoding='utf-8') as corpus_file:
         for _line in corpus_file:
             bar.update()
-            # if if_truecase:
-            #     tokens = tc(_line).split(" ")
-            # else:
             tokens = _line.strip().split(" ")
             for token in tokens:
                 if token in STOPWORD_LIST or "__" in token or token.isdigit():
@@ -102,9 +87,6 @@ def frequency_filtering(vocab_corpus, dict_pairvocab, window_size, cache_jsonlin
             with open(PATH_CORPUS, 'r', encoding='utf-8') as corpus_file:
                 for sentence in corpus_file:
                     bar.update()
-                    # if if_truecase:
-                    #     token_list = tc(sentence).split(" ")
-                    # else:
                     token_list = sentence.strip().split(" ")
                     contexts = [(token_list[i_], get_context(i_, token_list)) for i_ in range(len(token_list))]
                     contexts = dict(filter(lambda x: x[1] is not None, contexts))
@@ -211,7 +193,6 @@ def get_options():
     parser.add_argument('-o', '--output-dir', help='Output file path to store relation vectors',
                         type=str, default="./cache")
     parser.add_argument('-m', '--model', help='anchor word embedding model', type=str, default="fasttext")
-    parser.add_argument('--truecase', help='Truecasing', action='store_true')
     # The following parameters are needed if contexts are not provided
     parser.add_argument('-w', '--window-size', help='Co-occurring window size', type=int, default=10)
     parser.add_argument('--minimum-frequency-context', default=1, type=int,
@@ -232,6 +213,8 @@ if __name__ == '__main__':
         path = '{}/{}'.format(opt.output_dir, os.path.basename(url).replace('.tar.gz', ''))
         with open(path) as f:
             pair_vocab += [x.split('\t') for x in f.read().split('\n') if len(x)]
+    # lower case vocab
+    pair_vocab = [[i.lower(), i.lower()] for i in pair_vocab]
 
     logging.info("extracting contexts(this can take a few hours depending on the size of the corpus)")
     logging.info("\t * loading word frequency dictionary")
@@ -262,22 +245,7 @@ if __name__ == '__main__':
         with open(cache, 'w') as f:
             json.dump(pairs_context, f)
 
-    if opt.truecase:
-        logging.info('converting by truecaser')
-        cache = '{}/pairs_context_truecase.json'.format(opt.output_dir)
-        if os.path.exists(cache):
-            with open(cache, 'r') as f:
-                pairs_context_truecase = json.load(f)
-        else:
-            pairs_context_truecase = {}
-            for k, v in tqdm(pairs_context.items()):
-                pairs_context_truecase[tc(k)] = {tc(_k): {tc(__k): __v for __k, __v in _v.items()} for _k, _v in v.items()}
-            with open(cache, 'w') as f:
-                json.dump(pairs_context_truecase, f)
-        pairs_context = pairs_context_truecase
-        cache = '{}/relative_init.{}.truecase.txt'.format(opt.output_dir, opt.model)
-    else:
-        cache = '{}/relative_init.{}.txt'.format(opt.output_dir, opt.model)
+    cache = '{}/relative_init.{}.txt'.format(opt.output_dir, opt.model)
 
     logging.info("\t * computing relative-init vectors: {}".format(cache))
     if not os.path.exists(cache):
