@@ -79,8 +79,8 @@ def evaluate(embedding_model: str = None, feature_set='concat'):
         y_pred = np.ones(len(x)) * freq_label
         x = [(n, _x) for n, _x in enumerate(x) if _x is not None]
         y_pred_ = clf.predict([_x for _, _x in x])
-        for n, _ in x:
-            y_pred[n] = y_pred_[n]
+        for _n, (n, _) in enumerate(x):
+            y_pred[n] = y_pred_[_n]
         # y_pred = [clf.predict([i])[0] if i is not None else freq_label for i in x]
         print(y_pred)
         oov = len(x) - sum([i is None for i in x])
