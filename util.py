@@ -7,7 +7,7 @@ import os
 
 import gdown
 from gensim.models import KeyedVectors
-# from gensim.models import fasttext
+from gensim.models import fasttext
 
 
 def get_word_embedding_model(model_name: str = 'fasttext'):
@@ -23,16 +23,16 @@ def get_word_embedding_model(model_name: str = 'fasttext'):
                 gdrive_filename='GoogleNews-vectors-negative300.bin.gz'
             )
         model = KeyedVectors.load_word2vec_format(path, binary=True)
-    elif model_name == 'fasttext':
-        path = './cache/crawl-300d-2M-subword.vec'
+    elif model_name == 'fasttext_cc':
+        path = './cache/crawl-300d-2M-subword.bin'
         if not os.path.exists(path):
             print('downloading {}'.format(model_name))
             wget(
                 url='https://dl.fbaipublicfiles.com/fasttext/vectors-english/crawl-300d-2M-subword.zip',
                 cache_dir='./cache')
-        # model = fasttext.load_facebook_model(path)
-        model = KeyedVectors.load_word2vec_format(path)
-    elif model_name == 'fasttext_wiki':
+        model = fasttext.load_facebook_model(path)
+        # model = KeyedVectors.load_word2vec_format(path)
+    elif model_name == 'fasttext':
         path = './cache/wiki-news-300d-1M.vec'
         if not os.path.exists(path):
             print('downloading {}'.format(model_name))
