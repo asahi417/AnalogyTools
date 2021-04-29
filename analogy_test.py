@@ -92,7 +92,7 @@ def get_prediction_re(stem, choice, embedding_model, lower_case: bool = True):
     return p
 
 
-def test_analogy(model_type, relative: bool = False, add_feature_set='concat'):
+def test_analogy(model_type, relative: bool = False):
     model = get_word_embedding_model(model_type)
     if relative:
         get_prediction = get_prediction_re
@@ -101,11 +101,11 @@ def test_analogy(model_type, relative: bool = False, add_feature_set='concat'):
     pattern = list(combinations(['diff', 'concat', 'dot'], 2)) + [('diff', 'concat', 'dot')] + ['diff', 'concat', 'dot']
     results = []
 
-    for p in pattern:
+    for _pattern in pattern:
         for i, (val, test) in full_data.items():
             tmp_result = {'data': i, 'model': model_type}
             for prefix, data in zip(['test', 'valid'], [test, val]):
-                _pred = [get_prediction(o['stem'], o['choice'], model, add_feature_set) for o in data]
+                _pred = [get_prediction(o['stem'], o['choice'], model, _pattern) for o in data]
                 tmp_result['oov_{}'.format(prefix)] = len([p for p in _pred if p is None])
                 # random prediction when OOV occurs
                 _pred = [p if p is not None else data[n]['pmi_pred'] for n, p in enumerate(_pred)]
@@ -113,7 +113,7 @@ def test_analogy(model_type, relative: bool = False, add_feature_set='concat'):
                 tmp_result['accuracy_{}'.format(prefix)] = accuracy
             tmp_result['accuracy'] = (tmp_result['accuracy_test'] * len(test) +
                                       tmp_result['accuracy_valid'] * len(val)) / (len(val) + len(test))
-            tmp_result['feature'] = p
+            tmp_result['feature'] = _pattern
             results.append(tmp_result)
 
     return results

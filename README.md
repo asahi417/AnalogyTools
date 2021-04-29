@@ -2,6 +2,7 @@
 This repository is aimed to collect resources for word analogy and lexical relation research.   
 - Analogy Test Dataset: [description](#analogy-test-dataset), [link](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/analogy_test_dataset.tar.gz)
 - Lexical Relation Dataset: [description](#lexical-relation-dataset), [link](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/lexical_relation_dataset.tar.gz)
+- RELATIVE embedding model: [description], [link]
 
 Alias of released resource:
 - `GoogleNews-vectors-negative300`: [Google's released word2vec model](https://drive.google.com/file/d/0B7XkCwpI5KDYNlNUTTlSS21pQmM/edit).
@@ -34,14 +35,29 @@ and `answer` indicates the index of correct candidate. Data statistics are summa
 
 All data is lowercased except Google dataset.
 
-<details><summary>Baseline</summary>
-TBA
+To get word embedding baseline, 
+```shell script
+pytho analogy_test.py
+```
+<details><summary>Leader Board</summary>
 </details>
 
 
 ## Lexical Relation Dataset
-Five different datasets for lexical relation classification.
+Five different datasets for lexical relation classification used in [SphereRE](https://www.aclweb.org/anthology/P19-1169/).
+This contains `BLESS`, `CogALexV`, `EVALution`, `K&H+N`, `ROOT09` and each of them has `test.tsv` and `train.tsv`.
+Each tsv file consists of lines which describe the relation type given word A and B. 
+```
+A   B   relation_type
+```
 
+For more detailed discussion, please take a look the SphereRE paper.
+
+To get word embedding baseline, 
+```shell script
+pytho lexical_relation.py
+```
+ 
 ## Pretrained Relation Embedding Model
 [RELATIVE embedding](http://josecamachocollados.com/papers/relative_ijcai2019.pdf) models that trained on 
 [common-word-pair](#common-word-pairs) are available:
