@@ -43,6 +43,9 @@ To get word embedding baseline,
 ```shell script
 pytho analogy_test.py
 ```
+When the model suffers out-of-vocabulary error, we use PMI prediction, `pmi_pred` in each entry, to ensure the baseline can
+be compared with other methods to cover all the data points.   
+
 </details>
 
 
@@ -61,6 +64,8 @@ To get word embedding baseline,
 ```shell script
 pytho lexical_relation.py
 ```
+When the model suffers out-of-vocabulary error in evaluation, we use the most frequent label in training data, to ensure the baseline can
+be compared with other methods to cover all the data points.   
 
 </details>
  

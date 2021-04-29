@@ -38,7 +38,7 @@ def get_lexical_relation_data():
     return full_data
 
 
-def diff(a, b, model, add_feature_set='concat'):
+def diff(a, b, model, add_feature_set='concat', relative_model=None):
     try:
         vec_a = model[a]
         vec_b = model[b]
@@ -52,29 +52,38 @@ def diff(a, b, model, add_feature_set='concat'):
         feature.append(vec_a - vec_b)
     if 'dot' in add_feature_set:
         feature.append(vec_a * vec_b)
+
+    if relative_model is not None:
+        try:
+            vec_r = relative_model['__'.join([a, b]).lower().replace(' ', '_')]
+            feature.append(vec_r)
+        except KeyError:
+            return None
     return np.concatenate(feature)
 
 
-def evaluate(embedding_model: str = None, feature_set='concat'):
-
+def evaluate(embedding_model: str = None, feature_set='concat', add_relative: bool = False):
     model = get_word_embedding_model(embedding_model)
-    model_name = embedding_model
+    model_re = None
+    if add_relative:
+        model_re = get_word_embedding_model('relative_init.{}'.format(embedding_model))
+
     data = get_lexical_relation_data()
     report = []
     for data_name, v in data.items():
-        logging.info('train model with {} on {}'.format(model_name, data_name))
+        logging.info('train model with {} on {}'.format(embedding_model, data_name))
         label_dict = v.pop('label')
         freq_label = sorted([(n, len(list(i))) for n, i in groupby(sorted(v['train']['y']))],
                             key=lambda o: o[1], reverse=True)[0][0]
 
-        x = [diff(a, b, model, feature_set) for (a, b) in v['train']['x']]
+        x = [diff(a, b, model, feature_set, model_re) for (a, b) in v['train']['x']]
         y = [y for y, flag in zip(v['train']['y'], x) if flag is not None]
         x = [_x for _x in x if _x is not None]
         logging.info('\t training data info: data size {}, label size {}'.format(len(x), len(label_dict)))
         clf = MLPClassifier().fit(x, y)
 
         logging.info('\t run validation')
-        x = [diff(a, b, model, feature_set) for (a, b) in v['test']['x']]
+        x = [diff(a, b, model, feature_set, model_re) for (a, b) in v['test']['x']]
         y_pred = np.ones(len(x)) * freq_label
         x = [(n, _x) for n, _x in enumerate(x) if _x is not None]
         y_pred_ = clf.predict([_x for _, _x in x])
@@ -86,8 +95,9 @@ def evaluate(embedding_model: str = None, feature_set='concat'):
         f_mic = f1_score(v['test']['y'], y_pred, average='micro')
         accuracy = sum([a == b for a, b in zip(v['test']['y'], y_pred.tolist())])/len(y_pred)
 
-        report_tmp = {'model': model_name, 'accuracy': accuracy, 'f1_macro': f_mac, 'f1_micro': f_mic,
+        report_tmp = {'model': embedding_model, 'accuracy': accuracy, 'f1_macro': f_mac, 'f1_micro': f_mic,
                       'feature_set': feature_set,
+                      'add_relative': add_relative,
                       'label_size': len(label_dict), 'oov': oov,
                       'test_total': len(y_pred), 'data': data_name}
         logging.info('\t accuracy: \n{}'.format(report_tmp))
@@ -111,7 +121,8 @@ if __name__ == '__main__':
         if m in done_list:
             continue
         for _feature in pattern:
-            full_result += evaluate(m, feature_set=_feature)
+            for if_relative in [True, False]:
+                full_result += evaluate(m, feature_set=_feature, add_relative=if_relative)
         pd.DataFrame(full_result).to_csv(export)
 
 

@@ -124,6 +124,7 @@ def pmi_baseline():
         tmp_result['accuracy'] = (tmp_result['accuracy_test'] * len(test) +
                                   tmp_result['accuracy_valid'] * len(val)) / (len(val) + len(test))
         tmp_result['feature'] = None
+        tmp_result['add_relative'] = None
         results.append(tmp_result)
     return results
 
