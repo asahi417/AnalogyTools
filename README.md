@@ -8,6 +8,7 @@ This repository is aimed to collect resources for word analogy and lexical relat
     - [glove.840B.300d](https://nlp.stanford.edu/projects/glove/) based model. [***link***](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/relative_init.glove.bin.tar.gz)
 - Word embedding model:
     - Largest GloVe embedding model shared by [Stanford](https://nlp.stanford.edu/projects/glove/), converted to gensim format. [***link***](https://drive.google.com/file/d/1DbLuxwDlTRDbhBroOVgn2_fhVUQAVIqN/view?usp=sharing)
+
 Available aliases of released resource by third party:
 - [GoogleNews-vectors-negative300](https://drive.google.com/file/d/0B7XkCwpI5KDYNlNUTTlSS21pQmM/edit): [***link***](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/GoogleNews-vectors-negative300.bin.gz)
 - [BATS_3.0](https://vecto.space/projects/BATS/): [***link***](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/BATS_3.0.zip)
