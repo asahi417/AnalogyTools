@@ -81,10 +81,8 @@ def evaluate(embedding_model: str = None, feature_set='concat'):
         y_pred_ = clf.predict([_x for _, _x in x])
         for _n, (n, _) in enumerate(x):
             y_pred[n] = y_pred_[_n]
-        # y_pred = [clf.predict([i])[0] if i is not None else freq_label for i in x]
-        print(y_pred)
-        oov = len(x) - sum([i is None for i in x])
-        # accuracy
+        oov = len(y_pred) - len(x)
+
         f_mac = f1_score(v['test']['y'], y_pred, average='macro')
         f_mic = f1_score(v['test']['y'], y_pred, average='micro')
         accuracy = sum([a == b for a, b in zip(v['test']['y'], y_pred.tolist())])/len(y_pred)
@@ -92,7 +90,7 @@ def evaluate(embedding_model: str = None, feature_set='concat'):
         report_tmp = {'model': model_name, 'accuracy': accuracy, 'f1_macro': f_mac, 'f1_micro': f_mic,
                       'feature_set': feature_set,
                       'label_size': len(label_dict), 'oov': oov,
-                      'test_total': len(x), 'data': data_name}
+                      'test_total': len(y_pred), 'data': data_name}
         logging.info('\t accuracy: \n{}'.format(report_tmp))
         report.append(report_tmp)
     del model
