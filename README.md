@@ -37,9 +37,10 @@ and `answer` indicates the index of correct candidate. Data statistics are summa
 
 All data is lowercased except Google dataset.
 
-<details><summary>Leader Board</summary>
+<details><summary> Leader Board</summary>
 
-Here we report baseline with word embedding model.
+Here we report baseline with word embedding model. Complete result can be found [here](./results/analogy_test.csv), 
+and please refer [our script](analogy_test.py) to for more detail.
 
 - ***BATS***
 
