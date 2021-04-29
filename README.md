@@ -40,7 +40,7 @@ All data is lowercased except Google dataset.
 <details><summary> Leader Board</summary>
 
 Here we report baseline with word embedding model. Complete result can be found [here](./results/analogy_test.csv), 
-and please refer [our script](analogy_test.py) to for more detail.
+and please refer [our script](analogy_test.py) for more detail experimental setting.
 
 - ***BATS***
 
@@ -107,6 +107,49 @@ A   B   relation_type
 For more detailed discussion, please take a look the [SphereRE](https://www.aclweb.org/anthology/P19-1169/) paper.
 
 <details><summary>Leader Board</summary>
+
+Here we report baseline with word embedding model. Complete result can be found [here](./results/lexical_relation.csv), 
+and please refer [our script](lexical_relation.py) for more detail experimental setting.
+
+- ***BLESS*** 
+
+| model    | accuracy | f1_macro | f1_micro |
+|----------|----------|----------|----------|
+| fasttext |   92.87% |   92.34% |   92.87% |
+| glove    |   93.22% |   92.63% |   93.22% |
+| w2v      |   92.30% |   91.84% |   92.30% |
+
+- ***CogALexV***
+
+| model    | accuracy | f1_macro | f1_micro |
+|----------|----------|----------|----------|
+| fasttext |   78.10% |   52.06% |   78.10% |
+| glove    |   79.23% |   52.82% |   79.23% |
+| w2v      |   77.37% |   49.10% |   77.37% |
+
+- ***EVALution***
+
+| model    | accuracy | f1_macro | f1_micro |
+|----------|----------|----------|----------|
+| fasttext |   57.04% |   55.49% |   57.04% |
+| glove    |   58.34% |   57.59% |   58.34% |
+| w2v      |   56.66% |   55.61% |   56.66% |
+
+- ***K&H+N***
+
+| model    | accuracy | f1_macro | f1_micro |
+|----------|----------|----------|----------|
+| fasttext |   93.97% |   88.46% |   93.97% |
+| glove    |   95.26% |   90.15% |   95.26% |
+| w2v      |   90.81% |   84.76% |   90.81% |
+
+- ***ROOT09***
+
+| model    | accuracy | f1_macro | f1_micro |
+|----------|----------|----------|----------|
+| fasttext |   88.84% |   88.67% |   88.84% |
+| glove    |   89.22% |   88.64% |   89.22% |
+| w2v      |   87.15% |   86.65% |   87.15% |
 
 To get word embedding baseline, 
 ```shell script
