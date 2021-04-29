@@ -1,6 +1,5 @@
 import os
 import logging
-import argparse
 from itertools import combinations, groupby
 from glob import glob
 import pandas as pd

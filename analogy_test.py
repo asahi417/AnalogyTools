@@ -122,7 +122,7 @@ def test_analogy(model_type, relative: bool = False, add_feature_set='concat'):
 def pmi_baseline():
     results = []
     for i, (val, test) in full_data.items():
-        tmp_result = {'data': i, 'model': model_type}
+        tmp_result = {'data': i, 'model': 'PMI'}
         for prefix, data in zip(['test', 'valid'], [test, val]):
             tmp_result['oov_{}'.format(prefix)] = 0
             accuracy = sum([o['answer'] == o['pmi_pred'] for n, o in enumerate(data)]) / len(data)
