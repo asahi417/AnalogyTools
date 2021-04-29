@@ -39,6 +39,53 @@ All data is lowercased except Google dataset.
 
 <details><summary>Leader Board</summary>
 
+Here we report baseline with word embedding model.
+
+- ***BATS***
+
+| model    | accuracy (val) | accuracy (test) | accuracy (full) |
+|----------|----------------|-----------------|-----------------|
+| fasttext |         75.88% |          74.21% |          74.37% |
+| glove    |         70.85% |          67.32% |          67.67% |
+| w2v      |         65.33% |          63.15% |          63.36% |
+| PMI      |         35.18% |          42.75% |          41.99% |
+
+- ***Google***
+
+| model    | accuracy (val) | accuracy (test) | accuracy (full) |
+|----------|----------------|-----------------|-----------------|
+| fasttext |         94.00% |          97.40% |          97.09% |
+| glove    |         92.00% |          96.00% |          95.64% |
+| w2v      |         92.00% |          93.40% |          93.27% |
+| PMI      |         60.00% |          57.40% |          57.64% |
+
+- ***SAT***
+
+| model    | accuracy (val) | accuracy (test) | accuracy (full) |
+|----------|----------------|-----------------|-----------------|
+| fasttext |         67.57% |          47.77% |          49.73% |
+| glove    |         59.46% |          47.77% |          48.93% |
+| w2v      |         56.76% |          44.21% |          45.45% |
+| PMI      |         24.32% |          23.15% |          23.26% |
+
+- ***U2***
+
+| model    | accuracy (val) | accuracy (test) | accuracy (full) |
+|----------|----------------|-----------------|-----------------|
+| fasttext |         50.00% |          42.98% |          43.65% |
+| glove    |         41.67% |          44.74% |          44.44% |
+| w2v      |         37.50% |          41.23% |          40.87% |
+| PMI      |         29.17% |          32.89% |          32.54% |
+
+- ***U4***
+
+| model    | accuracy (val) | accuracy (test) | accuracy (full) |
+|----------|----------------|-----------------|-----------------|
+| fasttext |         47.92% |          37.04% |          38.13% |
+| glove    |         52.08% |          35.19% |          36.88% |
+| w2v      |         37.50% |          36.57% |          36.67% |
+| PMI      |         47.92% |          39.12% |          40.00% |
+
 To get word embedding baseline, 
 ```shell script
 pytho analogy_test.py
