@@ -35,11 +35,12 @@ and `answer` indicates the index of correct candidate. Data statistics are summa
 
 All data is lowercased except Google dataset.
 
+<details><summary>Leader Board</summary>
+
 To get word embedding baseline, 
 ```shell script
 pytho analogy_test.py
 ```
-<details><summary>Leader Board</summary>
 </details>
 
 

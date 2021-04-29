@@ -17,10 +17,9 @@ def test_analogy(model_type):
 
 if __name__ == '__main__':
     out_fasttext = test_analogy('fasttext')
-    out_fasttext_w = test_analogy('fasttext_wiki')
     out_glove = test_analogy('glove')
     out_w2v = test_analogy('w2v')
-    full_result = [out_fasttext, out_fasttext_w, out_glove, out_w2v]
+    full_result = [out_fasttext, out_glove, out_w2v]
     # word embeddings
 
     out = pd.DataFrame(full_result)

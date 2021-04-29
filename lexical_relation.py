@@ -97,7 +97,7 @@ def evaluate(embedding_model: str = None, feature_set='concat'):
 
 
 if __name__ == '__main__':
-    target_word_embedding = ['w2v', 'glove', 'fasttext', 'fasttext_cc']
+    target_word_embedding = ['w2v', 'glove', 'fasttext']
     done_list = []
     full_result = []
     export = 'results/lexical_relation.csv'

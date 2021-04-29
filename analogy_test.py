@@ -49,7 +49,7 @@ def cos_similarity(a_, b_):
     return inner / (norm_b * norm_a)
 
 
-def get_prediction_we(stem, choice, embedding_model, add_feature_set='concat'):
+def get_prediction_we(stem, choice, embedding_model, add_feature_set='concat', relative_model=None):
 
     def diff(vec_a, vec_b):
         if vec_a is None or vec_b is None:
@@ -62,6 +62,7 @@ def get_prediction_we(stem, choice, embedding_model, add_feature_set='concat'):
             feature.append(vec_a - vec_b)
         if 'dot' in add_feature_set:
             feature.append(vec_a * vec_b)
+
         assert len(feature)
         return np.concatenate(feature)
 
@@ -69,6 +70,15 @@ def get_prediction_we(stem, choice, embedding_model, add_feature_set='concat'):
     if stem_e is None:
         return None
     choice_e = [diff(embedding(a, embedding_model), embedding(b, embedding_model)) for a, b in choice]
+
+    if relative_model is not None:
+        stem_e_r = embedding('__'.join(stem).lower().replace(' ', '_'), relative_model)
+        if stem_e_r is not None:
+            stem_e = np.concatenate([stem_e,  stem_e_r])
+            choice_e_r = [embedding('__'.join(c).lower().replace(' ', '_'), relative_model) for c in choice]
+            choice_e = [np.concatenate([a, b]) if a is not None and b is not None else None
+                        for a, b in zip(choice_e, choice_e_r)]
+
     score = [cos_similarity(e, stem_e) for e in choice_e]
     _pred = score.index(max(score))
     if score[_pred] == -100:
@@ -76,36 +86,20 @@ def get_prediction_we(stem, choice, embedding_model, add_feature_set='concat'):
     return _pred
 
 
-def get_prediction_re(stem, choice, embedding_model, lower_case: bool = True):
-    if lower_case:
-        stem = '__'.join(stem).lower().replace(' ', '_')
-        choice = ['__'.join(c).lower().replace(' ', '_') for c in choice]
-    else:
-        stem = '__'.join(stem).replace(' ', '_')
-        choice = ['__'.join(c).replace(' ', '_') for c in choice]
-
-    e_dict = dict([(_i, embedding(_i, embedding_model)) for _i in choice + [stem]])
-    score = [cos_similarity(e_dict[stem], e_dict[c]) for c in choice]
-    p = score.index(max(score))
-    if score[p] == -100:
-        return None
-    return p
-
-
-def test_analogy(model_type, relative: bool = False):
+def test_analogy(model_type, add_relative: bool = False):
     model = get_word_embedding_model(model_type)
-    if relative:
-        get_prediction = get_prediction_re
-    else:
-        get_prediction = get_prediction_we
+    model_re = None
+    if add_relative:
+        model_re = get_word_embedding_model('relative_init.{}'.format(model_type))
     pattern = list(combinations(['diff', 'concat', 'dot'], 2)) + [('diff', 'concat', 'dot')] + ['diff', 'concat', 'dot']
     results = []
 
     for _pattern in pattern:
         for i, (val, test) in full_data.items():
-            tmp_result = {'data': i, 'model': model_type}
+            tmp_result = {'data': i, 'model': model_type, 'add_relative': add_relative}
             for prefix, data in zip(['test', 'valid'], [test, val]):
-                _pred = [get_prediction(o['stem'], o['choice'], model, _pattern) for o in data]
+                _pred = [get_prediction_we(o['stem'], o['choice'], model, _pattern, relative_model=model_re)
+                         for o in data]
                 tmp_result['oov_{}'.format(prefix)] = len([p for p in _pred if p is None])
                 # random prediction when OOV occurs
                 _pred = [p if p is not None else data[n]['pmi_pred'] for n, p in enumerate(_pred)]
@@ -139,7 +133,9 @@ if __name__ == '__main__':
     full_result += test_analogy('glove')
     full_result += test_analogy('w2v')
     full_result += test_analogy('fasttext')
-    full_result += test_analogy('fasttext_cc')
+    full_result += test_analogy('glove', add_relative=True)
+    full_result += test_analogy('w2v', add_relative=True)
+    full_result += test_analogy('fasttext', add_relative=True)
     out = pd.DataFrame(full_result)
     out = out.sort_values(by=['data', 'model'])
     logging.info('finish evaluation:\n{}'.format(out))

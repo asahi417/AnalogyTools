@@ -41,7 +41,6 @@ def get_word_embedding_model(model_name: str = 'fasttext'):
                 cache_dir='./cache'
             )
         model = KeyedVectors.load_word2vec_format(path)
-
     elif model_name == 'glove':
         path = './cache/glove.840B.300d.gensim.bin'
         if not os.path.exists(path):
@@ -50,26 +49,6 @@ def get_word_embedding_model(model_name: str = 'fasttext'):
                 url='https://drive.google.com/u/0/uc?id=1DbLuxwDlTRDbhBroOVgn2_fhVUQAVIqN&export=download',
                 cache_dir='./cache',
                 gdrive_filename='glove.840B.300d.gensim.bin.tar.gz'
-            )
-        model = KeyedVectors.load_word2vec_format(path, binary=True)
-    elif model_name == 'relative_init.fasttext.concat':
-        path = './cache/relative_init.fasttext.concat.bin'
-        if not os.path.exists(path):
-            print('downloading {}'.format(model_name))
-            wget(
-                url='https://drive.google.com/u/0/uc?id=1EH0oywBo8OaNExyc5XTGIFhLvf8mZiBz&export=download',
-                cache_dir='./cache',
-                gdrive_filename='relative_init.fasttext.concat.bin.tar.gz'
-            )
-        model = KeyedVectors.load_word2vec_format(path, binary=True)
-    elif model_name == 'relative_init.fasttext.truecase.concat':
-        path = './cache/relative_init.fasttext.truecase.concat.bin'
-        if not os.path.exists(path):
-            print('downloading {}'.format(model_name))
-            wget(
-                url="https://drive.google.com/u/0/uc?id=1iUuCYM_UJ6FHI5yxg5UIGkXN4qqU5S3G&export=download",
-                cache_dir='./cache',
-                gdrive_filename='relative_init.fasttext.truecase.concat.bin.tar.gz'
             )
         model = KeyedVectors.load_word2vec_format(path, binary=True)
     else:
