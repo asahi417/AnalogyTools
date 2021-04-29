@@ -1,18 +1,16 @@
 # Analogy Tools 
-This repository is aimed to collect resources for word analogy and lexical relation research:   
-- Analogy Test Dataset: [description](#analogy-test-dataset), [link](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/analogy_test_dataset.tar.gz)
-- Lexical Relation Dataset: [description](#lexical-relation-dataset), [link](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/lexical_relation_dataset.tar.gz)
-- RELATIVE embedding model:
-    - [GoogleNews-vectors-negative300](https://drive.google.com/file/d/0B7XkCwpI5KDYNlNUTTlSS21pQmM/edit) based model. [link](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/relative_init.w2v.bin.tar.gz)
-    - [wiki-news-300d-1M](https://fasttext.cc/docs/en/english-vectors.html) based model. [link](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/relative_init.fasttext.bin.tar.gz)
-    - [glove.840B.300d](https://nlp.stanford.edu/projects/glove/) based model. [link](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/relative_init.glove.bin.tar.gz)
-
+This repository is aimed to collect resources for word analogy and lexical relation research.
+- Analogy Test Dataset: [***description***](#analogy-test-dataset), [***link***](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/analogy_test_dataset.tar.gz)
+- Lexical Relation Dataset: [***description***](#lexical-relation-dataset), [***link***](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/lexical_relation_dataset.tar.gz)
+- [RELATIVE embedding](http://josecamachocollados.com/papers/relative_ijcai2019.pdf) model:
+    - [GoogleNews-vectors-negative300](https://drive.google.com/file/d/0B7XkCwpI5KDYNlNUTTlSS21pQmM/edit) based model. [***link***](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/relative_init.w2v.bin.tar.gz)
+    - [wiki-news-300d-1M](https://fasttext.cc/docs/en/english-vectors.html) based model. [***link***](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/relative_init.fasttext.bin.tar.gz)
+    - [glove.840B.300d](https://nlp.stanford.edu/projects/glove/) based model. [***link***](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/relative_init.glove.bin.tar.gz)
+- Word embedding model:
+    - Largest GloVe embedding model shared by [Stanford](https://nlp.stanford.edu/projects/glove/), converted to gensim format. [***link***](https://drive.google.com/file/d/1DbLuxwDlTRDbhBroOVgn2_fhVUQAVIqN/view?usp=sharing)
 Available aliases of released resource by third party:
-- `GoogleNews-vectors-negative300`: [Google's released word2vec model](https://drive.google.com/file/d/0B7XkCwpI5KDYNlNUTTlSS21pQmM/edit).
-[link](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/GoogleNews-vectors-negative300.bin.gz)
-- `BATS_3.0`: Original [BATS dataset](https://vecto.space/projects/BATS/). [link](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/BATS_3.0.zip)
-- `glove.840B.300d.gensim`: Largest GloVe embedding model shared by [Stanford](https://nlp.stanford.edu/projects/glove/), converted to gensim format.
-[link](https://drive.google.com/file/d/1DbLuxwDlTRDbhBroOVgn2_fhVUQAVIqN/view?usp=sharing)
+- [GoogleNews-vectors-negative300](https://drive.google.com/file/d/0B7XkCwpI5KDYNlNUTTlSS21pQmM/edit): [***link***](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/GoogleNews-vectors-negative300.bin.gz)
+- [BATS_3.0](https://vecto.space/projects/BATS/): [***link***](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/BATS_3.0.zip)
 
 ## Analogy Test Dataset
 Five different datasets for word analogy. Each contains jsonline files for validation and test, in which each line consists of following dictionary,
