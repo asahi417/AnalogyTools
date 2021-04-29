@@ -139,7 +139,7 @@ if __name__ == '__main__':
     full_result += test_analogy('glove')
     full_result += test_analogy('w2v')
     full_result += test_analogy('fasttext')
-    full_result += test_analogy('fasttext_wiki')
+    full_result += test_analogy('fasttext_cc')
     out = pd.DataFrame(full_result)
     out = out.sort_values(by=['data', 'model'])
     logging.info('finish evaluation:\n{}'.format(out))
