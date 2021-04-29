@@ -85,9 +85,9 @@ def evaluate(embedding_model: str = None, feature_set='concat'):
         print(y_pred)
         oov = len(x) - sum([i is None for i in x])
         # accuracy
-        accuracy = clf.score(x, v['test']['y'])
         f_mac = f1_score(v['test']['y'], y_pred, average='macro')
         f_mic = f1_score(v['test']['y'], y_pred, average='micro')
+        accuracy = sum([a == b for a, b in zip(v['test']['y'], y_pred.tolist())])/len(y_pred)
 
         report_tmp = {'model': model_name, 'accuracy': accuracy, 'f1_macro': f_mac, 'f1_micro': f_mic,
                       'feature_set': feature_set,
