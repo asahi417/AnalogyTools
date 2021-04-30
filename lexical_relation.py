@@ -33,7 +33,7 @@ def get_lexical_relation_data():
                 if _y not in label:
                     label[_y] = len(label)
             y = [label[_y] for _y in y]
-            full_data[os.path.basename(i)][os.path.basename(t).replace('.tsv', '')] = {'x': x, 'y':y}
+            full_data[os.path.basename(i)][os.path.basename(t).replace('.tsv', '')] = {'x': x, 'y': y}
         full_data[os.path.basename(i)]['label'] = label
     return full_data
 
@@ -85,22 +85,25 @@ def evaluate(embedding_model: str = None, feature_set='concat', add_relative: bo
         # train
         clf = MLPClassifier().fit(x, v['train']['y'])
 
-        # validation
-        logging.info('\t run validation')
-        x = [diff(a, b, model, feature_set, model_re) for (a, b) in v['test']['x']]
-        oov = sum([_x is None for _x in x])
-        x = [_x if _x is not None else np.zeros(dim) for _x in x]
-        y_pred = clf.predict(x)
-
-        f_mac = f1_score(v['test']['y'], y_pred, average='macro')
-        f_mic = f1_score(v['test']['y'], y_pred, average='micro')
-        accuracy = sum([a == b for a, b in zip(v['test']['y'], y_pred.tolist())])/len(y_pred)
-
-        report_tmp = {'model': embedding_model, 'accuracy': accuracy, 'f1_macro': f_mac, 'f1_micro': f_mic,
-                      'feature_set': feature_set,
-                      'add_relative': add_relative,
-                      'label_size': len(label_dict), 'oov': oov,
-                      'test_total': len(y_pred), 'data': data_name}
+        # test
+        report_tmp = {'model': embedding_model, 'feature_set': feature_set, 'add_relative': add_relative,
+                      'label_size': len(label_dict), 'data': data_name}
+        for prefix in ['test', 'val']:
+            logging.info('\t run {}'.format(prefix))
+            x = [diff(a, b, model, feature_set, model_re) for (a, b) in v[prefix]['x']]
+            oov = sum([_x is None for _x in x])
+            x = [_x if _x is not None else np.zeros(dim) for _x in x]
+            y_pred = clf.predict(x)
+            f_mac = f1_score(v[prefix]['y'], y_pred, average='macro')
+            f_mic = f1_score(v[prefix]['y'], y_pred, average='micro')
+            accuracy = sum([a == b for a, b in zip(v[prefix]['y'], y_pred.tolist())])/len(y_pred)
+            report_tmp.update(
+                {'accuracy/{}'.format(prefix): accuracy,
+                 'f1_macro/{}'.format(prefix): f_mac,
+                 'f1_micro/{}'.format(prefix): f_mic,
+                 'oov/{}'.format(prefix): oov,
+                 'data_size/{}'.format(prefix): len(y_pred)}
+            )
         logging.info('\t accuracy: \n{}'.format(report_tmp))
         report.append(report_tmp)
     del model
