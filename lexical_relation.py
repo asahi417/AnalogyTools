@@ -70,7 +70,7 @@ def diff(a, b, model, add_feature_set='concat', relative_model=None, both_direct
 
 
 def evaluate(embedding_model: str = None, feature_set='concat', add_relative: bool = False,
-             both_direction: bool = False):
+             both_direction: bool = None):
     model = get_word_embedding_model(embedding_model)
     model_re = None
     if add_relative:
@@ -128,18 +128,17 @@ if __name__ == '__main__':
         done_list = list(set(df['model'].values))
         full_result = [i.to_dict() for _, i in df.iterrows()]
     logging.info("RUN WORD-EMBEDDING BASELINE")
-    pattern = list(combinations(['diff', 'concat', 'dot'], 2)) + [('diff', 'concat', 'dot')] + ['diff', 'concat', 'dot']
+    pattern = ['diff', 'concat', ('diff', 'dot'), ('concat', 'dot')]
     for m in target_word_embedding:
         if m in done_list:
             continue
         for _feature in pattern:
-            # for if_relative in [True, False]:
-            for if_relative in [False]:
+            for if_relative in [True, False]:
                 if not if_relative:
                     full_result += evaluate(m, feature_set=_feature, add_relative=if_relative)
                 else:
-                    for if_both in [True, False]:
-                        full_result += evaluate(m, feature_set=_feature, add_relative=if_relative, both_direction=if_both)
+                    # for if_both in [True, False]:
+                    full_result += evaluate(m, feature_set=_feature, add_relative=if_relative, both_direction=True)
         pd.DataFrame(full_result).to_csv(export)
 
 
