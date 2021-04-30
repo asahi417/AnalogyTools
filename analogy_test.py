@@ -91,7 +91,7 @@ def test_analogy(model_type, add_relative: bool = False):
     model_re = None
     if add_relative:
         model_re = get_word_embedding_model('relative_init.{}'.format(model_type))
-    pattern = list(combinations(['diff', 'concat', 'dot'], 2)) + [('diff', 'concat', 'dot')] + ['diff', 'concat', 'dot']
+    pattern = ['diff', 'concat', ('diff', 'dot'), ('concat', 'dot')]
     results = []
 
     for _pattern in pattern:
