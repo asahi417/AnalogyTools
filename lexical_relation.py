@@ -137,7 +137,6 @@ if __name__ == '__main__':
                 if not if_relative:
                     full_result += evaluate(m, feature_set=_feature, add_relative=if_relative)
                 else:
-                    # for if_both in [True, False]:
                     full_result += evaluate(m, feature_set=_feature, add_relative=if_relative, both_direction=True)
         pd.DataFrame(full_result).to_csv(export)
 
