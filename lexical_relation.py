@@ -89,6 +89,8 @@ def evaluate(embedding_model: str = None, feature_set='concat', add_relative: bo
         report_tmp = {'model': embedding_model, 'feature_set': feature_set, 'add_relative': add_relative,
                       'label_size': len(label_dict), 'data': data_name}
         for prefix in ['test', 'val']:
+            if prefix not in v:
+                continue
             logging.info('\t run {}'.format(prefix))
             x = [diff(a, b, model, feature_set, model_re) for (a, b) in v[prefix]['x']]
             oov = sum([_x is None for _x in x])
