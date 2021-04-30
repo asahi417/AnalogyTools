@@ -77,19 +77,20 @@ def evaluate(embedding_model: str = None, feature_set='concat', add_relative: bo
                             key=lambda o: o[1], reverse=True)[0][0]
 
         x = [diff(a, b, model, feature_set, model_re) for (a, b) in v['train']['x']]
-        y = [y for y, flag in zip(v['train']['y'], x) if flag is not None]
-        x = [_x for _x in x if _x is not None]
-        logging.info('\t training data info: data size {}, label size {}'.format(len(x), len(label_dict)))
-        clf = MLPClassifier().fit(x, y)
 
+        # initialize zero vector for OOV
+        dim = len([_x for _x in x if _x is not None][0])
+        x = [_x if _x is not None else np.zeros(dim) for _x in x]
+
+        # train
+        clf = MLPClassifier().fit(x, v['train']['y'])
+
+        # validation
         logging.info('\t run validation')
         x = [diff(a, b, model, feature_set, model_re) for (a, b) in v['test']['x']]
-        y_pred = np.ones(len(x)) * freq_label
-        x = [(n, _x) for n, _x in enumerate(x) if _x is not None]
-        y_pred_ = clf.predict([_x for _, _x in x])
-        for _n, (n, _) in enumerate(x):
-            y_pred[n] = y_pred_[_n]
-        oov = len(y_pred) - len(x)
+        oov = sum([_x is None for _x in x])
+        x = [_x if _x is not None else np.zeros(dim) for _x in x]
+        y_pred = clf.predict(x)
 
         f_mac = f1_score(v['test']['y'], y_pred, average='macro')
         f_mic = f1_score(v['test']['y'], y_pred, average='micro')
@@ -121,7 +122,8 @@ if __name__ == '__main__':
         if m in done_list:
             continue
         for _feature in pattern:
-            for if_relative in [True, False]:
+            for if_relative in [False]:
+            # for if_relative in [True, False]:
                 full_result += evaluate(m, feature_set=_feature, add_relative=if_relative)
         pd.DataFrame(full_result).to_csv(export)
 
