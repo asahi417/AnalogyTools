@@ -35,7 +35,19 @@ and `answer` indicates the index of correct candidate. Data statistics are summa
 | google  | 50/500   | 4             | 2                     |
 | bats    | 199/1799 | 4             | 3                     |
 
-All data is lowercased except Google dataset.
+All data is lowercased except Google dataset. Please cite our paper if you use the dataset:
+```
+@inproceedings{ushio-etal-2021-bert-is,
+    title ={{BERT} is to {NLP} what {A}lex{N}et is to {CV}: {C}an {P}re-{T}rained {L}anguage {M}odels {I}dentify {A}nalogies?},
+    author={Ushio, Asahi and
+            Espinosa-Anke, Luis and 
+            Schockaert, Steven and
+            Camacho-Collados, Jose},
+    booktitle={Proceedings of the {ACL}-{IJCNLP} 2021 Main Conference},
+    year={2021},
+    publisher={Association for Computational Linguistics}
+}
+```
 
 <details><summary> Leader Board</summary>
 
