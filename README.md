@@ -1,5 +1,5 @@
 # Analogy Tools 
-This repository is aimed to collect resources for word analogy and lexical relation research.
+This repository is a collection of resources for word analogy and lexical relation research.
 - Analogy Test Dataset: [***link***](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/analogy_test_dataset.tar.gz)
 - Lexical Relation Dataset: [***link***](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/lexical_relation_dataset.tar.gz)
 - RELATIVE embedding model:
@@ -9,7 +9,7 @@ This repository is aimed to collect resources for word analogy and lexical relat
 - Word embedding model:
     - Largest GloVe embedding model shared by [Stanford](https://nlp.stanford.edu/projects/glove/), converted to gensim format. [***link***](https://drive.google.com/file/d/1DbLuxwDlTRDbhBroOVgn2_fhVUQAVIqN/view?usp=sharing)
 
-Available aliases of released resource by third party:
+Aliases of released resource by third party:
 - [GoogleNews-vectors-negative300](https://drive.google.com/file/d/0B7XkCwpI5KDYNlNUTTlSS21pQmM/edit): [***link***](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/GoogleNews-vectors-negative300.bin.gz)
 - [BATS_3.0](https://vecto.space/projects/BATS/): [***link***](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/BATS_3.0.zip)
 
@@ -35,7 +35,19 @@ and `answer` indicates the index of correct candidate. Data statistics are summa
 | google  | 50/500   | 4             | 2                     |
 | bats    | 199/1799 | 4             | 3                     |
 
-All data is lowercased except Google dataset.
+All data is lowercased except Google dataset. Please cite our paper if you use the dataset:
+```
+@inproceedings{ushio-etal-2021-bert-is,
+    title ={{BERT} is to {NLP} what {A}lex{N}et is to {CV}: {C}an {P}re-{T}rained {L}anguage {M}odels {I}dentify {A}nalogies?},
+    author={Ushio, Asahi and
+            Espinosa-Anke, Luis and 
+            Schockaert, Steven and
+            Camacho-Collados, Jose},
+    booktitle={Proceedings of the {ACL}-{IJCNLP} 2021 Main Conference},
+    year={2021},
+    publisher={Association for Computational Linguistics}
+}
+```
 
 <details><summary> Leader Board</summary>
 
@@ -181,6 +193,9 @@ To reproduce relative model, run the following code.
 ```shell script
 python calculate_relative_embedding.py
 ```
+
+## Project
+- [BERT is to NLP what AlexNet is to CV: Can Pre-Trained Language Models Identify Analogies? (ACL 2021 main conference)](https://github.com/asahi417/analogy-language-model)
 
 ## Acknowledgement
 About RELATIVE embedding work, please refer [the official implementation](https://github.com/pedrada88/relative) and
