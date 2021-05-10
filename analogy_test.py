@@ -114,7 +114,8 @@ def test_analogy(model_type, add_relative: bool = False, add_pair2vec: bool = Fa
 
     for _pattern in pattern:
         for i, (val, test) in full_data.items():
-            tmp_result = {'data': i, 'model': model_type, 'add_relative': add_relative, 'add_pair2vec': add_pair2vec}
+            tmp_result = {'data': i, 'model': model_type, 'add_relative': add_relative, 'add_pair2vec': add_pair2vec,
+                          'bi_direction': bi_direction}
             for prefix, data in zip(['test', 'valid'], [test, val]):
                 _pred = [get_prediction_we(o['stem'], o['choice'], model, _pattern, relative_model=model_re,
                                            pair2vec_model=model_p2v, bi_direction=bi_direction)
