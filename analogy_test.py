@@ -2,7 +2,6 @@
 import os
 import logging
 import json
-from itertools import combinations
 
 import pandas as pd
 import numpy as np
@@ -49,7 +48,8 @@ def cos_similarity(a_, b_):
     return inner / (norm_b * norm_a)
 
 
-def get_prediction_we(stem, choice, embedding_model, add_feature_set='concat', relative_model=None):
+def get_prediction_we(stem, choice, embedding_model, add_feature_set='concat',
+                      relative_model=None, pair2vec_model=None, bi_direction: bool = False):
 
     def diff(vec_a, vec_b):
         if vec_a is None or vec_b is None:
@@ -71,13 +71,28 @@ def get_prediction_we(stem, choice, embedding_model, add_feature_set='concat', r
         return None
     choice_e = [diff(embedding(a, embedding_model), embedding(b, embedding_model)) for a, b in choice]
 
-    if relative_model is not None:
-        stem_e_r = embedding('__'.join(stem).lower().replace(' ', '_'), relative_model)
+    def get_pair_embedding(_stem_e, _choice_e, pair_model, if_reverse: bool = False):
+        if if_reverse:
+            _stem = [stem[1], stem[0]]
+            _choice = [[_i[1], _i[0]] for _i in choice]
+        else:
+            _stem = stem
+            _choice = choice
+
+        stem_e_r = embedding('__'.join(_stem).lower().replace(' ', '_'), pair_model)
         if stem_e_r is not None:
-            stem_e = np.concatenate([stem_e,  stem_e_r])
-            choice_e_r = [embedding('__'.join(c).lower().replace(' ', '_'), relative_model) for c in choice]
-            choice_e = [np.concatenate([a, b]) if a is not None and b is not None else None
-                        for a, b in zip(choice_e, choice_e_r)]
+            _stem_e = np.concatenate([_stem_e, stem_e_r])
+            choice_e_r = [embedding('__'.join(c).lower().replace(' ', '_'), pair_model) for c in _choice]
+            _choice_e = [np.concatenate([a, b]) if a is not None and b is not None else None
+                         for a, b in zip(_choice_e, choice_e_r)]
+        return _stem_e, _choice_e
+
+    for _pair_model in [pair2vec_model, relative_model]:
+        if _pair_model is None:
+            continue
+        stem_e, choice_e = get_pair_embedding(stem_e, choice_e, _pair_model)
+        if bi_direction:
+            stem_e, choice_e = get_pair_embedding(stem_e, choice_e, _pair_model, if_reverse=True)
 
     score = [cos_similarity(e, stem_e) for e in choice_e]
     _pred = score.index(max(score))
@@ -86,11 +101,14 @@ def get_prediction_we(stem, choice, embedding_model, add_feature_set='concat', r
     return _pred
 
 
-def test_analogy(model_type, add_relative: bool = False):
+def test_analogy(model_type, add_relative: bool = False, add_pair2vec: bool = False, bi_direction: bool = False):
     model = get_word_embedding_model(model_type)
     model_re = None
+    model_p2v = None
     if add_relative:
         model_re = get_word_embedding_model('relative_init.{}'.format(model_type))
+    if add_pair2vec:
+        model_p2v = get_word_embedding_model('pair2vec')
     pattern = ['diff', 'concat', ('diff', 'dot'), ('concat', 'dot')]
     results = []
 
@@ -98,7 +116,8 @@ def test_analogy(model_type, add_relative: bool = False):
         for i, (val, test) in full_data.items():
             tmp_result = {'data': i, 'model': model_type, 'add_relative': add_relative}
             for prefix, data in zip(['test', 'valid'], [test, val]):
-                _pred = [get_prediction_we(o['stem'], o['choice'], model, _pattern, relative_model=model_re)
+                _pred = [get_prediction_we(o['stem'], o['choice'], model, _pattern, relative_model=model_re,
+                                           pair2vec_model=model_p2v, bi_direction=bi_direction)
                          for o in data]
                 tmp_result['oov_{}'.format(prefix)] = len([p for p in _pred if p is None])
                 # random prediction when OOV occurs
@@ -131,12 +150,21 @@ def pmi_baseline():
 
 if __name__ == '__main__':
     full_result = pmi_baseline()
-    full_result += test_analogy('glove')
-    full_result += test_analogy('w2v')
-    full_result += test_analogy('fasttext')
-    full_result += test_analogy('glove', add_relative=True)
-    full_result += test_analogy('w2v', add_relative=True)
+
+    full_result += test_analogy('fasttext', add_pair2vec=True, bi_direction=True)
+    full_result += test_analogy('fasttext', add_pair2vec=True)
+    full_result += test_analogy('fasttext', add_relative=True, bi_direction=True)
     full_result += test_analogy('fasttext', add_relative=True)
+    full_result += test_analogy('fasttext')
+
+    full_result += test_analogy('glove', add_relative=True, bi_direction=True)
+    full_result += test_analogy('glove', add_relative=True)
+    full_result += test_analogy('glove')
+
+    full_result += test_analogy('w2v', add_relative=True, bi_direction=True)
+    full_result += test_analogy('w2v', add_relative=True)
+    full_result += test_analogy('w2v')
+
     out = pd.DataFrame(full_result)
     out = out.sort_values(by=['data', 'model'])
     logging.info('finish evaluation:\n{}'.format(out))
