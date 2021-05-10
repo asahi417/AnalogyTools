@@ -52,13 +52,13 @@ def get_word_embedding_model(model_name: str = 'fasttext'):
             )
         model = KeyedVectors.load_word2vec_format(path, binary=True)
     elif model_name == 'pair2vec':
-        path = './cache/pair2vec.fasttext.txt'
+        path = './cache/pair2vec.fasttext.bin'
         if not os.path.exists(path):
             print('downloading {}'.format(model_name))
             wget(
-                url='https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/pair2vec.fasttext.txt.tar.gz',
+                url='https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/pair2vec.fasttext.bin.tar.gz',
                 cache_dir='./cache')
-        model = KeyedVectors.load_word2vec_format(path, binary=False)
+        model = KeyedVectors.load_word2vec_format(path, binary=True)
     else:
         path = './cache/{}.bin'.format(model_name)
         if not os.path.exists(path):
