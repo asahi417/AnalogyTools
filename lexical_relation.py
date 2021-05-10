@@ -37,7 +37,7 @@ def get_lexical_relation_data():
     return full_data
 
 
-def diff(a, b, model, add_feature_set='concat', relative_model=None, bi_direction: bool = True):
+def diff(a, b, model, add_feature_set='concat', pair_models=None, bi_direction: bool = True):
 
     try:
         vec_a = model[a]
@@ -53,34 +53,37 @@ def diff(a, b, model, add_feature_set='concat', relative_model=None, bi_directio
     if 'dot' in add_feature_set:
         feature.append(vec_a * vec_b)
 
-    if relative_model is not None:
-        try:
-            vec_r = relative_model['__'.join([a, b]).lower().replace(' ', '_')]
-        except KeyError:
-            vec_r = np.zeros(relative_model.vector_size)
-        feature.append(vec_r)
-        if bi_direction:
+    for pair_model in pair_models:
+        if pair_model is not None:
             try:
-                vec_r = relative_model['__'.join([b, a]).lower().replace(' ', '_')]
+                vec_r = pair_model['__'.join([a, b]).lower().replace(' ', '_')]
             except KeyError:
-                vec_r = np.zeros(relative_model.vector_size)
+                vec_r = np.zeros(pair_model.vector_size)
             feature.append(vec_r)
+            if bi_direction:
+                try:
+                    vec_r = pair_model['__'.join([b, a]).lower().replace(' ', '_')]
+                except KeyError:
+                    vec_r = np.zeros(pair_model.vector_size)
+                feature.append(vec_r)
     return np.concatenate(feature)
 
 
 def evaluate(embedding_model: str = None, feature_set='concat', add_relative: bool = False, 
              add_pair2vec: bool = False):
     model = get_word_embedding_model(embedding_model)
-    model_re = None
+    model_pair = []
     if add_relative:
-        model_re = get_word_embedding_model('relative_init.{}'.format(embedding_model))
+        model_pair.append(get_word_embedding_model('relative_init.{}'.format(embedding_model)))
+    if add_pair2vec:
+        model_pair.append(get_word_embedding_model('pair2vec'))
 
     data = get_lexical_relation_data()
     report = []
     for data_name, v in data.items():
         logging.info('train model with {} on {}'.format(embedding_model, data_name))
         label_dict = v.pop('label')
-        x = [diff(a, b, model, feature_set, model_re) for (a, b) in v['train']['x']]
+        x = [diff(a, b, model, feature_set, model_pair) for (a, b) in v['train']['x']]
 
         # initialize zero vector for OOV
         dim = len([_x for _x in x if _x is not None][0])
@@ -97,7 +100,7 @@ def evaluate(embedding_model: str = None, feature_set='concat', add_relative: bo
             if prefix not in v:
                 continue
             logging.info('\t run {}'.format(prefix))
-            x = [diff(a, b, model, feature_set, model_re) for (a, b) in v[prefix]['x']]
+            x = [diff(a, b, model, feature_set, model_pair) for (a, b) in v[prefix]['x']]
             oov = sum([_x is None for _x in x])
             x = [_x if _x is not None else np.zeros(dim) for _x in x]
             y_pred = clf.predict(x)
@@ -114,7 +117,7 @@ def evaluate(embedding_model: str = None, feature_set='concat', add_relative: bo
         logging.info('\t accuracy: \n{}'.format(report_tmp))
         report.append(report_tmp)
     del model
-    del model_re
+    del model_pair
     return report
 
 
@@ -135,6 +138,7 @@ if __name__ == '__main__':
         for _feature in pattern:
             full_result += evaluate(m, feature_set=_feature)
             full_result += evaluate(m, feature_set=_feature, add_relative=True)
+            full_result += evaluate(m, feature_set=_feature, add_pair2vec=True)
         pd.DataFrame(full_result).to_csv(export)
 
 
