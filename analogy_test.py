@@ -158,10 +158,14 @@ if __name__ == '__main__':
     full_result += test_analogy('fasttext', add_relative=True)
     full_result += test_analogy('fasttext')
 
+    full_result += test_analogy('glove', add_pair2vec=True, bi_direction=True)
+    full_result += test_analogy('glove', add_pair2vec=True)
     full_result += test_analogy('glove', add_relative=True, bi_direction=True)
     full_result += test_analogy('glove', add_relative=True)
     full_result += test_analogy('glove')
 
+    full_result += test_analogy('w2v', add_pair2vec=True, bi_direction=True)
+    full_result += test_analogy('w2v', add_pair2vec=True)
     full_result += test_analogy('w2v', add_relative=True, bi_direction=True)
     full_result += test_analogy('w2v', add_relative=True)
     full_result += test_analogy('w2v')
