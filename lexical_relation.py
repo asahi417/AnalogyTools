@@ -90,7 +90,7 @@ def evaluate(embedding_model: str = None, feature_set='concat', add_relative: bo
         x = [_x if _x is not None else np.zeros(dim) for _x in x]
 
         # train
-        clf = MLPClassifier().fit(x, v['train']['y'])
+        clf = MLPClassifier(random_state=0).fit(x, v['train']['y'])
 
         # test
         report_tmp = {
