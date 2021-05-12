@@ -56,7 +56,7 @@ def get_prediction_we(stem, choice, embedding_model, add_feature_set='concat',
     def diff(vec_a, vec_b):
         if vec_a is None or vec_b is None:
             return None
-        if 'concat' in add_feature_set:
+        if add_feature_set is None or 'concat' in add_feature_set:
             feature = [vec_a, vec_b]
         else:
             feature = []
@@ -121,7 +121,10 @@ def test_analogy(model_type, add_relative: bool = False, add_pair2vec: bool = Fa
     else:
         assert model
 
-    pattern = ['diff', 'concat', ('diff', 'dot'), ('concat', 'dot')]
+    if only_pair_embedding:
+        pattern = [None]
+    else:
+        pattern = ['diff', 'concat', ('diff', 'dot'), ('concat', 'dot')]
     results = []
 
     for _pattern in pattern:
@@ -164,9 +167,8 @@ def pmi_baseline():
 if __name__ == '__main__':
     full_result = pmi_baseline()
 
-    # full_result += test_analogy('fasttext', add_pair2vec=True, bi_direction=True, only_pair_embedding=True)
-    # full_result += test_analogy('fasttext', add_relative=True, bi_direction=True, only_pair_embedding=True)
-    # full_result += test_analogy('glove', add_relative=True, bi_direction=True, only_pair_embedding=True)
+    full_result += test_analogy('fasttext', add_pair2vec=True, bi_direction=True, only_pair_embedding=True)
+    full_result += test_analogy('fasttext', add_relative=True, bi_direction=True, only_pair_embedding=True)
 
     full_result += test_analogy('fasttext', add_pair2vec=True, bi_direction=True)
     full_result += test_analogy('fasttext', add_pair2vec=True)
