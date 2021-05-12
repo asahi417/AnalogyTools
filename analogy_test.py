@@ -31,6 +31,8 @@ full_data = get_analogy_data()
 
 
 def embedding(term, model):
+    if model is None:
+        return np.zeros(3)
     try:
         return model[term]
     except KeyError:
@@ -101,14 +103,24 @@ def get_prediction_we(stem, choice, embedding_model, add_feature_set='concat',
     return _pred
 
 
-def test_analogy(model_type, add_relative: bool = False, add_pair2vec: bool = False, bi_direction: bool = False):
-    model = get_word_embedding_model(model_type)
+def test_analogy(model_type, add_relative: bool = False, add_pair2vec: bool = False, bi_direction: bool = False,
+                 only_pair_embedding: bool = False):
+
     model_re = None
     model_p2v = None
+    if only_pair_embedding:
+        model = None
+    else:
+        model = get_word_embedding_model(model_type)
     if add_relative:
         model_re = get_word_embedding_model('relative_init.{}'.format(model_type))
     if add_pair2vec:
         model_p2v = get_word_embedding_model('pair2vec')
+    if only_pair_embedding:
+        assert model_p2v or model_re
+    else:
+        assert model
+
     pattern = ['diff', 'concat', ('diff', 'dot'), ('concat', 'dot')]
     results = []
 
@@ -151,6 +163,10 @@ def pmi_baseline():
 
 if __name__ == '__main__':
     full_result = pmi_baseline()
+
+    # full_result += test_analogy('fasttext', add_pair2vec=True, bi_direction=True, only_pair_embedding=True)
+    # full_result += test_analogy('fasttext', add_relative=True, bi_direction=True, only_pair_embedding=True)
+    # full_result += test_analogy('glove', add_relative=True, bi_direction=True, only_pair_embedding=True)
 
     full_result += test_analogy('fasttext', add_pair2vec=True, bi_direction=True)
     full_result += test_analogy('fasttext', add_pair2vec=True)
