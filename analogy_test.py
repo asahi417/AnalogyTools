@@ -56,7 +56,7 @@ def get_prediction_we(stem, choice, embedding_model, add_feature_set='concat',
     def diff(vec_a, vec_b):
         if vec_a is None or vec_b is None:
             return None
-        if add_feature_set is None or 'concat' in add_feature_set:
+        if 'concat' in add_feature_set:
             feature = [vec_a, vec_b]
         else:
             feature = []
@@ -122,7 +122,7 @@ def test_analogy(model_type, add_relative: bool = False, add_pair2vec: bool = Fa
         assert model
 
     if only_pair_embedding:
-        pattern = [None]
+        pattern = ['concat']
     else:
         pattern = ['diff', 'concat', ('diff', 'dot'), ('concat', 'dot')]
     results = []
