@@ -49,64 +49,12 @@ All data is lowercased except Google dataset. Please cite our paper if you use t
 }
 ```
 
-<details><summary> Leader Board</summary>
-
-Here we report baseline with word embedding model. Complete result can be found [here](./results/analogy_test.csv), 
-and please refer [our script](analogy_test.py) for more detail experimental setting.
-
-- ***BATS***
-
-| model    | accuracy (val) | accuracy (test) | accuracy (full) |
-|----------|----------------|-----------------|-----------------|
-| fasttext |         75.88% |          74.21% |          74.37% |
-| glove    |         70.85% |          67.32% |          67.67% |
-| w2v      |         65.33% |          63.15% |          63.36% |
-| PMI      |         35.18% |          42.75% |          41.99% |
-
-- ***Google***
-
-| model    | accuracy (val) | accuracy (test) | accuracy (full) |
-|----------|----------------|-----------------|-----------------|
-| fasttext |         94.00% |          97.40% |          97.09% |
-| glove    |         92.00% |          96.00% |          95.64% |
-| w2v      |         92.00% |          93.40% |          93.27% |
-| PMI      |         60.00% |          57.40% |          57.64% |
-
-- ***SAT***
-
-| model    | accuracy (val) | accuracy (test) | accuracy (full) |
-|----------|----------------|-----------------|-----------------|
-| fasttext |         67.57% |          47.77% |          49.73% |
-| glove    |         59.46% |          47.77% |          48.93% |
-| w2v      |         56.76% |          44.21% |          45.45% |
-| PMI      |         24.32% |          23.15% |          23.26% |
-
-- ***U2***
-
-| model    | accuracy (val) | accuracy (test) | accuracy (full) |
-|----------|----------------|-----------------|-----------------|
-| fasttext |         50.00% |          42.98% |          43.65% |
-| glove    |         41.67% |          44.74% |          44.44% |
-| w2v      |         37.50% |          41.23% |          40.87% |
-| PMI      |         29.17% |          32.89% |          32.54% |
-
-- ***U4***
-
-| model    | accuracy (val) | accuracy (test) | accuracy (full) |
-|----------|----------------|-----------------|-----------------|
-| fasttext |         47.92% |          37.04% |          38.13% |
-| glove    |         52.08% |          35.19% |          36.88% |
-| w2v      |         37.50% |          36.57% |          36.67% |
-| PMI      |         47.92% |          39.12% |          40.00% |
-
 To get word embedding baseline, 
 ```shell script
 python analogy_test.py
 ```
 When the model suffers out-of-vocabulary error, we use PMI prediction, `pmi_pred` in each entry, to ensure the baseline can
 be compared with other methods to cover all the data points.   
-
-</details>
 
 
 ## Lexical Relation Dataset
@@ -118,50 +66,6 @@ A   B   relation_type
 ```
 For more detailed discussion, please take a look the [SphereRE](https://www.aclweb.org/anthology/P19-1169/) paper.
 
-<details><summary>Leader Board</summary>
-
-Here we report baseline with word embedding model. Complete result can be found [here](./results/lexical_relation.csv), 
-and please refer [our script](lexical_relation.py) for more detail experimental setting.
-
-- ***BLESS*** 
-
-| model    | accuracy | f1_macro | f1_micro |
-|----------|----------|----------|----------|
-| fasttext |   92.87% |   92.34% |   92.87% |
-| glove    |   93.22% |   92.63% |   93.22% |
-| w2v      |   92.30% |   91.84% |   92.30% |
-
-- ***CogALexV***
-
-| model    | accuracy | f1_macro | f1_micro |
-|----------|----------|----------|----------|
-| fasttext |   78.10% |   52.06% |   78.10% |
-| glove    |   79.23% |   52.82% |   79.23% |
-| w2v      |   77.37% |   49.10% |   77.37% |
-
-- ***EVALution***
-
-| model    | accuracy | f1_macro | f1_micro |
-|----------|----------|----------|----------|
-| fasttext |   57.04% |   55.49% |   57.04% |
-| glove    |   58.34% |   57.59% |   58.34% |
-| w2v      |   56.66% |   55.61% |   56.66% |
-
-- ***K&H+N***
-
-| model    | accuracy | f1_macro | f1_micro |
-|----------|----------|----------|----------|
-| fasttext |   93.97% |   88.46% |   93.97% |
-| glove    |   95.26% |   90.15% |   95.26% |
-| w2v      |   90.81% |   84.76% |   90.81% |
-
-- ***ROOT09***
-
-| model    | accuracy | f1_macro | f1_micro |
-|----------|----------|----------|----------|
-| fasttext |   88.84% |   88.67% |   88.84% |
-| glove    |   89.22% |   88.64% |   89.22% |
-| w2v      |   87.15% |   86.65% |   87.15% |
 
 To get word embedding baseline, 
 ```shell script
@@ -169,8 +73,6 @@ python lexical_relation.py
 ```
 When the model suffers out-of-vocabulary error in evaluation, we use the most frequent label in training data, to ensure the baseline can
 be compared with other methods to cover all the data points.   
-
-</details>
  
 
 ## RELATIVE Embedding
