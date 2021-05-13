@@ -16,13 +16,14 @@ def cap(_list):
 
 if __name__ == '__main__':
     full_data['bats_cap'] = full_data['bats']
-
-    for i, (val, test) in full_data.items():
+    for i in ['bats_cap', 'bats', 'sat', 'u2', 'u4', 'google']:
+        val, test = full_data[i]
+    # for i, (val, test) in full_data.items():
         for data in [test, val]:
             for model_type in ['fasttext', 'glove', 'w2v']:
                 model = get_word_embedding_model(model_type)
                 if i == 'bats_cap':
-                    _pred = [get_prediction_we(cap(o['stem']), cap(o['choice']), model, 'diff') for o in test]
+                    _pred = [get_prediction_we(cap(o['stem']), [cap(m) for m in o['choice']], model, 'diff') for o in test]
                 else:
                     _pred = [get_prediction_we(o['stem'], o['choice'], model, 'diff') for o in data]
                 for d, p in zip(data, _pred):
