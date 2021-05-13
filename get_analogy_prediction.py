@@ -11,7 +11,7 @@ full_data = get_analogy_data()
 
 
 def cap(_list):
-    return [i.capitalize() for i in _list]
+    return [t.capitalize() for t in _list]
 
 
 if __name__ == '__main__':
