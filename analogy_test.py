@@ -137,7 +137,7 @@ def test_analogy(model_type, add_relative: bool = False, add_pair2vec: bool = Fa
                          for o in data]
                 tmp_result['oov_{}'.format(prefix)] = len([p for p in _pred if p is None])
                 # random prediction when OOV occurs
-                _pred = [p if p is not None else data[n]['pmi_pred'] for n, p in enumerate(_pred)]
+                _pred = [p if p is not None else data[n]['pred/pmi'] for n, p in enumerate(_pred)]
                 accuracy = sum([o['answer'] == _pred[n] for n, o in enumerate(data)]) / len(_pred)
                 tmp_result['accuracy_{}'.format(prefix)] = accuracy
             tmp_result['accuracy'] = (tmp_result['accuracy_test'] * len(test) +
@@ -154,7 +154,7 @@ def pmi_baseline():
         tmp_result = {'data': i, 'model': 'PMI'}
         for prefix, data in zip(['test', 'valid'], [test, val]):
             tmp_result['oov_{}'.format(prefix)] = 0
-            accuracy = sum([o['answer'] == o['pmi_pred'] for n, o in enumerate(data)]) / len(data)
+            accuracy = sum([o['answer'] == o['pred/pmi'] for n, o in enumerate(data)]) / len(data)
             tmp_result['accuracy_{}'.format(prefix)] = accuracy
         tmp_result['accuracy'] = (tmp_result['accuracy_test'] * len(test) +
                                   tmp_result['accuracy_valid'] * len(val)) / (len(val) + len(test))

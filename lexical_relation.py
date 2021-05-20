@@ -112,13 +112,9 @@ class Evaluate:
         config = self.configs[config_id]
         # train
         x, y = self.dataset['train']
-        print(x)
-        print(y)
         clf = MLPClassifier(**config).fit(x, y)
         # test
         x, y = self.dataset['test']
-        print(x)
-        print(y)
         t_accuracy, t_f_mac, t_f_mic = run_test(clf, x, y)
         report = self.shared_config.copy()
         report.update(
@@ -128,8 +124,6 @@ class Evaluate:
              'classifier_config': clf.get_params()})
         if 'val' in self.dataset:
             x, y = self.dataset['val']
-            print(x)
-            print(y)
             v_accuracy, v_f_mac, v_f_mic = run_test(clf, x, y)
             report.update(
                 {'metric/val/accuracy': v_accuracy,
