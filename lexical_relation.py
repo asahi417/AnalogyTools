@@ -160,7 +160,7 @@ def evaluate(embedding_model: str = None, feature='concat', add_relative: bool =
             # initialize zero vector for OOV
             dataset[_k] = [
                 [_x if _x is not None else np.zeros(dim) for _x in x],
-                v['y']]
+                _v['y']]
             oov[_k] = sum([_x is None for _x in x])
         shared_config = {
             'model': embedding_model, 'feature': feature, 'add_relative': add_relative,
