@@ -78,7 +78,7 @@ def diff(a, b, model, add_feature='concat', pair_models=None, bi_direction: bool
     return np.concatenate(feature)
 
 
-def run_test(clf, x, y ):
+def run_test(clf, x, y):
     """ run evaluation on valid or test set """
     y_pred = clf.predict(x)
     f_mac = f1_score(y, y_pred, average='macro')
@@ -112,6 +112,8 @@ class Evaluate:
         config = self.configs[config_id]
         # train
         x, y = self.dataset['train']
+        print(x)
+        print(y)
         clf = MLPClassifier(**config).fit(x, y)
         # test
         x, y = self.dataset['test']
