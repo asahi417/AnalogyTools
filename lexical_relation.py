@@ -111,7 +111,7 @@ class Evaluate:
         pbar.update(1)
         config = self.configs[config_id]
         # train
-        x, y = self.dataset['train']
+        x, y = self.dataset['train']['x'], self.dataset['train']['y'],
         print(x)
         print(y)
         clf = MLPClassifier(**config).fit(x, y)
