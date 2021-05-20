@@ -111,12 +111,14 @@ class Evaluate:
         pbar.update(1)
         config = self.configs[config_id]
         # train
-        x, y = self.dataset['train']['x'], self.dataset['train']['y'],
+        x, y = self.dataset['train']
         print(x)
         print(y)
         clf = MLPClassifier(**config).fit(x, y)
         # test
         x, y = self.dataset['test']
+        print(x)
+        print(y)
         t_accuracy, t_f_mac, t_f_mic = run_test(clf, x, y)
         report = self.shared_config.copy()
         report.update(
@@ -126,6 +128,8 @@ class Evaluate:
              'classifier_config': clf.get_params()})
         if 'val' in self.dataset:
             x, y = self.dataset['val']
+            print(x)
+            print(y)
             v_accuracy, v_f_mac, v_f_mic = run_test(clf, x, y)
             report.update(
                 {'metric/val/accuracy': v_accuracy,
@@ -154,10 +158,9 @@ def evaluate(embedding_model: str = None, feature='concat', add_relative: bool =
             x = [diff(a, b, model, feature, model_pair) for (a, b) in _v['x']]
             dim = len([_x for _x in x if _x is not None][0])
             # initialize zero vector for OOV
-            dataset[_k] = {
-                'x': [_x if _x is not None else np.zeros(dim) for _x in x],
-                'y': _v['y']
-            }
+            dataset[_k] = [
+                [_x if _x is not None else np.zeros(dim) for _x in x],
+                v['y']]
             oov[_k] = sum([_x is None for _x in x])
         shared_config = {
             'model': embedding_model, 'feature': feature, 'add_relative': add_relative,
