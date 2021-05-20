@@ -1,6 +1,12 @@
+#TODO: to parallelize grid search
+
 import os
 import logging
 from glob import glob
+import tqdm
+from itertools import product
+from multiprocessing import Pool
+
 import pandas as pd
 import numpy as np
 
@@ -9,9 +15,11 @@ from sklearn.neural_network import MLPClassifier
 
 from util import get_word_embedding_model, wget
 logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', level=logging.INFO, datefmt='%Y-%m-%d %H:%M:%S')
+pbar = tqdm.tqdm()
 
 
 def get_lexical_relation_data():
+    """ get dataset """
     cache_dir = 'cache'
     os.makedirs(cache_dir, exist_ok=True)
     root_url_analogy = 'https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/lexical_relation_dataset.tar.gz'
@@ -37,20 +45,21 @@ def get_lexical_relation_data():
     return full_data
 
 
-def diff(a, b, model, add_feature_set='concat', pair_models=None, bi_direction: bool = True):
+def diff(a, b, model, add_feature='concat', pair_models=None, bi_direction: bool = True):
+    """ get feature for each pair """
 
     try:
         vec_a = model[a]
         vec_b = model[b]
     except KeyError:
         return None
-    if 'concat' in add_feature_set:
+    if 'concat' in add_feature:
         feature = [vec_a, vec_b]
     else:
         feature = []
-    if 'diff' in add_feature_set:
+    if 'diff' in add_feature:
         feature.append(vec_a - vec_b)
-    if 'dot' in add_feature_set:
+    if 'dot' in add_feature:
         feature.append(vec_a * vec_b)
 
     for pair_model in pair_models:
@@ -69,8 +78,61 @@ def diff(a, b, model, add_feature_set='concat', pair_models=None, bi_direction: 
     return np.concatenate(feature)
 
 
-def evaluate(embedding_model: str = None, feature_set='concat', add_relative: bool = False, 
-             add_pair2vec: bool = False):
+def run_test(clf, x, y ):
+    """ run evaluation on valid or test set """
+    y_pred = clf.predict(x)
+    f_mac = f1_score(y, y_pred, average='macro')
+    f_mic = f1_score(y, y_pred, average='micro')
+    accuracy = sum([a == b for a, b in zip(y, y_pred.tolist())]) / len(y_pred)
+    return accuracy, f_mac, f_mic
+
+
+class Evaluate:
+
+    def __init__(self, dataset, shared_config, default_config: bool = False):
+        self.dataset = dataset
+        if default_config:
+            self.configs = [{'random_state': 0}]
+        else:
+            learning_rate_init = [0.001, 0.0001, 0.00001]
+            max_iter = [25, 50, 75]
+            hidden_layer_sizes = [100, 150, 200]
+            self.configs = [{
+                'random_state': 0, 'learning_rate_init': i[0], 'max_iter': i[1],
+                'hidden_layer_sizes': i[2]} for i in
+                            list(product(learning_rate_init, max_iter, hidden_layer_sizes))]
+        self.shared_config = shared_config
+
+    @property
+    def config_indices(self):
+        return list(range(len(self.configs)))
+
+    def __call__(self, config_id):
+        pbar.update(1)
+        config = self.configs[config_id]
+        # train
+        x, y = self.dataset['train']
+        clf = MLPClassifier(**config).fit(x, y)
+        # test
+        x, y = self.dataset['test']
+        t_accuracy, t_f_mac, t_f_mic = run_test(clf, x, y)
+        report = self.shared_config.copy()
+        report.update(
+            {'metric/test/accuracy': t_accuracy,
+             'metric/test/f1_macro': t_f_mac,
+             'metric/test/f1_micro': t_f_mic,
+             'classifier_config': clf.get_params()})
+        if 'val' in self.dataset:
+            x, y = self.dataset['val']
+            v_accuracy, v_f_mac, v_f_mic = run_test(clf, x, y)
+            report.update(
+                {'metric/val/accuracy': v_accuracy,
+                 'metric/val/f1_macro': v_f_mac,
+                 'metric/val/f1_micro': v_f_mic})
+        return report
+
+
+def evaluate(embedding_model: str = None, feature='concat', add_relative: bool = False, add_pair2vec: bool = False):
     model = get_word_embedding_model(embedding_model)
     model_pair = []
     if add_relative:
@@ -83,49 +145,44 @@ def evaluate(embedding_model: str = None, feature_set='concat', add_relative: bo
     for data_name, v in data.items():
         logging.info('train model with {} on {}'.format(embedding_model, data_name))
         label_dict = v.pop('label')
-        x = [diff(a, b, model, feature_set, model_pair) for (a, b) in v['train']['x']]
+        # preprocess data
+        oov = {}
+        dataset = {}
+        for _k, _v in v.items():
+            x = [diff(a, b, model, feature, model_pair) for (a, b) in _v['x']]
+            dim = len([_x for _x in x if _x is not None][0])
+            # initialize zero vector for OOV
+            dataset[_k] = {
+                'x': [_x if _x is not None else np.zeros(dim) for _x in x],
+                'y': _v['y']
+            }
+            oov[_k] = sum([_x is None for _x in x])
+        shared_config = {
+            'model': embedding_model, 'feature': feature, 'add_relative': add_relative,
+            'add_pair2vec': add_pair2vec, 'label_size': len(label_dict), 'data': data_name,
+            'oov': oov
+        }
 
-        # initialize zero vector for OOV
-        dim = len([_x for _x in x if _x is not None][0])
-        x = [_x if _x is not None else np.zeros(dim) for _x in x]
+        # grid serach
+        if 'val' not in dataset:
+            evaluator = Evaluate(dataset, shared_config, default_config=True)
+            report += evaluator(0)
+        else:
+            pool = Pool()
+            evaluator = Evaluate(dataset, shared_config)
+            report += pool.map(evaluator, evaluator.config_indices)
+            pool.close()
 
-        # train
-        clf = MLPClassifier(random_state=0).fit(x, v['train']['y'])
-
-        # test
-        report_tmp = {
-            'model': embedding_model, 'feature_set': feature_set, 'add_relative': add_relative,
-            'add_pair2vec': add_pair2vec, 'label_size': len(label_dict), 'data': data_name}
-        for prefix in ['test', 'val']:
-            if prefix not in v:
-                continue
-            logging.info('\t run {}'.format(prefix))
-            x = [diff(a, b, model, feature_set, model_pair) for (a, b) in v[prefix]['x']]
-            oov = sum([_x is None for _x in x])
-            x = [_x if _x is not None else np.zeros(dim) for _x in x]
-            y_pred = clf.predict(x)
-            f_mac = f1_score(v[prefix]['y'], y_pred, average='macro')
-            f_mic = f1_score(v[prefix]['y'], y_pred, average='micro')
-            accuracy = sum([a == b for a, b in zip(v[prefix]['y'], y_pred.tolist())])/len(y_pred)
-            report_tmp.update(
-                {'accuracy/{}'.format(prefix): accuracy,
-                 'f1_macro/{}'.format(prefix): f_mac,
-                 'f1_micro/{}'.format(prefix): f_mic,
-                 'oov/{}'.format(prefix): oov,
-                 'data_size/{}'.format(prefix): len(y_pred)}
-            )
-        logging.info('\t accuracy: \n{}'.format(report_tmp))
-        report.append(report_tmp)
     del model
     del model_pair
     return report
 
 
 if __name__ == '__main__':
-    target_word_embedding = ['w2v', 'glove', 'fasttext']
+    target_word_embedding = ['fasttext', 'glove']  # 'w2v'
     done_list = []
     full_result = []
-    export = 'results/lexical_relation.csv'
+    export = 'results/lexical_relation_all.csv'
     if os.path.exists(export):
         df = pd.read_csv(export, index_col=0)
         done_list = list(set(df['model'].values))
@@ -136,9 +193,22 @@ if __name__ == '__main__':
         if m in done_list:
             continue
         for _feature in pattern:
-            full_result += evaluate(m, feature_set=_feature)
-            full_result += evaluate(m, feature_set=_feature, add_relative=True)
-            full_result += evaluate(m, feature_set=_feature, add_pair2vec=True)
+            full_result += evaluate(m, feature=_feature)
+            if _feature in [('diff', 'dot'), ('concat', 'dot')]:
+                full_result += evaluate(m, feature=_feature, add_relative=True)
+                full_result += evaluate(m, feature=_feature, add_pair2vec=True)
         pd.DataFrame(full_result).to_csv(export)
-
+    # aggregate result
+    export = 'results/lexical_relation.csv'
+    out = []
+    df = pd.DataFrame(full_result)
+    for _m in df.model.unique():
+        for _f in df.feature.unique():
+            for _d in df.data.unique():
+                for _r in df.add_relative.unique():
+                    for _p in df.add_pair2vec.unique():
+                        df_tmp = df[df.model == _m][df.feature == _f][df.data == _d][df.add_relative == _r][df.add_pair2vec == _p]
+                        df_tmp.sort_values(by=['metric/val/f1_macro'], ascending=False)
+                        out.append(df_tmp.head(1))
+    pd.concat(out).to_csv(export)
 
