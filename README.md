@@ -18,7 +18,7 @@ Five different datasets for word analogy. Each contains jsonline files for valid
 ```
 {"stem": ["raphael", "painter"],
  "answer": 2,
- "pmi_pred": 1,
+ "pred/pmi": 1,
  "choice": [["andersen", "plato"],
             ["reading", "berkshire"],
             ["marx", "philosopher"],
