@@ -144,8 +144,8 @@ def evaluate(embedding_model: str = None, feature='concat', add_relative: bool =
     data = get_lexical_relation_data()
     report = []
     for data_name, v in data.items():
-        if data_name != 'CogALexV':
-            continue
+        # if data_name != 'CogALexV':
+        #     continue
         logging.info('train model with {} on {}'.format(embedding_model, data_name))
         label_dict = v.pop('label')
         # preprocess data
@@ -177,9 +177,9 @@ def evaluate(embedding_model: str = None, feature='concat', add_relative: bool =
             pool.close()
         tmp_report = [tmp_report] if type(tmp_report) is not list else tmp_report
         report += tmp_report
-        print(report)
-        print(pd.DataFrame(report))
-        input()
+        # print(report)
+        # print(pd.DataFrame(report))
+        # input()
     del model
     del model_pair
     return report
