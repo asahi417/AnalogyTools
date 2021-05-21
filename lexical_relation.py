@@ -92,9 +92,12 @@ class Evaluate:
         if default_config:
             self.configs = [{'random_state': 0}]
         else:
-            learning_rate_init = [0.001, 0.0001, 0.00001]
-            max_iter = [25, 50, 75]
-            hidden_layer_sizes = [100, 150, 200]
+            # learning_rate_init = [0.001, 0.0001, 0.00001]
+            # max_iter = [25, 50, 75]
+            # hidden_layer_sizes = [100, 150, 200]
+            learning_rate_init = [0.001, 0.0001]
+            max_iter = [25]
+            hidden_layer_sizes = [100]
             self.configs = [{
                 'random_state': 0, 'learning_rate_init': i[0], 'max_iter': i[1],
                 'hidden_layer_sizes': i[2]} for i in
@@ -170,8 +173,8 @@ def evaluate(embedding_model: str = None, feature='concat', add_relative: bool =
             report += pool.map(evaluator, evaluator.config_indices)
             pool.close()
 
-    print(report)
-    print(pd.DataFrame(report))
+        print(report)
+        print(pd.DataFrame(report))
     del model
     del model_pair
     return report
