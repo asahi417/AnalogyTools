@@ -170,19 +170,21 @@ def evaluate(embedding_model: str = None, feature='concat', add_relative: bool =
             report += pool.map(evaluator, evaluator.config_indices)
             pool.close()
 
+    print(report)
+    print(pd.DataFrame(report))
     del model
     del model_pair
     return report
 
 
 if __name__ == '__main__':
-    model = os.getenv('MODEL', 'w2v')
-    print(model)
+    model_name = os.getenv('MODEL', 'w2v')
+    print(model_name)
     # target_word_embedding = ['w2v', 'fasttext', 'glove']
-    target_word_embedding = [model]
+    target_word_embedding = [model_name]
     done_list = []
     full_result = []
-    export = 'results/lexical_relation_all.{}.csv'.format(model)
+    export = 'results/lexical_relation_all.{}.csv'.format(model_name)
     if os.path.exists(export):
         df = pd.read_csv(export, index_col=0)
         done_list = list(set(df['model'].values))
@@ -199,7 +201,7 @@ if __name__ == '__main__':
                 full_result += evaluate(m, feature=_feature, add_pair2vec=True)
         pd.DataFrame(full_result).to_csv(export)
     # aggregate result
-    export = 'results/lexical_relation.{}.csv'.format(model)
+    export = 'results/lexical_relation.{}.csv'.format(model_name)
     out = []
     df = pd.DataFrame(full_result)
     for _m in df.model.unique():
