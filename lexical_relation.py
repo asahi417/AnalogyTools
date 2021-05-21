@@ -144,8 +144,6 @@ def evaluate(embedding_model: str = None, feature='concat', add_relative: bool =
     data = get_lexical_relation_data()
     report = []
     for data_name, v in data.items():
-        # if data_name != 'CogALexV':
-        #     continue
         logging.info('train model with {} on {}'.format(embedding_model, data_name))
         label_dict = v.pop('label')
         # preprocess data
@@ -173,7 +171,6 @@ def evaluate(embedding_model: str = None, feature='concat', add_relative: bool =
             pool = Pool()
             evaluator = Evaluate(dataset, shared_config)
             tmp_report = pool.map(evaluator, evaluator.config_indices)
-
             pool.close()
         tmp_report = [tmp_report] if type(tmp_report) is not list else tmp_report
         report += tmp_report
@@ -186,30 +183,32 @@ def evaluate(embedding_model: str = None, feature='concat', add_relative: bool =
 
 
 if __name__ == '__main__':
-    model_name = os.getenv('MODEL', 'w2v')
-    print(model_name)
-    # target_word_embedding = ['w2v', 'fasttext', 'glove']
-    target_word_embedding = [model_name]
+    # model_name = os.getenv('MODEL', 'w2v')
+    # print(model_name)
+    # target_word_embedding = [model_name]
+    target_word_embedding = ['w2v', 'fasttext', 'glove']
     done_list = []
     full_result = []
-    export = 'results/lexical_relation_all.{}.csv'.format(model_name)
-    # if os.path.exists(export):
-    #     df = pd.read_csv(export, index_col=0)
-    #     done_list = list(set(df['model'].values))
-    #     full_result = [i.to_dict() for _, i in df.iterrows()]
+    # export = 'results/lexical_relation_all.{}.csv'.format(model_name)
+    export = 'results/lexical_relation_all.csv'
+    if os.path.exists(export):
+        df = pd.read_csv(export, index_col=0)
+        done_list = list(set(df[['model', 'feature']].values))
+        full_result = [i.to_dict() for _, i in df.iterrows()]
     logging.info("RUN WORD-EMBEDDING BASELINE")
     pattern = ['diff', 'concat', ('diff', 'dot'), ('concat', 'dot')]
     for m in target_word_embedding:
-        if m in done_list:
-            continue
         for _feature in pattern:
+            if (m, _feature) in done_list:
+                continue
             full_result += evaluate(m, feature=_feature)
             if _feature in [('diff', 'dot'), ('concat', 'dot')]:
                 full_result += evaluate(m, feature=_feature, add_relative=True)
                 full_result += evaluate(m, feature=_feature, add_pair2vec=True)
             pd.DataFrame(full_result).to_csv(export)
     # aggregate result
-    export = 'results/lexical_relation.{}.csv'.format(model_name)
+    # export = 'results/lexical_relation.{}.csv'.format(model_name)
+    export = 'results/lexical_relation.csv'
     out = []
     df = pd.DataFrame(full_result)
     for _m in df.model.unique():
@@ -217,7 +216,8 @@ if __name__ == '__main__':
             for _d in df.data.unique():
                 for _r in df.add_relative.unique():
                     for _p in df.add_pair2vec.unique():
-                        df_tmp = df[df.model == _m][df.feature == _f][df.data == _d][df.add_relative == _r][df.add_pair2vec == _p]
+                        df_tmp = df[df.model == _m][df.feature == _f][df.data == _d][df.add_relative
+                                                                                     == _r][df.add_pair2vec == _p]
                         df_tmp.sort_values(by=['metric/val/f1_macro'], ascending=False)
                         out.append(df_tmp.head(1))
     pd.concat(out).to_csv(export)
