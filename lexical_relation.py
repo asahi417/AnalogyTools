@@ -144,6 +144,8 @@ def evaluate(embedding_model: str = None, feature='concat', add_relative: bool =
     data = get_lexical_relation_data()
     report = []
     for data_name, v in data.items():
+        if data_name != 'CogALexV':
+            continue
         logging.info('train model with {} on {}'.format(embedding_model, data_name))
         label_dict = v.pop('label')
         # preprocess data
@@ -171,6 +173,7 @@ def evaluate(embedding_model: str = None, feature='concat', add_relative: bool =
             pool = Pool()
             evaluator = Evaluate(dataset, shared_config)
             report += pool.map(evaluator, evaluator.config_indices)
+            print(report)
             pool.close()
 
         print(report)
@@ -188,10 +191,10 @@ if __name__ == '__main__':
     done_list = []
     full_result = []
     export = 'results/lexical_relation_all.{}.csv'.format(model_name)
-    if os.path.exists(export):
-        df = pd.read_csv(export, index_col=0)
-        done_list = list(set(df['model'].values))
-        full_result = [i.to_dict() for _, i in df.iterrows()]
+    # if os.path.exists(export):
+    #     df = pd.read_csv(export, index_col=0)
+    #     done_list = list(set(df['model'].values))
+    #     full_result = [i.to_dict() for _, i in df.iterrows()]
     logging.info("RUN WORD-EMBEDDING BASELINE")
     pattern = ['diff', 'concat', ('diff', 'dot'), ('concat', 'dot')]
     for m in target_word_embedding:
@@ -202,7 +205,7 @@ if __name__ == '__main__':
             if _feature in [('diff', 'dot'), ('concat', 'dot')]:
                 full_result += evaluate(m, feature=_feature, add_relative=True)
                 full_result += evaluate(m, feature=_feature, add_pair2vec=True)
-        pd.DataFrame(full_result).to_csv(export)
+            pd.DataFrame(full_result).to_csv(export)
     # aggregate result
     export = 'results/lexical_relation.{}.csv'.format(model_name)
     out = []
