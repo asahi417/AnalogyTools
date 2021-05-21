@@ -123,6 +123,7 @@ class Evaluate:
              'metric/test/f1_macro': t_f_mac,
              'metric/test/f1_micro': t_f_mic,
              'classifier_config': clf.get_params()})
+        print(report, t_accuracy, t_f_mac, t_f_mic)
         if 'val' in self.dataset:
             x, y = self.dataset['val']
             v_accuracy, v_f_mac, v_f_mic = run_test(clf, x, y)
@@ -173,11 +174,11 @@ def evaluate(embedding_model: str = None, feature='concat', add_relative: bool =
             pool = Pool()
             evaluator = Evaluate(dataset, shared_config)
             report += pool.map(evaluator, evaluator.config_indices)
-            print(report)
             pool.close()
 
         print(report)
         print(pd.DataFrame(report))
+        input()
     del model
     del model_pair
     return report
