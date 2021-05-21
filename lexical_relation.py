@@ -1,5 +1,3 @@
-#TODO: to parallelize grid search
-
 import os
 import logging
 from glob import glob
@@ -178,10 +176,13 @@ def evaluate(embedding_model: str = None, feature='concat', add_relative: bool =
 
 
 if __name__ == '__main__':
-    target_word_embedding = ['w2v', 'fasttext', 'glove']
+    model = os.getenv('MODEL', 'w2v')
+    print(model)
+    # target_word_embedding = ['w2v', 'fasttext', 'glove']
+    target_word_embedding = [model]
     done_list = []
     full_result = []
-    export = 'results/lexical_relation_all.csv'
+    export = 'results/lexical_relation_all.{}.csv'.format(model)
     if os.path.exists(export):
         df = pd.read_csv(export, index_col=0)
         done_list = list(set(df['model'].values))
@@ -198,7 +199,7 @@ if __name__ == '__main__':
                 full_result += evaluate(m, feature=_feature, add_pair2vec=True)
         pd.DataFrame(full_result).to_csv(export)
     # aggregate result
-    export = 'results/lexical_relation.csv'
+    export = 'results/lexical_relation.{}.csv'.format(model)
     out = []
     df = pd.DataFrame(full_result)
     for _m in df.model.unique():
