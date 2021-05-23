@@ -189,17 +189,16 @@ if __name__ == '__main__':
     target_word_embedding = ['w2v', 'fasttext', 'glove']
     done_list = []
     full_result = []
-    # export = 'results/lexical_relation_all.{}.csv'.format(model_name)
     export = 'results/lexical_relation_all.csv'
     if os.path.exists(export):
         df = pd.read_csv(export, index_col=0)
-        done_list = list(set(df[['model', 'feature']].values))
+        done_list = df[['model', 'feature']].values.tolist()
         full_result = [i.to_dict() for _, i in df.iterrows()]
     logging.info("RUN WORD-EMBEDDING BASELINE")
     pattern = ['diff', 'concat', ('diff', 'dot'), ('concat', 'dot')]
     for m in target_word_embedding:
         for _feature in pattern:
-            if (m, _feature) in done_list:
+            if [m, str(_feature)] in done_list:
                 continue
             full_result += evaluate(m, feature=_feature)
             if _feature in [('diff', 'dot'), ('concat', 'dot')]:
@@ -218,7 +217,7 @@ if __name__ == '__main__':
                     for _p in df.add_pair2vec.unique():
                         df_tmp = df[df.model == _m][df.feature == _f][df.data == _d][df.add_relative
                                                                                      == _r][df.add_pair2vec == _p]
-                        df_tmp.sort_values(by=['metric/val/f1_macro'], ascending=False)
+                        df_tmp = df_tmp.sort_values(by=['metric/val/f1_macro'], ascending=False)
                         out.append(df_tmp.head(1))
     pd.concat(out).to_csv(export)
 
