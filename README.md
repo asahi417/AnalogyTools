@@ -1,6 +1,6 @@
 # Analogy Tools 
 This repository is a collection of resources for word analogy and lexical relation research.
-- Analogy Test Dataset: [***link***](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/analogy_test_dataset.tar.gz)
+- Analogy Test Dataset: [***link***](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/analogy_test_dataset_no_prediction.tar.gz)
 - Lexical Relation Dataset: [***link***](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/lexical_relation_dataset.tar.gz)
 - RELATIVE embedding model:
     - [GoogleNews-vectors-negative300](https://drive.google.com/file/d/0B7XkCwpI5KDYNlNUTTlSS21pQmM/edit) based model. [***link***](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/relative_init.w2v.bin.tar.gz)
@@ -14,17 +14,20 @@ Aliases of released resource by third party:
 - [BATS_3.0](https://vecto.space/projects/BATS/): [***link***](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/BATS_3.0.zip)
 
 ## Analogy Test Dataset
-Five different datasets for word analogy. Each contains jsonline files for validation and test, in which each line consists of following dictionary,
+We release the five different word analogy dataset in the following links: 
+- [dataset](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/analogy_test_dataset_no_prediction.tar.gz)
+- [dataset with baseline prediction](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/analogy_test_dataset.tar.gz)
+
+The first file contains the dataset while second file has model prediction from PMI and some word embedding models. Each contains jsonline files for validation and test, in which each line consists of following dictionary,
 ```
 {"stem": ["raphael", "painter"],
  "answer": 2,
- "pred/pmi": 1,
  "choice": [["andersen", "plato"],
             ["reading", "berkshire"],
             ["marx", "philosopher"],
             ["tolstoi", "edison"]]}
 ``` 
-where `stem` is the query word pair, `choice` has word pair candidates, `pmi_pred` is statistical baseline
+where `stem` is the query word pair, `choice` has word pair candidates, 
 and `answer` indicates the index of correct candidate. Data statistics are summarized as below.
 
 | Dataset | Size (valid/test) | Num of choice | Num of relation group |
@@ -35,7 +38,14 @@ and `answer` indicates the index of correct candidate. Data statistics are summa
 | google  | 50/500   | 4             | 2                     |
 | bats    | 199/1799 | 4             | 3                     |
 
-All data is lowercased except Google dataset. Please cite our paper if you use the dataset:
+All data is lowercased except Google dataset. The model predictions stored in the dataset can be reproduced by following script.
+```shell script
+python analogy_test.py
+```
+When the model suffers out-of-vocabulary error, we use PMI prediction, `pmi_pred` in each entry, to ensure the baseline can
+be compared with other methods to cover all the data points.   
+
+Please read [our paper](https://arxiv.org/abs/2105.04949) for more information about the dataset and cite it if you use the dataset:
 ```
 @inproceedings{ushio-etal-2021-bert-is,
     title ={{BERT} is to {NLP} what {A}lex{N}et is to {CV}: {C}an {P}re-{T}rained {L}anguage {M}odels {I}dentify {A}nalogies?},
@@ -48,14 +58,6 @@ All data is lowercased except Google dataset. Please cite our paper if you use t
     publisher={Association for Computational Linguistics}
 }
 ```
-
-To get word embedding baseline, 
-```shell script
-python analogy_test.py
-```
-When the model suffers out-of-vocabulary error, we use PMI prediction, `pmi_pred` in each entry, to ensure the baseline can
-be compared with other methods to cover all the data points.   
-
 
 ## Lexical Relation Dataset
 Five different datasets for lexical relation classification used in [SphereRE](https://www.aclweb.org/anthology/P19-1169/).
