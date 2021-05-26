@@ -97,11 +97,6 @@ To reproduce relative model, run the following code.
 ```shell script
 python calculate_relative_embedding.py
 ```
-
-## Project
-- [BERT is to NLP what AlexNet is to CV: Can Pre-Trained Language Models Identify Analogies? (ACL 2021 main conference)](https://github.com/asahi417/analogy-language-model)
-
-## Acknowledgement
-About RELATIVE embedding work, please refer [the official implementation](https://github.com/pedrada88/relative) and
-[the paper](http://josecamachocollados.com/papers/relative_ijcai2019.pdf) for further information.
+Please refer [the official implementation](https://github.com/pedrada88/relative) and
+[the paper](http://josecamachocollados.com/papers/relative_ijcai2019.pdf) for further information about RELATIVE embedding.
 
