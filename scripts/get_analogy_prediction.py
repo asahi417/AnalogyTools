@@ -15,7 +15,7 @@ def cap(_list):
 
 
 if __name__ == '__main__':
-    full_data['bats_cap'] = full_data['bats']
+    # full_data['bats_cap'] = full_data['bats']
     for i in ['bats_cap', 'bats', 'sat', 'u2', 'u4', 'google']:
         val, test = full_data[i]
         for data in [test, val]:
@@ -28,7 +28,7 @@ if __name__ == '__main__':
                 for d, p in zip(data, _pred):
                     d['pred/{}'.format(model_type)] = p
 
-    with open('results/analogy.prediction.json', 'w') as f:
+    with open('../results/analogy.prediction.json', 'w') as f:
         json.dump(full_data, f)
 
 
