@@ -1,7 +1,7 @@
 # Analogy Tools 
 This repository is a collection of resources for word analogy and lexical relation research.
-- Analogy Test Dataset: [***link***](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/analogy_test_dataset_no_prediction.tar.gz)
-- Lexical Relation Dataset: [***link***](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/lexical_relation_dataset.tar.gz)
+- Analogy Test Dataset: [***link***](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/analogy_test_dataset.zip)
+- Lexical Relation Dataset: [***link***](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/lexical_relation_dataset.zip)
 - RELATIVE embedding model:
     - [GoogleNews-vectors-negative300](https://drive.google.com/file/d/0B7XkCwpI5KDYNlNUTTlSS21pQmM/edit) based model. [***link***](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/relative_init.w2v.bin.tar.gz)
     - [wiki-news-300d-1M](https://fasttext.cc/docs/en/english-vectors.html) based model. [***link***](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/relative_init.fasttext.bin.tar.gz)
@@ -18,8 +18,8 @@ The LICENSE of all the resources are under [CC-BY-NC-4.0](./LICENSE). Thus, they
 
 ## Analogy Test Dataset
 We release the five different word analogy dataset in the following links: 
-- [dataset](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/analogy_test_dataset_no_prediction.tar.gz)
-- [dataset with baseline prediction](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/analogy_test_dataset.tar.gz)
+- [dataset](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/analogy_test_dataset.zip)
+- [dataset with baseline prediction](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/analogy_test_dataset_with_prediction.zip)
 
 The first file contains the dataset while second file has model prediction from PMI and some word embedding models. Each contains jsonline files for validation and test, in which each line consists of following dictionary,
 ```
