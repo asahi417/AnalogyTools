@@ -14,7 +14,7 @@ Aliases of released resource by third party:
 - [BATS_3.0](https://vecto.space/projects/BATS/): [***link***](https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/BATS_3.0.zip)
 
 ### LICENSE 
-The LICENSE of all the resources are under [CC-BY-NC-4.0](./LICENSE). Thus, they are freely available for academic purpose or individual research, but restricted for commecial use.
+The LICENSE of all the resources are under [CC-BY-NC-4.0](./LICENSE). Thus, they are freely available for academic purpose or individual research, but restricted for commercial use.
 
 ## Analogy Test Dataset
 We release the five different word analogy dataset in the following links: 
@@ -31,15 +31,15 @@ The first file contains the dataset while second file has model prediction from 
             ["tolstoi", "edison"]]}
 ``` 
 where `stem` is the query word pair, `choice` has word pair candidates, 
-and `answer` indicates the index of correct candidate. Data statistics are summarized as below.
+and `answer` indicates the index of correct candidate which starts from `0`. Data statistics are summarized as below.
 
-| Dataset | Size (valid/test) | Num of choice | Num of relation group |
-|---------|---------:|--------------:|----------------------:|
-| sat     | 37/337   | 5             | 2                     |
-| u2      | 24/228   | 5,4,3         | 9                     |
-| u4      | 48/432   | 5,4,3         | 5                     |
-| google  | 50/500   | 4             | 2                     |
-| bats    | 199/1799 | 4             | 3                     |
+| Dataset | Size (valid/test) | Num of choice | Num of relation group | Original Reference                                                         |
+|---------|------------------:|--------------:|----------------------:|:--------------------------------------------------------------------------:|
+| sat     | 37/337            | 5             | 2                     | [Turney (2005)](https://arxiv.org/pdf/cs/0508053.pdf)                      |
+| u2      | 24/228            | 5,4,3         | 9                     | [EnglishForEveryone](https://englishforeveryone.org/Topics/Analogies.html) |
+| u4      | 48/432            | 5,4,3         | 5                     | [EnglishForEveryone](https://englishforeveryone.org/Topics/Analogies.html) |
+| google  | 50/500            | 4             | 2                     | [Mikolov et al., (2013)](https://www.aclweb.org/anthology/N13-1090.pdf)    |
+| bats    | 199/1799          | 4             | 3                     | [Gladkova et al., (2016)](https://www.aclweb.org/anthology/N18-2017.pdf)   |
 
 All data is lowercased except Google dataset. The model predictions stored in the dataset can be reproduced by following script.
 ```shell script
