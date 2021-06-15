@@ -45,7 +45,7 @@ All data is lowercased except Google dataset. The model predictions stored in th
 ```shell script
 python analogy_test.py
 ```
-When the model suffers out-of-vocabulary error, we use PMI prediction, `pmi_pred` in each entry, to ensure the baseline can
+When the model suffers out-of-vocabulary error, we use PMI prediction to ensure the baseline can
 be compared with other methods to cover all the data points.   
 
 Please read [our paper](https://arxiv.org/abs/2105.04949) for more information about the dataset and cite it if you use the dataset:
