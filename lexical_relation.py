@@ -93,15 +93,15 @@ class Evaluate:
             self.configs = [{'random_state': 0}]
         else:
             learning_rate_init = [0.001, 0.0001, 0.00001]
-            max_iter = [25, 50, 75]
+            # max_iter = [25, 50, 75]
             hidden_layer_sizes = [100, 150, 200]
             # learning_rate_init = [0.001, 0.0001]
             # max_iter = [25]
             # hidden_layer_sizes = [100]
             self.configs = [{
-                'random_state': 0, 'learning_rate_init': i[0], 'max_iter': i[1],
+                'random_state': 0, 'learning_rate_init': i[0],
                 'hidden_layer_sizes': i[2]} for i in
-                            list(product(learning_rate_init, max_iter, hidden_layer_sizes))]
+                            list(product(learning_rate_init, hidden_layer_sizes))]
         self.shared_config = shared_config
 
     @property
