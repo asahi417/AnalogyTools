@@ -48,17 +48,23 @@ python analogy_test.py
 When the model suffers out-of-vocabulary error, we use PMI prediction to ensure the baseline can
 be compared with other methods to cover all the data points.   
 
-Please read [our paper](https://arxiv.org/abs/2105.04949) for more information about the dataset and cite it if you use the dataset:
+Please read [our paper](https://aclanthology.org/2021.acl-long.280/) for more information about the dataset and cite it if you use the dataset:
 ```
-@inproceedings{ushio-etal-2021-bert-is,
-    title ={{BERT} is to {NLP} what {A}lex{N}et is to {CV}: {C}an {P}re-{T}rained {L}anguage {M}odels {I}dentify {A}nalogies?},
-    author={Ushio, Asahi and
-            Espinosa-Anke, Luis and 
-            Schockaert, Steven and
-            Camacho-Collados, Jose},
-    booktitle={Proceedings of the {ACL}-{IJCNLP} 2021 Main Conference},
-    year={2021},
-    publisher={Association for Computational Linguistics}
+@inproceedings{ushio-etal-2021-bert,
+    title = "{BERT} is to {NLP} what {A}lex{N}et is to {CV}: Can Pre-Trained Language Models Identify Analogies?",
+    author = "Ushio, Asahi  and
+      Espinosa Anke, Luis  and
+      Schockaert, Steven  and
+      Camacho-Collados, Jose",
+    booktitle = "Proceedings of the 59th Annual Meeting of the Association for Computational Linguistics and the 11th International Joint Conference on Natural Language Processing (Volume 1: Long Papers)",
+    month = aug,
+    year = "2021",
+    address = "Online",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2021.acl-long.280",
+    doi = "10.18653/v1/2021.acl-long.280",
+    pages = "3609--3624",
+    abstract = "Analogies play a central role in human commonsense reasoning. The ability to recognize analogies such as {``}eye is to seeing what ear is to hearing{''}, sometimes referred to as analogical proportions, shape how we structure knowledge and understand language. Surprisingly, however, the task of identifying such analogies has not yet received much attention in the language model era. In this paper, we analyze the capabilities of transformer-based language models on this unsupervised task, using benchmarks obtained from educational settings, as well as more commonly used datasets. We find that off-the-shelf language models can identify analogies to a certain extent, but struggle with abstract and complex relations, and results are highly sensitive to model architecture and hyperparameters. Overall the best results were obtained with GPT-2 and RoBERTa, while configurations using BERT were not able to outperform word embedding models. Our results raise important questions for future work about how, and to what extent, pre-trained language models capture knowledge about abstract semantic relations.",
 }
 ```
 
