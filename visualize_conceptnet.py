@@ -1,44 +1,3 @@
-import os
-import json
-from tqdm import tqdm
-from glob import glob
-from datasets import load_dataset
-
-export_dir = './data/conceptnet'
-os.makedirs(export_dir, exist_ok=True)
-dataset = load_dataset("conceptnet5", "conceptnet5", split="train")
-dataset = dataset.filter(lambda example: example['lang'] == 'en')
-dataset = dataset.sort('rel')
-
-cur_relation_type = None
-f = None
-for i in tqdm(dataset):
-    if cur_relation_type is None or cur_relation_type != i['rel']:
-        cur_relation_type = i['rel']
-        if f is not None:
-            f.close()
-        f = open(f'{export_dir}/cache_{os.path.basename(cur_relation_type)}.jsonl', 'w')
-    f.write(json.dumps({
-        'rel': i['rel'],
-        'arg1': i['arg1'],
-        'arg2': i['arg2'],
-        'sentence': i['sentence']
-    }) + '\n')
-f.close()
-
-# get statistics
-table = {}
-for i in glob(f'{export_dir}/*.jsonl'):
-    r_type = os.path.basename(i).replace('.jsonl', '')
-    with open(i) as f:
-        data = [json.loads(i) for i in f.read().split('\n') if len(i) > 0]
-    table[r_type] = len(data)
-print(json.dumps(table, indent=4))
-with open(f'data/conceptnet_stats.csv', 'w') as f:
-    json.dump(table, f)
-
-
-
 """
 pip install umap-learn
 pip install hdbscan
@@ -62,10 +21,10 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+from datasets import load_dataset
 from relbert import RelBERT
 from gensim.models import KeyedVectors
 from umap import UMAP
-
 
 MODEL_ALIAS = os.getenv("MODEL_ALIAS", "relbert/relbert-roberta-large-semeval2012-average-prompt-d-nce")
 # MODEL_ALIAS = os.getenv("MODEL_ALIAS", "relbert/relbert-roberta-large-semeval2012-average-no-mask-prompt-d-triplet")
@@ -79,6 +38,43 @@ figure_file = f"data/{os.path.basename(MODEL_ALIAS)}.figure"
 
 def get_term(arg):
     return arg.split('/en/')[-1].split('/')[0]
+
+
+######################
+# PROCESS CONCEPTNET #
+######################
+if len(glob(f'{concept_net_processed_file_dir}/*.jsonl')) == 0:
+    os.makedirs(concept_net_processed_file_dir, exist_ok=True)
+    dataset = load_dataset("conceptnet5", "conceptnet5", split="train")
+    dataset = dataset.filter(lambda example: example['lang'] == 'en')
+    dataset = dataset.sort('rel')
+
+    cur_relation_type = None
+    f = None
+    for i in tqdm(dataset):
+        if cur_relation_type is None or cur_relation_type != i['rel']:
+            cur_relation_type = i['rel']
+            if f is not None:
+                f.close()
+            _file = f'{concept_net_processed_file_dir}/cache_{os.path.basename(cur_relation_type)}.jsonl'
+            f = open(_file, 'w')
+        f.write(json.dumps({
+            'rel': i['rel'],
+            'arg1': i['arg1'],
+            'arg2': i['arg2'],
+            'sentence': i['sentence']
+        }) + '\n')
+    f.close()
+    # get statistics
+    table = {}
+    for i in glob(f'{concept_net_processed_file_dir}/*.jsonl'):
+        r_type = os.path.basename(i).replace('.jsonl', '')
+        with open(i) as f:
+            data = [json.loads(i) for i in f.read().split('\n') if len(i) > 0]
+        table[r_type] = len(data)
+    print(json.dumps(table, indent=4))
+    with open(f'data/conceptnet_stats.csv', 'w') as f:
+        json.dump(table, f)
 
 
 #################

@@ -62,7 +62,7 @@ def embedding_model(model_name):
                 v_b = model[b]
             except KeyError:
                 v_b = 0
-            if v_a == 0 and v_b == 0:
+            if type(v_a) is int and type(v_b) is int:
                 return 0
             return (v_a - v_b).tolist()
             # return (model[a] - model[b]).tolist()
@@ -72,7 +72,7 @@ def embedding_model(model_name):
 
 
 def cosine_similarity(a, b):
-    if a == 0 or b == 0:
+    if type(a) is int or type(b) is int:
         return 0
     return dot(a, b) / (norm(a) * norm(b) + 1e-4)
 
