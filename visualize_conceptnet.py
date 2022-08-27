@@ -82,9 +82,8 @@ if len(glob(f'{concept_net_processed_file_dir}/*.jsonl')) == 0:
 
 
 if not os.path.exists(f'{gensim_file}.bin'):
-    BATCH = int(os.getenv("BATCH", "1024"))
     CHUNK = int(os.getenv("CHUNK", "10240"))
-    model = get_embedding_interface(MODEL_ALIAS)
+    model, vector_size = get_embedding_interface(MODEL_ALIAS)
     word_pairs = []
     for i in glob(f'{concept_net_processed_file_dir}/*.jsonl'):
         with open(i) as f:
@@ -101,13 +100,20 @@ if not os.path.exists(f'{gensim_file}.bin'):
     pbar = tqdm(total=len(word_pairs))
     print(f'generate gensim file `{gensim_file}.txt`')
     with open(f'{gensim_file}.txt', 'w', encoding='utf-8') as f:
-        f.write(str(len(word_pairs)) + " " + str(model.model.config.hidden_size) + "\n")
+        f.write(str(len(word_pairs)) + " " + str(vector_size) + "\n")
         while True:
             if chunk_start == chunk_end:
                 break
             word_pairs_chunk = word_pairs[chunk_start:chunk_end]
-            vector = model(word_pairs_chunk, batch_size=BATCH)
+            vector = []
+            for i in word_pairs_chunk:
+                v = model(*i)
+                if type(v) is int:
+                    v = None
+                vector.append(v)
             for n, (token_i, token_j) in enumerate(word_pairs_chunk):
+                if vector[n] is None:
+                    continue
                 token_i, token_j = token_i.replace(' ', '_'), token_j.replace(' ', '_')
                 f.write('__'.join([token_i, token_j]))
                 for y in vector[n]:
@@ -168,8 +174,11 @@ if not os.path.exists(f'{cluster_file}.json'):
         keys = []
         for a, b in v:
             key = f'{a}__{b}'
-            keys.append(key)
-            embeddings.append(model[key])
+            try:
+                embeddings.append(model[key])
+                keys.append(key)
+            except KeyError:
+                pass
         data = np.stack(embeddings)  # data x dimension
 
         # clustering
@@ -235,8 +244,11 @@ if not os.path.exists(f'{embedding_file}.npy') or not os.path.exists(f'{embeddin
 
         # get embedding
         for a, b in v:
-            embeddings.append(model[f'{a}__{b}'])
-            relation_types.append(relation_type)
+            try:
+                embeddings.append(model[f'{a}__{b}'])
+                relation_types.append(relation_type)
+            except KeyError:
+                pass
 
     data = np.stack(embeddings)  # data x dimension
 

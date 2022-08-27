@@ -28,7 +28,7 @@ def get_embedding_interface(model_name):
             return (v_a - v_b).tolist()
     else:
         raise ValueError(f'unknown model {model_name}')
-    return get_embedding
+    return get_embedding, model.vector_size
 
 
 def get_word_embedding_model(model_name: str = 'fasttext'):
@@ -39,10 +39,8 @@ def get_word_embedding_model(model_name: str = 'fasttext'):
         if not os.path.exists(path):
             print('downloading {}'.format(model_name))
             wget(
-                url="https://drive.google.com/u/0/uc?id=0B7XkCwpI5KDYNlNUTTlSS21pQmM&export=download",
-                cache_dir='./cache',
-                gdrive_filename='GoogleNews-vectors-negative300.bin.gz'
-            )
+                url="https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/GoogleNews-vectors-negative300.bin.gz",
+                cache_dir='./cache')
         model = KeyedVectors.load_word2vec_format(path, binary=True)
     elif model_name == 'fasttext_cc':
         path = './cache/crawl-300d-2M-subword.bin'
@@ -91,6 +89,7 @@ def get_word_embedding_model(model_name: str = 'fasttext'):
 
 def wget(url, cache_dir: str, gdrive_filename: str = None):
     """ wget and uncompress data_iterator """
+    print(url)
     path = _wget(url, cache_dir, gdrive_filename=gdrive_filename)
     if path.endswith('.tar.gz') or path.endswith('.tgz') or path.endswith('.tar'):
         if path.endswith('.tar'):
@@ -115,6 +114,7 @@ def wget(url, cache_dir: str, gdrive_filename: str = None):
 def _wget(url: str, cache_dir, gdrive_filename: str = None):
     """ get data from web """
     os.makedirs(cache_dir, exist_ok=True)
+    print(url)
     if url.startswith('https://drive.google.com'):
         assert gdrive_filename is not None, 'please provide fileaname for gdrive download'
         return gdown.download(url, '{}/{}'.format(cache_dir, gdrive_filename), quiet=False)

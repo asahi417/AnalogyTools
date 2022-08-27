@@ -83,7 +83,7 @@ def evaluate_relation_mapping(word_embedding_model: str,
         if len(inputs) == 0:
             continue
         if model is None:
-            model = get_embedding_interface(word_embedding_model)
+            model, vector_size = get_embedding_interface(word_embedding_model)
         vector = []
         for i in tqdm(inputs):
             vector.append(model(*i))
