@@ -39,7 +39,7 @@ def get_word_embedding_model(model_name: str = 'fasttext'):
         if not os.path.exists(path):
             print('downloading {}'.format(model_name))
             wget(
-                url="https://github.com/asahi417/AnalogyTools/releases/download/0.0.0/GoogleNews-vectors-negative300.bin.gz",
+                url="https://huggingface.co/relbert/word_embedding_models/resolve/main/GoogleNews-vectors-negative300.bin",
                 cache_dir='./cache')
         model = KeyedVectors.load_word2vec_format(path, binary=True)
     elif model_name == 'fasttext_cc':
@@ -56,18 +56,15 @@ def get_word_embedding_model(model_name: str = 'fasttext'):
             print('downloading {}'.format(model_name))
             wget(
                 url='https://dl.fbaipublicfiles.com/fasttext/vectors-english/wiki-news-300d-1M.vec.zip',
-                cache_dir='./cache'
-            )
+                cache_dir='./cache')
         model = KeyedVectors.load_word2vec_format(path)
     elif model_name == 'glove':
         path = './cache/glove.840B.300d.gensim.bin'
         if not os.path.exists(path):
             print('downloading {}'.format(model_name))
             wget(
-                url='https://drive.google.com/u/0/uc?id=1DbLuxwDlTRDbhBroOVgn2_fhVUQAVIqN&export=download',
-                cache_dir='./cache',
-                gdrive_filename='glove.840B.300d.gensim.bin.tar.gz'
-            )
+                url='https://huggingface.co/relbert/word_embedding_models/resolve/main/glove.840B.300d.gensim.bin',
+                cache_dir='./cache')
         model = KeyedVectors.load_word2vec_format(path, binary=True)
     elif model_name == 'pair2vec':
         path = './cache/pair2vec.fasttext.bin'
@@ -89,7 +86,6 @@ def get_word_embedding_model(model_name: str = 'fasttext'):
 
 def wget(url, cache_dir: str, gdrive_filename: str = None):
     """ wget and uncompress data_iterator """
-    print(url)
     path = _wget(url, cache_dir, gdrive_filename=gdrive_filename)
     if path.endswith('.tar.gz') or path.endswith('.tgz') or path.endswith('.tar'):
         if path.endswith('.tar'):
@@ -114,7 +110,6 @@ def wget(url, cache_dir: str, gdrive_filename: str = None):
 def _wget(url: str, cache_dir, gdrive_filename: str = None):
     """ get data from web """
     os.makedirs(cache_dir, exist_ok=True)
-    print(url)
     if url.startswith('https://drive.google.com'):
         assert gdrive_filename is not None, 'please provide fileaname for gdrive download'
         return gdown.download(url, '{}/{}'.format(cache_dir, gdrive_filename), quiet=False)

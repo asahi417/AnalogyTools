@@ -3,8 +3,8 @@ pip install umap-learn
 pip install hdbscan
 pip install seaborn
 
-export MODEL_ALIAS=relbert/relbert-roberta-large-semeval2012-average-prompt-d-nce
-python main.py
+export MODEL_ALIAS=fasttext
+python visualize_conceptnet.py
 
 export MODEL_ALIAS=relbert/relbert-roberta-large-semeval2012-average-no-mask-prompt-d-triplet
 python main.py
@@ -32,7 +32,7 @@ concept_net_processed_file_dir = './cache/conceptnet'
 gensim_file = f"cache/{os.path.basename(MODEL_ALIAS)}"
 cluster_file = f"cache/{os.path.basename(MODEL_ALIAS)}.cluster"
 embedding_file = f"cache/{os.path.basename(MODEL_ALIAS)}.embedding"
-figure_file = f"cache/{os.path.basename(MODEL_ALIAS)}.figure"
+figure_file = f"results/conceptnet.visualization.{os.path.basename(MODEL_ALIAS)}.png"
 
 
 def get_term(arg):
@@ -109,11 +109,9 @@ if not os.path.exists(f'{gensim_file}.bin'):
             for i in word_pairs_chunk:
                 v = model(*i)
                 if type(v) is int:
-                    v = None
+                    v = [0] * vector_size
                 vector.append(v)
             for n, (token_i, token_j) in enumerate(word_pairs_chunk):
-                if vector[n] is None:
-                    continue
                 token_i, token_j = token_i.replace(' ', '_'), token_j.replace(' ', '_')
                 f.write('__'.join([token_i, token_j]))
                 for y in vector[n]:
@@ -174,11 +172,11 @@ if not os.path.exists(f'{cluster_file}.json'):
         keys = []
         for a, b in v:
             key = f'{a}__{b}'
-            try:
-                embeddings.append(model[key])
-                keys.append(key)
-            except KeyError:
-                pass
+            vector = model[key]
+            if np.sum(vector) == 0:
+                continue
+            embeddings.append(vector)
+            keys.append(key)
         data = np.stack(embeddings)  # data x dimension
 
         # clustering
@@ -284,4 +282,4 @@ plt.legend(handles=scatter.legend_elements(num=len(relation_type_dict))[0],
            labels=unique_relation_types,
            bbox_to_anchor=(1.04, 1),
            borderaxespad=0)
-plt.savefig(f'{figure_file}.png', bbox_inches='tight')
+plt.savefig(figure_file, bbox_inches='tight')
