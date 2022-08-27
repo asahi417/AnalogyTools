@@ -22,18 +22,17 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from datasets import load_dataset
-from relbert import RelBERT
 from gensim.models import KeyedVectors
 from umap import UMAP
+from util import get_embedding_interface
 
-MODEL_ALIAS = os.getenv("MODEL_ALIAS", "relbert/relbert-roberta-large-semeval2012-average-prompt-d-nce")
-# MODEL_ALIAS = os.getenv("MODEL_ALIAS", "relbert/relbert-roberta-large-semeval2012-average-no-mask-prompt-d-triplet")
+MODEL_ALIAS = os.getenv("MODEL_ALIAS", "fasttext_cc")
 
-concept_net_processed_file_dir = './data/conceptnet'
-gensim_file = f"data/{os.path.basename(MODEL_ALIAS)}"
-cluster_file = f"data/{os.path.basename(MODEL_ALIAS)}.cluster"
-embedding_file = f"data/{os.path.basename(MODEL_ALIAS)}.embedding"
-figure_file = f"data/{os.path.basename(MODEL_ALIAS)}.figure"
+concept_net_processed_file_dir = './cache/conceptnet'
+gensim_file = f"cache/{os.path.basename(MODEL_ALIAS)}"
+cluster_file = f"cache/{os.path.basename(MODEL_ALIAS)}.cluster"
+embedding_file = f"cache/{os.path.basename(MODEL_ALIAS)}.embedding"
+figure_file = f"cache/{os.path.basename(MODEL_ALIAS)}.figure"
 
 
 def get_term(arg):
@@ -73,17 +72,19 @@ if len(glob(f'{concept_net_processed_file_dir}/*.jsonl')) == 0:
             data = [json.loads(i) for i in f.read().split('\n') if len(i) > 0]
         table[r_type] = len(data)
     print(json.dumps(table, indent=4))
-    with open(f'data/conceptnet_stats.csv', 'w') as f:
+    with open(f'cache/conceptnet_stats.csv', 'w') as f:
         json.dump(table, f)
 
 
 #################
 # GET EMBEDDING #
 #################
+
+
 if not os.path.exists(f'{gensim_file}.bin'):
     BATCH = int(os.getenv("BATCH", "1024"))
     CHUNK = int(os.getenv("CHUNK", "10240"))
-    model = RelBERT(MODEL_ALIAS, max_length=128)
+    model = get_embedding_interface(MODEL_ALIAS)
     word_pairs = []
     for i in glob(f'{concept_net_processed_file_dir}/*.jsonl'):
         with open(i) as f:
@@ -105,7 +106,7 @@ if not os.path.exists(f'{gensim_file}.bin'):
             if chunk_start == chunk_end:
                 break
             word_pairs_chunk = word_pairs[chunk_start:chunk_end]
-            vector = model.get_embedding(word_pairs_chunk, batch_size=BATCH)
+            vector = model(word_pairs_chunk, batch_size=BATCH)
             for n, (token_i, token_j) in enumerate(word_pairs_chunk):
                 token_i, token_j = token_i.replace(' ', '_'), token_j.replace(' ', '_')
                 f.write('__'.join([token_i, token_j]))
@@ -191,7 +192,7 @@ if not os.path.exists(f'{cluster_file}.json'):
                 _cluster[_v] = [_k]
         cluster[k] = _cluster
 
-    with open('data/conceptnet_clusters.json', 'w') as f:
+    with open('cache/conceptnet_clusters.json', 'w') as f:
         json.dump(cluster, f)
 
     pd.DataFrame(cluster).sort_index().to_csv(f'{cluster_file}.csv')

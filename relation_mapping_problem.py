@@ -46,29 +46,7 @@ from tqdm import tqdm
 from numpy import dot
 from numpy.linalg import norm
 from datasets import load_dataset
-from util import get_word_embedding_model
-
-
-def embedding_model(model_name):
-    if model_name in ['fasttext', 'fasttext_cc']:
-        model = get_word_embedding_model(model_name)
-
-        def get_embedding(a, b):
-            try:
-                v_a = model[a]
-            except KeyError:
-                v_a = 0
-            try:
-                v_b = model[b]
-            except KeyError:
-                v_b = 0
-            if type(v_a) is int and type(v_b) is int:
-                return 0
-            return (v_a - v_b).tolist()
-            # return (model[a] - model[b]).tolist()
-    else:
-        raise ValueError(f'unknown model {model_name}')
-    return get_embedding
+from util import get_embedding_interface
 
 
 def cosine_similarity(a, b):
@@ -105,7 +83,7 @@ def evaluate_relation_mapping(word_embedding_model: str,
         if len(inputs) == 0:
             continue
         if model is None:
-            model = embedding_model(word_embedding_model)
+            model = get_embedding_interface(word_embedding_model)
         vector = []
         for i in tqdm(inputs):
             vector.append(model(*i))

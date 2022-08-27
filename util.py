@@ -10,6 +10,27 @@ from gensim.models import KeyedVectors
 from gensim.models import fasttext
 
 
+def get_embedding_interface(model_name):
+    if model_name in ['fasttext', 'fasttext_cc', 'w2v', 'glove']:
+        model = get_word_embedding_model(model_name)
+
+        def get_embedding(a, b):
+            try:
+                v_a = model[a]
+            except KeyError:
+                v_a = 0
+            try:
+                v_b = model[b]
+            except KeyError:
+                v_b = 0
+            if type(v_a) is int and type(v_b) is int:
+                return 0
+            return (v_a - v_b).tolist()
+    else:
+        raise ValueError(f'unknown model {model_name}')
+    return get_embedding
+
+
 def get_word_embedding_model(model_name: str = 'fasttext'):
     """ get word embedding model """
     os.makedirs('./cache', exist_ok=True)
