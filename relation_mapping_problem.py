@@ -52,13 +52,28 @@ from util import get_word_embedding_model
 def embedding_model(model_name):
     if model_name in ['fasttext', 'fasttext_cc']:
         model = get_word_embedding_model(model_name)
-        def get_embedding(a, b): return (model[a] - model[b]).tolist()
+
+        def get_embedding(a, b):
+            try:
+                v_a = model[a]
+            except KeyError:
+                v_a = 0
+            try:
+                v_b = model[b]
+            except KeyError:
+                v_b = 0
+            if v_a == 0 and v_b == 0:
+                return 0
+            return (v_a - v_b).tolist()
+            # return (model[a] - model[b]).tolist()
     else:
         raise ValueError(f'unknown model {model_name}')
     return get_embedding
 
 
 def cosine_similarity(a, b):
+    if a == 0 or b == 0:
+        return 0
     return dot(a, b) / (norm(a) * norm(b) + 1e-4)
 
 
@@ -155,7 +170,7 @@ def evaluate_relation_mapping(word_embedding_model: str,
 
 if __name__ == '__main__':
     result = {}
-    for w2v_models in ['fasttext_cc']:
+    for w2v_models in ['fasttext_cc', 'fasttext', 'w2v', 'glove']:
         _mean_accuracy, _, _perms_full = evaluate_relation_mapping(w2v_models, 'max')
         result[w2v_models] = {"accuracy": _mean_accuracy, "prediction": _perms_full}
     with open('results/relation_mapping.json', 'w') as _f:
