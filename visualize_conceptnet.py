@@ -199,7 +199,7 @@ if not os.path.exists(f'{cluster_file}.json'):
                 _cluster[_v] = [_k]
         cluster[k] = _cluster
 
-    with open('cache/conceptnet_clusters.json', 'w') as f:
+    with open(f'{cluster_file}.json', 'w') as f:
         json.dump(cluster, f)
 
     pd.DataFrame(cluster).sort_index().to_csv(f'{cluster_file}.csv')
