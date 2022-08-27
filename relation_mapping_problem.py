@@ -148,7 +148,7 @@ def evaluate_relation_mapping(word_embedding_model: str,
 
 if __name__ == '__main__':
     result = {}
-    for w2v_models in ['fasttext_cc', 'fasttext', 'w2v', 'glove']:
+    for w2v_models in ['w2v', 'glove', 'fasttext_cc', 'fasttext']:
         _mean_accuracy, _, _perms_full = evaluate_relation_mapping(w2v_models, 'max')
         result[w2v_models] = {"accuracy": _mean_accuracy, "prediction": _perms_full}
     with open('results/relation_mapping.json', 'w') as _f:
