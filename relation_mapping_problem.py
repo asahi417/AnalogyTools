@@ -135,7 +135,6 @@ def evaluate_relation_mapping(word_embedding_model: str,
             perms.append({'target': tmp_target, 'similarity_mean': mean(list_sim), 'similarity_max': max(list_sim)})
         sims_full.extend([{'pair': k, 'sim': v, 'data_id': data_id} for k, v in sim.items()])
         pred = sorted(perms, key=lambda _x: _x[f'similarity_{aggregation}'], reverse=True)
-        # accuracy.extend([t == p for t, p in zip(target, pred[0]['target'])])
         accuracy.append(mean([int(t == p) for t, p in zip(target, pred[0]['target'])]))
         tmp = [i for i in perms if list(i['target']) == target]
         assert len(tmp) == 1, perms
@@ -155,5 +154,10 @@ def evaluate_relation_mapping(word_embedding_model: str,
 
 
 if __name__ == '__main__':
+    result = {}
     for w2v_models in ['fasttext_cc']:
-        evaluate_relation_mapping(w2v_models, 'max')
+        _mean_accuracy, _, _perms_full = evaluate_relation_mapping(w2v_models, 'max')
+        result[w2v_models] = {"accuracy": _mean_accuracy, "prediction": _perms_full}
+    with open('results/relation_mapping.json', 'w') as _f:
+        json.dump(result, _f)
+
