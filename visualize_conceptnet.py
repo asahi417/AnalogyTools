@@ -6,8 +6,14 @@ pip install seaborn
 export MODEL_ALIAS=fasttext
 python visualize_conceptnet.py
 
-export MODEL_ALIAS=relbert/relbert-roberta-large-semeval2012-average-no-mask-prompt-d-triplet
-python main.py
+export MODEL_ALIAS=fasttext_cc
+python visualize_conceptnet.py
+
+export MODEL_ALIAS=w2v
+python visualize_conceptnet.py
+
+export MODEL_ALIAS=glove
+python visualize_conceptnet.py
 """
 
 import os
