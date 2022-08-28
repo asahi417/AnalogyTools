@@ -30,7 +30,7 @@ MODEL_ALIAS = os.getenv("MODEL_ALIAS", "fasttext_cc")
 
 concept_net_processed_file_dir = './cache/conceptnet'
 gensim_file = f"cache/{os.path.basename(MODEL_ALIAS)}"
-cluster_file = f"cache/{os.path.basename(MODEL_ALIAS)}.cluster"
+cluster_file = f"cache/conceptnet.{os.path.basename(MODEL_ALIAS)}.cluster"
 embedding_file = f"cache/{os.path.basename(MODEL_ALIAS)}.embedding"
 figure_file = f"results/conceptnet.visualization.{os.path.basename(MODEL_ALIAS)}.png"
 
